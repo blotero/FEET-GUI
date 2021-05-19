@@ -1,6 +1,7 @@
 #GCPDS - Universidad Nacional de Colombia
 #Proyecto caracterización termográfica de extremidades inferiores durante aplicación de anestesia epidural
 # Mayo de 2021
+#Disponible en https//:github.com/blotero/FEET-GUI
 
 import os
 from pathlib import Path
@@ -25,7 +26,15 @@ class Window(QMainWindow):
         self.imgs = []
         self.subj = []
         self.figlabels = Image.open('figlabels.png')
+        self.make_connect()
 
+    def make_connect(self):
+        QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment)
+        QObject.connect(self.ui_window.tempButton, SIGNAL ('clicked()'), self.temp_extract)
+        QObject.connect(self.ui_window.manualSegButton, SIGNAL ('clicked()'), self.manual_segment)
+        QObject.connect(self.ui_window.actionCargar_imagen, SIGNAL ('triggered()'), self.abrir_imagen)
+        QObject.connect(self.ui_window.actionCarpeta_de_imagenes , SIGNAL ('triggered()'), self.abrir_carpeta)
+ 
     def load_ui(self):
         loader = QUiLoader()        
         path = os.fspath(Path(__file__).resolve().parent / "form.ui")
@@ -47,6 +56,7 @@ class Window(QMainWindow):
         print("Se abrirá diálogo de extracción manual")
         self.manual=manualSeg()
         self.manual.show()
+        return
 
     def temp_extract(self):
         print("Se extraerá temperatura")
@@ -57,13 +67,12 @@ class Window(QMainWindow):
     def abrir_imagen(self):
         self.filedialog=QFileDialog(self)
         self.filedialog.setDirectory(QDir.currentPath())        
-        if self.filedialog.exec_() == QDialog.Accepted:
-            return self.imgs.append( self.filedialog.selectedUrls()[0])           
-       
+        opdir=self.filedialog.getOpenFileName(None)
+
     def abrir_carpeta(self):
         print("Se abrirá la carpeta")
         self.filedialog=QFileDialog(self)
-        self.filedialog.setDirectory('/home/brandon/FEET_GUI/piecitos/database/Images/users/lauralrh')        
+        self.filedialog.setDirectory(QDir.currentPath())        
         #if self.filedialog.exec_() == QDialog.Accepted:
         return self.filedialog.selectedUrls()[0]      
         
@@ -73,14 +82,5 @@ class Window(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
-
-    QObject.connect(window.ui_window.segButton, SIGNAL ('clicked()'), window.segment)
-    QObject.connect(window.ui_window.tempButton, SIGNAL ('clicked()'), window.temp_extract)
-    QObject.connect(window.ui_window.manualSegButton, SIGNAL ('clicked()'), window.manual_segment)
-    QObject.connect(window.ui_window.actionCargar_imagen, SIGNAL ('triggered()'), window.abrir_imagen)
-    QObject.connect(window.ui_window.actionCargar_imagen, SIGNAL ('triggered()'), window.abrir_imagen)
-    QObject.connect(window.ui_window.actionCargar_imagen, SIGNAL ('triggered()'), window.abrir_imagen)
-    QObject.connect(window.ui_window.actionCarpeta_de_imagenes , SIGNAL ('triggered()'), window.abrir_carpeta)
     window.ui_window.show()   
-
     sys.exit(app.exec_())
