@@ -4,9 +4,9 @@
 #Disponible en https//:github.com/blotero/FEET-GUI
 
 import os
+from PIL import Image
 from pathlib import Path
 import sys
-from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -25,7 +25,7 @@ class Window(QMainWindow):
         self.figlabels()
         self.imgs = []
         self.subj = []
-        self.figlabels = Image.open('figlabels.png')
+       # self.figlabels = cv2.imread('figlabels.png')
         self.make_connect()
 
     def make_connect(self):
@@ -62,12 +62,17 @@ class Window(QMainWindow):
         print("Se extraerá temperatura")
     
     def figlabels(self):
-        img=Image.open('figlabels.png')
+        pass
+
 
     def abrir_imagen(self):
         self.filedialog=QFileDialog(self)
         self.filedialog.setDirectory(QDir.currentPath())        
-        opdir=self.filedialog.getOpenFileName(None)
+        opdir=self.filedialog.getOpenFileName(self ,"Open Image", "Image Files (*.png *.jpg *bmp)")
+        print(opdir)
+        self.input_img=Image.open(opdir[0])
+        plt.imshow(np.array(self.input_img))
+        plt.show()
 
     def abrir_carpeta(self):
         print("Se abrirá la carpeta")
@@ -82,5 +87,6 @@ class Window(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
-    window.ui_window.show()   
+    window.show()
+    A = window.ui_window.show()  
     sys.exit(app.exec_())
