@@ -11,9 +11,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from PySide2.QtWidgets import QApplication, QMainWindow, QGraphicsView, QLabel, QPushButton, QTextBrowser, QAction, QFileDialog, QDialog, QDialog
-from PySide2.QtCore import QFile, QObject, SIGNAL, QDir
-from PySide2.QtUiTools import QUiLoader
-from PySide2.QtGui import QImage, QPixmap
+from PySide2.QtCore import QFile, QObject, SIGNAL, QDir 
+from PySide2.QtUiTools import QUiLoader 
+from PySide2.QtGui import QImage, QPixmap 
 from segment import Image_2_seg
 from manualseg import manualSeg
 
@@ -27,13 +27,17 @@ class Window(QMainWindow):
         self.subj = []
        # self.figlabels = cv2.imread('figlabels.png')
         self.make_connect()
+        self.inputExists = False
+        self.defaultDirectoryExists = False
 
     def make_connect(self):
         QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment)
         QObject.connect(self.ui_window.tempButton, SIGNAL ('clicked()'), self.temp_extract)
         QObject.connect(self.ui_window.manualSegButton, SIGNAL ('clicked()'), self.manual_segment)
-        QObject.connect(self.ui_window.actionCargar_imagen, SIGNAL ('triggered()'), self.abrir_imagen)
-        QObject.connect(self.ui_window.actionCarpeta_de_imagenes , SIGNAL ('triggered()'), self.abrir_carpeta)
+        QObject.connect(self.ui_window.actionCargar_imagen, SIGNAL ('triggered()'), self.openImage)
+        QObject.connect(self.ui_window.actionCargar_carpeta , SIGNAL ('triggered()'), self.openFolder)
+        QObject.connect(self.ui_window.refreshTimePlot , SIGNAL ('clicked()'), self.makeTimePlot)
+ 
  
     def load_ui(self):
         loader = QUiLoader()        
@@ -47,10 +51,21 @@ class Window(QMainWindow):
         im = Image_2_seg()
         im.extract()
         print(im.bin_img)
+        self.ui_window.outputImg.setPixmap(self.opdir)
 
     def segment(self):
-        self.ui_window.textBrowser.setSource('out.html')
-        self.feet_segment()
+        out_file = open("out.html" , "w")
+        if self.inputExists:
+            out_file.write("Imagen segmentada exitosamente")
+            out_file.close()
+            self.ui_window.textBrowser.setSource('out.html')
+            self.ui_window.textBrowser.reload()
+            self.feet_segment()
+        else:
+            out_file.write("No se ha seleccionado imagen de entrada")
+            out_file.close()
+            self.ui_window.textBrowser.setSource('out.html')
+            self.ui_window.textBrowser.reload()
 
     def manual_segment(self):
         print("Se abrirá diálogo de extracción manual")
@@ -59,34 +74,63 @@ class Window(QMainWindow):
         return
 
     def temp_extract(self):
-        print("Se extraerá temperatura")
+        out_file = open("out.html" , "w")
+        if self.inputExists:
+            out_file.write("Se extrajo temperatura exitosamente")
+            out_file.close()
+            self.ui_window.textBrowser.setSource('out.html')
+            self.ui_window.textBrowser.reload()
+        else:
+            out_file.write("No se ha seleccionado imagen de entrada")
+            out_file.close()
+            self.ui_window.textBrowser.setSource('out.html')
+            self.ui_window.textBrowser.reload()
     
     def figlabels(self):
         pass
 
+    def openImage(self):
+        self.fileDialog=QFileDialog(self)
+        if self.defaultDirectoryExists:
+            self.fileDialog.setDirectory(self.defaultDirectory)
+        else:
+            self.fileDialog.setDirectory(QDir.currentPath())        
+        filters =  ["*.png", "*.xpm", "*.jpg"]
+        self.fileDialog.setNameFilters("Images (*.png *.jpg)")
+        self.fileDialog.selectNameFilter("Images (*.png *.jpg)")
+        #self.fileDialog.setFilter(self.fileDialog.selectedNameFilter())
+        self.opdir = self.fileDialog.getOpenFileName()[0]
+        if self.opdir:
+            self.inputExists = True
+            self.ui_window.inputImg.setPixmap(self.opdir)
 
-    def abrir_imagen(self):
-        self.filedialog=QFileDialog(self)
-        self.filedialog.setDirectory(QDir.currentPath())        
-        opdir=self.filedialog.getOpenFileName(self ,"Open Image", "Image Files (*.png *.jpg *bmp)")
-        print(opdir)
-        self.input_img=Image.open(opdir[0])
-        plt.imshow(np.array(self.input_img))
-        plt.show()
+    def openFolder(self):
+        self.folderDialog=QFileDialog(self)
+        self.folderDialog.setDirectory(QDir.currentPath())        
+        self.folderDialog.setFileMode(QFileDialog.FileMode.Directory)
+        self.defaultDirectory = self.folderDialog.getExistingDirectory()
+        if self.defaultDirectory:
+            self.defaultDirectoryExists = True
+            print(self.defaultDirectory) 
 
-    def abrir_carpeta(self):
-        print("Se abrirá la carpeta")
-        self.filedialog=QFileDialog(self)
-        self.filedialog.setDirectory(QDir.currentPath())        
-        #if self.filedialog.exec_() == QDialog.Accepted:
-        return self.filedialog.selectedUrls()[0]      
-        
-    def abrir_proyecto(self):
-        print("Se abrirá un proyecto de extensión .feet")
+    def makeTimePlot(self):
+        x=np.array([0,1,5,10,15,20])
+        y=np.array([35.5, 35.7 , 36 , 37.2 , 37.3, 37.5])
+        fig=plt.figure(figsize=(9.6,4))
+        plt.plot(x,y,label='Paciente 1')
+        plt.legend()
+        plt.grid()
+        plt.xlabel("Tiempo [minutos]")
+        plt.ylabel("Temperatura [°C]")
+        plt.title("Time plot")
+        #plt.show()
+        plt.savefig('fresh.png')
+        self.ui_window.timePlot.setPixmap('fresh.png')
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
     window.show()
-    A = window.ui_window.show()  
+    window.ui_window.show()  
     sys.exit(app.exec_())
