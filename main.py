@@ -48,9 +48,10 @@ class Window(QMainWindow):
         ui_file.close()
 
     def feet_segment(self):
-        im = Image_2_seg()
-        im.extract()
-        print(im.bin_img)
+        self.i2s = Image_2_seg()
+        self.i2s.setPath(self.opdir)
+        self.i2s.extract()
+        print(self.i2s.Y_pred)
         self.ui_window.outputImg.setPixmap(self.opdir)
 
     def segment(self):
