@@ -1,7 +1,7 @@
-#GCPDS - Universidad Nacional de Colombia
-#Proyecto caracterización termográfica de extremidades inferiores durante aplicación de anestesia epidural
+# GCPDS - Universidad Nacional de Colombia
+# Proyecto caracterización termográfica de extremidades inferiores durante aplicación de anestesia epidural
 # Mayo de 2021
-#Disponible en https//:github.com/blotero/FEET-GUI
+# Disponible en https//:github.com/blotero/FEET-GUI
 
 import os
 from PIL import Image
@@ -17,6 +17,7 @@ from PySide2.QtGui import QImage, QPixmap
 from segment import Image_2_seg
 from manualseg import manualSeg
 
+import cv2
 
 class Window(QMainWindow):
     def __init__(self):
@@ -37,8 +38,10 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.actionCargar_imagen, SIGNAL ('triggered()'), self.openImage)
         QObject.connect(self.ui_window.actionCargar_carpeta , SIGNAL ('triggered()'), self.openFolder)
         QObject.connect(self.ui_window.refreshTimePlot , SIGNAL ('clicked()'), self.makeTimePlot)
- 
- 
+        QObject.connect(self.ui_window.nextImageButton , SIGNAL ('clicked()'), self.nextImage)
+        QObject.connect(self.ui_window.previousImageButton , SIGNAL ('clicked()'), self.previousImage)
+        QObject.connect(self.ui_window.saveButton , SIGNAL ('clicked()'), self.saveImage)
+
     def load_ui(self):
         loader = QUiLoader()        
         path = os.fspath(Path(__file__).resolve().parent / "form.ui")
@@ -47,12 +50,49 @@ class Window(QMainWindow):
         self.ui_window = loader.load(ui_file, self)
         ui_file.close()
 
+    def messagePrint(self):
+        #INPUT: string to print
+        #OUTPUT: none
+        #ACTION. generate out.html file and refresh it in Messages QTextArea
+        pass
+
+    def findImages(self):
+        self.fileList = []
+        for root, dirs, files in os.walk(self.defaultDirectory):
+            for file in files:
+                if (file.endswith(".jpg")):
+                    self.fileList.append(os.path.join(root,file))
+        self.fileList.sort()
+        self.imageIndex = 0
+
+    def nextImage(self):
+        if self.imageIndex < len(self.fileList):
+            self.imageIndex += 1
+            self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
+
+    def previousImage(self):
+        if self.imageIndex > 0:
+            self.imageIndex -= 1
+            self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
+
+    def saveImage(self):
+        #Saves segmented image
+        pass
+ 
     def feet_segment(self):
         self.i2s = Image_2_seg()
         self.i2s.setPath(self.opdir)
         self.i2s.extract()
         print(self.i2s.Y_pred)
-        self.ui_window.outputImg.setPixmap(self.opdir)
+        threshold =  0.5
+        img = plt.imread(self.opdir)/255
+        Y = self.i2s.Y_pred / self.i2s.Y_pred.max()
+        Y = np.where( Y >= threshold  , 1 , 0)
+        Y = cv2.resize(Y[0] , (self.inputImage.shape[1] , self.inputImage.shape[0] ) , interpolation = cv2.INTER_NEAREST)
+        Y = cv2.cvtColor(Y , cv2.COLOR_BGR2RGB)
+        cv2.imwrite("output.jpg" , Y)
+        self.ui_window.outputImg.setPixmap("output.jpg")
+
 
     def segment(self):
         out_file = open("out.html" , "w")
@@ -112,7 +152,12 @@ class Window(QMainWindow):
         self.defaultDirectory = self.folderDialog.getExistingDirectory()
         if self.defaultDirectory:
             self.defaultDirectoryExists = True
-            print(self.defaultDirectory) 
+            first_image = str(self.defaultDirectory + "/t0.jpg")
+            print(first_image)
+            self.ui_window.inputImg.setPixmap(first_image)
+            self.opdir = first_image
+            self.inputExists = True
+            self.findImages()
 
     def makeTimePlot(self):
         x=np.array([0,1,5,10,15,20])

@@ -467,9 +467,9 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>20</y>
+      <y>10</y>
       <width>1171</width>
-      <height>711</height>
+      <height>641</height>
      </rect>
     </property>
     <property name="palette">
@@ -510,7 +510,7 @@
      </palette>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -521,8 +521,8 @@
        <rect>
         <x>20</x>
         <y>20</y>
-        <width>401</width>
-        <height>371</height>
+        <width>400</width>
+        <height>341</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -534,8 +534,8 @@
       <widget class="QLabel" name="inputImg">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>50</y>
+         <x>40</x>
+         <y>20</y>
          <width>320</width>
          <height>240</height>
         </rect>
@@ -553,9 +553,9 @@
       <widget class="QFrame" name="frame_5">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>310</y>
-         <width>381</width>
+         <x>110</x>
+         <y>280</y>
+         <width>191</width>
          <height>51</height>
         </rect>
        </property>
@@ -568,7 +568,7 @@
        <widget class="QLabel" name="label_12">
         <property name="geometry">
          <rect>
-          <x>160</x>
+          <x>80</x>
           <y>20</y>
           <width>41</width>
           <height>17</height>
@@ -579,14 +579,40 @@
         </property>
        </widget>
       </widget>
+      <widget class="QPushButton" name="nextImageButton">
+       <property name="geometry">
+        <rect>
+         <x>320</x>
+         <y>290</y>
+         <width>20</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>&gt;</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="previousImageButton">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>290</y>
+         <width>20</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>&lt;</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QFrame" name="frame_3">
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>400</y>
+        <y>370</y>
         <width>311</width>
-        <height>231</height>
+        <height>221</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -756,8 +782,8 @@
        <rect>
         <x>440</x>
         <y>20</y>
-        <width>401</width>
-        <height>371</height>
+        <width>400</width>
+        <height>341</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -770,7 +796,7 @@
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>50</y>
+         <y>20</y>
          <width>320</width>
          <height>240</height>
         </rect>
@@ -789,8 +815,8 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>310</y>
-         <width>381</width>
+         <y>280</y>
+         <width>211</width>
          <height>51</height>
         </rect>
        </property>
@@ -803,7 +829,7 @@
        <widget class="QLabel" name="label_11">
         <property name="geometry">
          <rect>
-          <x>120</x>
+          <x>40</x>
           <y>20</y>
           <width>131</width>
           <height>17</height>
@@ -813,6 +839,19 @@
          <string>Imagen segmentada</string>
         </property>
        </widget>
+      </widget>
+      <widget class="QPushButton" name="saveButton">
+       <property name="geometry">
+        <rect>
+         <x>270</x>
+         <y>300</y>
+         <width>80</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Guardar</string>
+       </property>
       </widget>
      </widget>
      <zorder>frame_3</zorder>
@@ -824,260 +863,285 @@
      <attribute name="title">
       <string>Salidas</string>
      </attribute>
-     <widget class="QLabel" name="label">
+     <widget class="QScrollArea" name="scrollArea">
       <property name="geometry">
        <rect>
-        <x>470</x>
+        <x>10</x>
         <y>10</y>
-        <width>251</width>
-        <height>22</height>
+        <width>1141</width>
+        <height>581</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>20</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Gráfica en el tiempo:</string>
-      </property>
-     </widget>
-     <widget class="QFrame" name="frame">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>490</y>
-        <width>361</width>
-        <height>141</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <widget class="QLabel" name="label_2">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>30</y>
-         <width>171</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Tiempo de captura (minutos):</string>
-       </property>
-      </widget>
-      <widget class="QPlainTextEdit" name="plainTextEdit">
-       <property name="geometry">
-        <rect>
-         <x>240</x>
-         <y>30</y>
-         <width>51</width>
-         <height>21</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="refreshTimePlot">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>70</y>
-         <width>171</width>
-         <height>24</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Refrescar timeplot</string>
-       </property>
-       <property name="shortcut">
-        <string>Ctrl+U</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_10">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>50</y>
-         <width>171</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Etiqueta</string>
-       </property>
-      </widget>
-      <widget class="QPlainTextEdit" name="plainTextEdit_3">
-       <property name="geometry">
-        <rect>
-         <x>240</x>
-         <y>50</y>
-         <width>51</width>
-         <height>21</height>
-        </rect>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QLabel" name="label_9">
-      <property name="geometry">
-       <rect>
-        <x>500</x>
-        <y>480</y>
-        <width>221</width>
-        <height>191</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>template.svg</pixmap>
-      </property>
-      <property name="scaledContents">
+      <property name="mouseTracking">
        <bool>true</bool>
       </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_4">
-      <property name="geometry">
-       <rect>
-        <x>720</x>
-        <y>570</y>
-        <width>111</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Extraer mapa</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_8">
-      <property name="geometry">
-       <rect>
-        <x>470</x>
-        <y>440</y>
-        <width>261</width>
-        <height>271</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>cover.svg</pixmap>
-      </property>
-      <property name="scaledContents">
+      <property name="widgetResizable">
        <bool>true</bool>
       </property>
-     </widget>
-     <widget class="QFrame" name="timePlotFrame">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>40</y>
-        <width>1021</width>
-        <height>421</height>
-       </rect>
-      </property>
-      <property name="palette">
-       <palette>
-        <active>
-         <colorrole role="Base">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>170</red>
-            <green>187</green>
-            <blue>188</blue>
-           </color>
-          </brush>
-         </colorrole>
-         <colorrole role="Window">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>129</red>
-            <green>138</green>
-            <blue>200</blue>
-           </color>
-          </brush>
-         </colorrole>
-        </active>
-        <inactive>
-         <colorrole role="Base">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>170</red>
-            <green>187</green>
-            <blue>188</blue>
-           </color>
-          </brush>
-         </colorrole>
-         <colorrole role="Window">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>129</red>
-            <green>138</green>
-            <blue>200</blue>
-           </color>
-          </brush>
-         </colorrole>
-        </inactive>
-        <disabled>
-         <colorrole role="Base">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>129</red>
-            <green>138</green>
-            <blue>200</blue>
-           </color>
-          </brush>
-         </colorrole>
-         <colorrole role="Window">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>129</red>
-            <green>138</green>
-            <blue>200</blue>
-           </color>
-          </brush>
-         </colorrole>
-        </disabled>
-       </palette>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <widget class="QLabel" name="timePlot">
+      <widget class="QWidget" name="scrollAreaWidgetContents">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>15</y>
-         <width>900</width>
-         <height>400</height>
+         <x>0</x>
+         <y>0</y>
+         <width>1139</width>
+         <height>579</height>
         </rect>
        </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="pixmap">
-        <pixmap>ice.png</pixmap>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
+       <widget class="QLabel" name="label_9">
+        <property name="geometry">
+         <rect>
+          <x>850</x>
+          <y>60</y>
+          <width>241</width>
+          <height>181</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap>template.svg</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_8">
+        <property name="geometry">
+         <rect>
+          <x>820</x>
+          <y>10</y>
+          <width>281</width>
+          <height>281</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap>cover.svg</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QFrame" name="timePlotFrame">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>10</y>
+          <width>791</width>
+          <height>441</height>
+         </rect>
+        </property>
+        <property name="palette">
+         <palette>
+          <active>
+           <colorrole role="Base">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>170</red>
+              <green>187</green>
+              <blue>188</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Window">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>129</red>
+              <green>138</green>
+              <blue>200</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </active>
+          <inactive>
+           <colorrole role="Base">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>170</red>
+              <green>187</green>
+              <blue>188</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Window">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>129</red>
+              <green>138</green>
+              <blue>200</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </inactive>
+          <disabled>
+           <colorrole role="Base">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>129</red>
+              <green>138</green>
+              <blue>200</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Window">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>129</red>
+              <green>138</green>
+              <blue>200</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </disabled>
+         </palette>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <widget class="QLabel" name="timePlot">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>768</width>
+           <height>320</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="pixmap">
+          <pixmap>ice.png</pixmap>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label">
+         <property name="geometry">
+          <rect>
+           <x>250</x>
+           <y>410</y>
+           <width>251</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>20</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Time Plot</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QPushButton" name="pushButton_4">
+        <property name="geometry">
+         <rect>
+          <x>930</x>
+          <y>300</y>
+          <width>111</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Extraer mapa</string>
+        </property>
+       </widget>
+       <widget class="QFrame" name="frame">
+        <property name="geometry">
+         <rect>
+          <x>830</x>
+          <y>340</y>
+          <width>301</width>
+          <height>111</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <widget class="QLabel" name="label_2">
+         <property name="geometry">
+          <rect>
+           <x>50</x>
+           <y>30</y>
+           <width>171</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Tiempo de captura (minutos):</string>
+         </property>
+        </widget>
+        <widget class="QPlainTextEdit" name="plainTextEdit">
+         <property name="geometry">
+          <rect>
+           <x>240</x>
+           <y>30</y>
+           <width>51</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="refreshTimePlot">
+         <property name="geometry">
+          <rect>
+           <x>50</x>
+           <y>70</y>
+           <width>171</width>
+           <height>24</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Refrescar timeplot</string>
+         </property>
+         <property name="shortcut">
+          <string>Ctrl+U</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_10">
+         <property name="geometry">
+          <rect>
+           <x>50</x>
+           <y>50</y>
+           <width>171</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Etiqueta</string>
+         </property>
+        </widget>
+        <widget class="QPlainTextEdit" name="plainTextEdit_3">
+         <property name="geometry">
+          <rect>
+           <x>240</x>
+           <y>50</y>
+           <width>51</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+       </widget>
+       <zorder>label_8</zorder>
+       <zorder>label_9</zorder>
+       <zorder>timePlotFrame</zorder>
+       <zorder>pushButton_4</zorder>
+       <zorder>frame</zorder>
       </widget>
      </widget>
-     <zorder>label</zorder>
-     <zorder>frame</zorder>
-     <zorder>pushButton_4</zorder>
-     <zorder>label_8</zorder>
-     <zorder>label_9</zorder>
-     <zorder>timePlotFrame</zorder>
     </widget>
    </widget>
    <widget class="QTextBrowser" name="textBrowser">
@@ -1105,9 +1169,9 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
+      <y>10</y>
       <width>161</width>
-      <height>421</height>
+      <height>431</height>
      </rect>
     </property>
     <column>

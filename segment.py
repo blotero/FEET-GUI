@@ -1,5 +1,5 @@
 #Polygon segmentation using pretrained model with U-Net
-#Avaliable in https://gihthub.com/Rmejiaz/Feet_U-Net
+#AI model avaliable in https://gihthub.com/Rmejiaz/Feet_U-Net
 
 import numpy as np
 import os
