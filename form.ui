@@ -669,7 +669,7 @@
         <string>Segmentación manual</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="manualSegButton_2">
+      <widget class="QPushButton" name="fullPlotButton">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -682,7 +682,7 @@
         <string>Full plot paciente</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="manualSegButton_3">
+      <widget class="QPushButton" name="reportButton">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -692,7 +692,10 @@
         </rect>
        </property>
        <property name="text">
-        <string>Segmentación manual</string>
+        <string>Exportar reporte</string>
+       </property>
+       <property name="shortcut">
+        <string>Ctrl+Shift+E</string>
        </property>
       </widget>
      </widget>

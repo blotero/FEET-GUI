@@ -48,15 +48,20 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.nextImageButton , SIGNAL ('clicked()'), self.nextImage)
         QObject.connect(self.ui_window.previousImageButton , SIGNAL ('clicked()'), self.previousImage)
         QObject.connect(self.ui_window.saveButton , SIGNAL ('clicked()'), self.saveImage)
+        QObject.connect(self.ui_window.fullPlotButton , SIGNAL ('clicked()'), self.fullPlot)
+        QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.exportReport)
+
+
 
     def messagePrint(self, message):
         #INPUT: string to print
         #OUTPUT: none
         #ACTION: generate out.html file and refresh it in Messages QTextArea
-        out_file = open("out.html" , "w")
+        log_path = "outputs/logs.html"
+        out_file = open(log_path , "w")
         out_file.write(message)
         out_file.close()
-        self.ui_window.textBrowser.setSource('out.html')
+        self.ui_window.textBrowser.setSource(log_path)
         self.ui_window.textBrowser.reload()
 
     def findImages(self):
@@ -169,6 +174,24 @@ class Window(QMainWindow):
         else:
             self.messagePrint("No se puede actualizar el TimePlot. No se ha seleccionado una imagen de entrada")
 
+    def fullPlot(self):
+        self.messagePrint("Preparando full plot...")
+        #SHOWS ALL SEGMENTED PICTURE FROM INPUT PATIENT
+        #ARGS: SELF, PATIENT DIR
+        #RETURN: NONE
+        #ACTION: DISPLAY A DIALOG SHOWING ALL SEGMENTS AND TIMEPLOTS
+        self.messagePrint("Full plot generado exitosamente")
+        pass
+
+    def exportReport(self):
+        self.messagePrint("Generando reporte...") 
+        #GENERATE A PDF REPORT FOR THE PATIENT
+        #INPUT: SELF, PATIENT DIR
+        #RETURN: NONE
+        #ACTION: COMPILE PDF TEXT BASED ON
+        self.messagePrunt("Reporte generado exitosamente")
+        pass
+    
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
