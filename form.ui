@@ -565,7 +565,7 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <widget class="QLabel" name="label_12">
+       <widget class="QLabel" name="inputLabel">
         <property name="geometry">
          <rect>
           <x>80</x>
@@ -589,7 +589,10 @@
         </rect>
        </property>
        <property name="text">
-        <string>&gt;</string>
+        <string>+</string>
+       </property>
+       <property name="shortcut">
+        <string>+</string>
        </property>
       </widget>
       <widget class="QPushButton" name="previousImageButton">
@@ -602,7 +605,10 @@
         </rect>
        </property>
        <property name="text">
-        <string>&lt;</string>
+        <string>-</string>
+       </property>
+       <property name="shortcut">
+        <string>-</string>
        </property>
       </widget>
      </widget>
@@ -611,8 +617,8 @@
        <rect>
         <x>20</x>
         <y>370</y>
-        <width>311</width>
-        <height>221</height>
+        <width>181</width>
+        <height>191</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -621,21 +627,11 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QTextEdit" name="textEdit">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>10</y>
-         <width>261</width>
-         <height>101</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QPushButton" name="segButton">
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>150</y>
+         <y>50</y>
          <width>141</width>
          <height>30</height>
         </rect>
@@ -643,12 +639,15 @@
        <property name="text">
         <string>Segmentar</string>
        </property>
+       <property name="shortcut">
+        <string>Ctrl+F</string>
+       </property>
       </widget>
       <widget class="QPushButton" name="tempButton">
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>120</y>
+         <y>20</y>
          <width>141</width>
          <height>30</height>
         </rect>
@@ -661,7 +660,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>180</y>
+         <y>80</y>
          <width>141</width>
          <height>30</height>
         </rect>
@@ -670,30 +669,30 @@
         <string>Segmentación manual</string>
        </property>
       </widget>
-      <widget class="QCheckBox" name="checkBox_2">
+      <widget class="QPushButton" name="manualSegButton_2">
        <property name="geometry">
         <rect>
-         <x>180</x>
-         <y>120</y>
-         <width>94</width>
-         <height>28</height>
+         <x>20</x>
+         <y>110</y>
+         <width>141</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
-        <string>Barplot</string>
+        <string>Full plot paciente</string>
        </property>
       </widget>
-      <widget class="QCheckBox" name="checkBox">
+      <widget class="QPushButton" name="manualSegButton_3">
        <property name="geometry">
         <rect>
-         <x>180</x>
-         <y>150</y>
-         <width>111</width>
-         <height>28</height>
+         <x>20</x>
+         <y>140</y>
+         <width>141</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
-        <string>Modo completo</string>
+        <string>Segmentación manual</string>
        </property>
       </widget>
      </widget>
@@ -890,9 +889,9 @@
        <widget class="QLabel" name="label_9">
         <property name="geometry">
          <rect>
-          <x>850</x>
+          <x>870</x>
           <y>60</y>
-          <width>241</width>
+          <width>221</width>
           <height>181</height>
          </rect>
         </property>
@@ -909,9 +908,9 @@
        <widget class="QLabel" name="label_8">
         <property name="geometry">
          <rect>
-          <x>820</x>
+          <x>840</x>
           <y>10</y>
-          <width>281</width>
+          <width>261</width>
           <height>281</height>
          </rect>
         </property>
@@ -1016,9 +1015,6 @@
          <property name="text">
           <string/>
          </property>
-         <property name="pixmap">
-          <pixmap>ice.png</pixmap>
-         </property>
          <property name="scaledContents">
           <bool>true</bool>
          </property>
@@ -1026,7 +1022,7 @@
         <widget class="QLabel" name="label">
          <property name="geometry">
           <rect>
-           <x>250</x>
+           <x>350</x>
            <y>410</y>
            <width>251</width>
            <height>22</height>
@@ -1054,7 +1050,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Extraer mapa</string>
+         <string>ANIMAR</string>
         </property>
        </widget>
        <widget class="QFrame" name="frame">
