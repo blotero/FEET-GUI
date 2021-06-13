@@ -52,7 +52,6 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.exportReport)
 
 
-
     def messagePrint(self, message):
         #INPUT: string to print
         #OUTPUT: none
@@ -74,14 +73,17 @@ class Window(QMainWindow):
         self.imageIndex = 0
 
     def nextImage(self):
-        if self.imageIndex < len(self.fileList):
+        if self.imageIndex < len(self.fileList)-1:
             self.imageIndex += 1
             self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
-
+            self.opdir = self.fileList[self.imageIndex]
+            
     def previousImage(self):
-        if self.imageIndex > 0:
+        if self.imageIndex > 1:
             self.imageIndex -= 1
             self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
+            self.opdir = self.fileList[self.imageIndex]
+            
 
     def saveImage(self):
         #Saves segmented image
@@ -106,10 +108,7 @@ class Window(QMainWindow):
         if self.inputExists:
             self.feet_segment()
         else:
-            out_file.write("No se ha seleccionado imagen de entrada")
-            out_file.close()
-            self.ui_window.textBrowser.setSource('out.html')
-            self.ui_window.textBrowser.reload()
+            self.messagePrint("No se ha seleccionado imagen de entrada")
 
     def manual_segment(self):
         print("Se abrirá diálogo de extracción manual")
@@ -189,7 +188,7 @@ class Window(QMainWindow):
         #INPUT: SELF, PATIENT DIR
         #RETURN: NONE
         #ACTION: COMPILE PDF TEXT BASED ON
-        self.messagePrunt("Reporte generado exitosamente")
+        self.messagePrint("Reporte generado exitosamente")
         pass
     
 if __name__ == "__main__":
