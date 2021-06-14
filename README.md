@@ -108,4 +108,3 @@ By clicking the *patient full plot* button, a new dialog will open and show the 
 
 Once you have done all processing, you can save your report as a pdf file by clicking the button "Export report". This action will only make sense if you have imported  a whole directory with the correctly named files. If you execute this action without making all processing previously, it will be done automatically by default.
 
-
