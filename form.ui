@@ -655,6 +655,9 @@
        <property name="text">
         <string>Obtener temperaturas</string>
        </property>
+       <property name="shortcut">
+        <string>Ctrl+T</string>
+       </property>
       </widget>
       <widget class="QPushButton" name="manualSegButton">
        <property name="geometry">
@@ -1043,7 +1046,7 @@
          </property>
         </widget>
        </widget>
-       <widget class="QPushButton" name="pushButton_4">
+       <widget class="QPushButton" name="animateButton">
         <property name="geometry">
          <rect>
           <x>930</x>
@@ -1137,7 +1140,7 @@
        <zorder>label_8</zorder>
        <zorder>label_9</zorder>
        <zorder>timePlotFrame</zorder>
-       <zorder>pushButton_4</zorder>
+       <zorder>animateButton</zorder>
        <zorder>frame</zorder>
       </widget>
      </widget>
@@ -1347,6 +1350,9 @@ p, li { white-space: pre-wrap; }
   <action name="actionCargar_anotaciones">
    <property name="text">
     <string>Cargar anotaciones</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+O</string>
    </property>
   </action>
  </widget>

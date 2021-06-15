@@ -86,16 +86,14 @@ class Window(QMainWindow):
             self.opdir = self.fileList[self.imageIndex]
 
     def loadAnnotations(self): 
-        self.fileDialog=QFileDialog(self)
-        if self.defaultDirectoryExists:
-            self.fileDialog.setDirectory(self.defaultDirectory)
-        else:
-            self.fileDialog.setDirectory(QDir.currentPath())        
-        self.annotationDir = self.fileDialog.getOpenFileName()[0]
+        self.messagePrint("Cargar el directorio de anotaciones de la paciente") 
+        self.folderDialog=QFileDialog(self)
+        self.folderDialog.setDirectory(QDir.currentPath())        
+        self.folderDialog.setFileMode(QFileDialog.FileMode.Directory)
+        self.annotationDir = self.folderDialog.getExistingDirectory()
         if self.annotationDir:
             self.annotationExists = True
-        self.messagePrint("Se han cargado exitosamente las anotaciones de la paciente" + str(self.annotationExists))
-
+            self.messagePrint("Se ha cargado exitosamente el directorio de anotacioes")
     def saveImage(self):
         #Saves segmented image
         pass
@@ -127,11 +125,11 @@ class Window(QMainWindow):
         return
 
     def temp_extract(self):
-        if self.inputExists:
-            get_temperatures("paciente")            
+        if self.inputExists and self.annotationExists:
+            show_temperatures("patient" ,self.imagesDir ,self.annotationDir, range_=[22.5 , 33.5] )          
             self.messagePrint("Se extrajo la temperatura exitosamente")
         else:
-            self.messagePrint("No se han seleccionado un imágenes de entrada")
+            self.messagePrint("No se han seleccionado un imagenes de entrada")
     
     def figlabels(self):
         #  Get info from directory path name and obtain time indexes based on name
@@ -148,6 +146,7 @@ class Window(QMainWindow):
         self.fileDialog.selectNameFilter("Images (*.png *.jpg)")
         #self.fileDialog.setFilter(self.fileDialog.selectedNameFilter())
         self.opdir = self.fileDialog.getOpenFileName()[0]
+        self.imagesDir = os.path.dirname(self.opdir) 
         if self.opdir:
             self.inputExists = True
             self.ui_window.inputImg.setPixmap(self.opdir)
@@ -157,6 +156,7 @@ class Window(QMainWindow):
         self.folderDialog.setDirectory(QDir.currentPath())        
         self.folderDialog.setFileMode(QFileDialog.FileMode.Directory)
         self.defaultDirectory = self.folderDialog.getExistingDirectory()
+        self.imagesDir = self.defaultDirectory
         if self.defaultDirectory:
             self.defaultDirectoryExists = True
             first_image = str(self.defaultDirectory + "/t0.jpg")
@@ -202,7 +202,12 @@ class Window(QMainWindow):
         #ACTION: COMPILE PDF TEXT BASED ON
         self.messagePrint("Reporte generado exitosamente")
         pass
-    
+
+    def animate(self):
+        self.messagePrint("Iniciando animacion...")
+        pass
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()

@@ -178,23 +178,23 @@ def get_polygons(image, annotation, range_):
     return fix_right_left(polygons_arr)
 
 
-def get_temperatures(patient, range_):
+def get_temperatures(range_, images_path , annotations_path):
 
     poly = []
 
     file_range = False
     if isinstance(range_, str):
-        ranges = image = os.path.join(images_path, patient, f'{range_}.json')
+        ranges = image = os.path.join(images_path, f'{range_}.json')
         ranges = json.load(open(ranges, 'r'))
         file_range = True
 
-    for file in os.listdir(os.path.join(images_path, patient)):
+    for file in os.listdir(images_path):
         if not file.endswith('.jpg'):
             continue
 
-        image = os.path.join(images_path, patient, file)
+        image = os.path.join(images_path, file)
         annotation = os.path.join(
-            annotations_path, patient, file.replace('.jpg', '.xml'))
+            annotations_path, file.replace('.jpg', '.xml'))
 
         if file_range:
             range_ = ranges[file]
@@ -204,15 +204,15 @@ def get_temperatures(patient, range_):
     return poly
 
 
-def show_temperatures(patient, fn='mean', range_='scale', sufix='', fig=None):
+def show_temperatures(patient, images_path, annotations_path,  fn='mean', range_='scale', sufix='', fig=None):
 
     if fig is None:
         fig_ = pyplot.figure(figsize=(20, 15), dpi=90)
 
-    poly = get_temperatures(patient, range_)
+    poly = get_temperatures(range_, images_path , annotations_path)
     pyplot.subplot(2, 3, 1)
     pyplot.title(f"{patient}{sufix}")
-    pyplot.imshow(Image.open(os.path.join('assets', 'figlabels.png')))
+    pyplot.imshow(Image.open('figlabels.png'))
     pyplot.axis('off')
     Position = ['Plantar medial', 'Safeno',
                 'Tibial', 'Sural', 'Plantar lateral']
@@ -242,6 +242,7 @@ def show_temperatures(patient, fn='mean', range_='scale', sufix='', fig=None):
         pyplot.ylabel('Temperature [°C]')
         pyplot.xlabel('Time [$s$]')
         pyplot.grid(True)
+        pyplot.show()
 
     if fig is None:
 
