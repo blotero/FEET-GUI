@@ -93,18 +93,30 @@ By pressing *Segment* button or ```Ctrl + F``` to an already displaying image (l
 In case AI does not offer desired results, user can choose the *manual segmentation*. By pressing this button, a new Dialog Window will be opened for the user to make the segmentation area in two stages. *(More on this in future versions)*
 
 
-### 3.4 Get temperature curves
 
-Once you have already imported a directory for patient, you can get the temperature curves.
+### 3.4 Import annotations
+
+By launching File/Load Annotations , you can set the directory for annotations for the patient you previously loaded as a directory. This action can also be done with ```Ctrl  + Shift + O ```
+
+![annotations](https://user-images.githubusercontent.com/43280129/122077272-349cb700-cdc1-11eb-9703-69c4450b5f66.gif)
 
 
 
-### 3.5 Make full plot!
+### 3.5 Get temperature curves
+
+Once you have already imported a directory for patient, you can get the temperature curves. You can press ```Ctrl + T``` for this action. Inmediately, a window will appear, showint the temperature curves based on the input images. It is important to have imported a directory, not an image.
+
+
+![temp](https://user-images.githubusercontent.com/43280129/122077755-9f4df280-cdc1-11eb-9dbb-879b14504842.gif)
+
+
+
+### 3.6 Make full plot!
 By clicking the *patient full plot* button, a new dialog will open and show the entire sessions plot. This is only avaliable when a folder has been the last file opening action.
 
 
 
-### 3.6 Save report
+### 3.7 Save report
 
 Once you have done all processing, you can save your report as a pdf file by clicking the button "Export report". This action will only make sense if you have imported  a whole directory with the correctly named files. If you execute this action without making all processing previously, it will be done automatically by default.
 
