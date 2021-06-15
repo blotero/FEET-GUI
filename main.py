@@ -93,7 +93,7 @@ class Window(QMainWindow):
         self.annotationDir = self.folderDialog.getExistingDirectory()
         if self.annotationDir:
             self.annotationExists = True
-            self.messagePrint("Se ha cargado exitosamente el directorio de anotacioes")
+            self.messagePrint("Se ha cargado exitosamente el directorio de anotaciones")
     def saveImage(self):
         #Saves segmented image
         pass
