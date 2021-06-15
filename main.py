@@ -16,7 +16,7 @@ from PySide2.QtUiTools import QUiLoader
 from PySide2.QtGui import QImage, QPixmap 
 from segment import Image_2_seg
 from manualseg import manualSeg
-
+from handler import show_temperatures, get_temperatures
 
 class Window(QMainWindow):
     def __init__(self):
@@ -29,6 +29,7 @@ class Window(QMainWindow):
         self.make_connect()
         self.inputExists = False
         self.defaultDirectoryExists = False
+        self.annotationExists : False
 
     def load_ui(self):
         loader = QUiLoader()        
@@ -39,18 +40,18 @@ class Window(QMainWindow):
         ui_file.close()
     
     def make_connect(self):
+        QObject.connect(self.ui_window.actionCargar_imagen, SIGNAL ('triggered()'), self.openImage)
+        QObject.connect(self.ui_window.actionCargar_carpeta , SIGNAL ('triggered()'), self.openFolder)
+        QObject.connect(self.ui_window.actionCargar_anotaciones , SIGNAL ('triggered()'), self.loadAnnotations)
         QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment)
         QObject.connect(self.ui_window.tempButton, SIGNAL ('clicked()'), self.temp_extract)
         QObject.connect(self.ui_window.manualSegButton, SIGNAL ('clicked()'), self.manual_segment)
-        QObject.connect(self.ui_window.actionCargar_imagen, SIGNAL ('triggered()'), self.openImage)
-        QObject.connect(self.ui_window.actionCargar_carpeta , SIGNAL ('triggered()'), self.openFolder)
         QObject.connect(self.ui_window.refreshTimePlot , SIGNAL ('clicked()'), self.makeTimePlot)
         QObject.connect(self.ui_window.nextImageButton , SIGNAL ('clicked()'), self.nextImage)
         QObject.connect(self.ui_window.previousImageButton , SIGNAL ('clicked()'), self.previousImage)
         QObject.connect(self.ui_window.saveButton , SIGNAL ('clicked()'), self.saveImage)
         QObject.connect(self.ui_window.fullPlotButton , SIGNAL ('clicked()'), self.fullPlot)
         QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.exportReport)
-
 
     def messagePrint(self, message):
         #INPUT: string to print
@@ -83,12 +84,22 @@ class Window(QMainWindow):
             self.imageIndex -= 1
             self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
             self.opdir = self.fileList[self.imageIndex]
-            
+
+    def loadAnnotations(self): 
+        self.fileDialog=QFileDialog(self)
+        if self.defaultDirectoryExists:
+            self.fileDialog.setDirectory(self.defaultDirectory)
+        else:
+            self.fileDialog.setDirectory(QDir.currentPath())        
+        self.annotationDir = self.fileDialog.getOpenFileName()[0]
+        if self.annotationDir:
+            self.annotationExists = True
+        self.messagePrint("Se han cargado exitosamente las anotaciones de la paciente" + str(self.annotationExists))
 
     def saveImage(self):
         #Saves segmented image
         pass
- 
+
     def feet_segment(self):
         self.i2s = Image_2_seg()
         self.i2s.setPath(self.opdir)
@@ -99,10 +110,9 @@ class Window(QMainWindow):
         Y = Y / Y.max()
         Y = np.where( Y >= threshold  , 1 , 0)
         Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
-        #Y_im = cv2.cvtColor(Y, cv2.COLOR_BGR2RGB)
-        #cv2.imwrite("output.jpg", Y_im) 
-        plt.imsave("output.jpg" , Y*0.5+img[:,:,0] , cmap='gray')
-        self.ui_window.outputImg.setPixmap("output.jpg")
+        plt.imsave("outputs/output.jpg" , Y*0.5+img[:,:,0] , cmap='gray')
+        self.ui_window.outputImg.setPixmap("outputs/output.jpg")
+        self.messagePrint("Se ha segmentado exitosamente la imagen")
 
     def segment(self):
         if self.inputExists:
@@ -118,9 +128,10 @@ class Window(QMainWindow):
 
     def temp_extract(self):
         if self.inputExists:
+            get_temperatures("paciente")            
             self.messagePrint("Se extrajo la temperatura exitosamente")
         else:
-            self.messagePrint("No se ha seleccionado un imagen de entrada")
+            self.messagePrint("No se han seleccionado un imágenes de entrada")
     
     def figlabels(self):
         #  Get info from directory path name and obtain time indexes based on name
@@ -167,14 +178,15 @@ class Window(QMainWindow):
             plt.ylabel("Temperatura [°C]")
             plt.title("Time plot")
             #plt.show()
-            plt.savefig('fresh.png')
-            self.ui_window.timePlot.setPixmap('fresh.png')
+            plt.savefig('/ouputs/fresh.png')
+            self.ui_window.timePlot.setPixmap('/outputs/outputs//fresh.png')
             self.messagePrint("Se ha actualizado el TimePlot")
         else:
             self.messagePrint("No se puede actualizar el TimePlot. No se ha seleccionado una imagen de entrada")
 
     def fullPlot(self):
         self.messagePrint("Preparando full plot...")
+        show_temperatures("paciente" , fn="mean" , range_ = [22.5 , 33.5])
         #SHOWS ALL SEGMENTED PICTURE FROM INPUT PATIENT
         #ARGS: SELF, PATIENT DIR
         #RETURN: NONE
