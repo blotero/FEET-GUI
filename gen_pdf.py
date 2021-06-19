@@ -1,5 +1,7 @@
 from fpdf import FPDF 
 
+class PDF(FPDF):
+
 pdf = FPDF(orientation = 'P' , unit  = 'mm'  , format = 'Letter')
 pdf_w = 210
 psd_h = 297

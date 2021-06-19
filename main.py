@@ -108,7 +108,7 @@ class Window(QMainWindow):
         Y = Y / Y.max()
         Y = np.where( Y >= threshold  , 1 , 0)
         Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
-        plt.imsave("outputs/output.jpg" , Y*0.5+img[:,:,0] , cmap='gray')
+        plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap='gray')
         self.ui_window.outputImg.setPixmap("outputs/output.jpg")
         self.messagePrint("Se ha segmentado exitosamente la imagen")
 
