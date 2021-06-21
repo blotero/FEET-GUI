@@ -17,6 +17,7 @@ from PySide2.QtGui import QImage, QPixmap
 from segment import Image_2_seg
 from manualseg import manualSeg
 from handler import show_temperatures, get_temperatures
+from temperatures import mean_temperature
 
 class Window(QMainWindow):
     def __init__(self):
@@ -30,6 +31,7 @@ class Window(QMainWindow):
         self.inputExists = False
         self.defaultDirectoryExists = False
         self.annotationExists : False
+        self.isSegmented = False
 
     def load_ui(self):
         loader = QUiLoader()        
@@ -107,10 +109,12 @@ class Window(QMainWindow):
         Y = self.i2s.Y_pred
         Y = Y / Y.max()
         Y = np.where( Y >= threshold  , 1 , 0)
+        self.Y = Y[0]
         Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
         plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap='gray')
         self.ui_window.outputImg.setPixmap("outputs/output.jpg")
         self.messagePrint("Se ha segmentado exitosamente la imagen")
+        self.isSegmented = True
 
     def segment(self):
         if self.inputExists:
@@ -125,11 +129,17 @@ class Window(QMainWindow):
         return
 
     def temp_extract(self):
-        if self.inputExists and self.annotationExists:
-            show_temperatures("patient" ,self.imagesDir ,self.annotationDir, range_=[22.5 , 33.5] )          
-            self.messagePrint("Se extrajo la temperatura exitosamente")
+        if (self.inputExists and self.isSegmented):
+            mean = mean_temperature(self.i2s.Xarray[:,:,0] , self.Y[:,:,0] , plot = True)
+            self.messagePrint("La temperatura media es: " + str(mean))
+        #    show_temperatures("patient" ,self.imagesDir ,self.annotationDir, range_=[22.5 , 33.5] )          
+        #    self.messagePrint("Se extrajo la temperatura exitosamente")
+        elif not self.isSegmented:
+            self.messagePrint("No se ha segmentado previamente la imagen. Segmentando...")
+            self.segment()
         else:
-            self.messagePrint("No se han seleccionado un imagenes de entrada")
+            self.messagePrint("No se han seleccionado imagenes de entrada...")
+            self.openFolder(self)
     
     def figlabels(self):
         #  Get info from directory path name and obtain time indexes based on name
@@ -186,11 +196,7 @@ class Window(QMainWindow):
 
     def fullPlot(self):
         self.messagePrint("Preparando full plot...")
-        show_temperatures("paciente" , fn="mean" , range_ = [22.5 , 33.5])
-        #SHOWS ALL SEGMENTED PICTURE FROM INPUT PATIENT
-        #ARGS: SELF, PATIENT DIR
-        #RETURN: NONE
-        #ACTION: DISPLAY A DIALOG SHOWING ALL SEGMENTS AND TIMEPLOTS
+        #show_temperatures("paciente" , fn="mean" , range_ = [22.5 , 33.5])
         self.messagePrint("Full plot generado exitosamente")
         pass
 
