@@ -106,7 +106,7 @@ In case AI does not offer desired results, user can choose the *manual segmentat
 
 
 
-### 3.4 Import annotations
+### 3.4 Import annotations (WILL DIE SOON)
 
 By launching File/Load Annotations , you can set the directory for annotations for the patient you previously loaded as a directory. This action can also be done with ```Ctrl  + Shift + O ```
 
