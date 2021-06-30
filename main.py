@@ -44,7 +44,6 @@ class Window(QMainWindow):
     def make_connect(self):
         QObject.connect(self.ui_window.actionCargar_imagen, SIGNAL ('triggered()'), self.openImage)
         QObject.connect(self.ui_window.actionCargar_carpeta , SIGNAL ('triggered()'), self.openFolder)
-        QObject.connect(self.ui_window.actionCargar_anotaciones , SIGNAL ('triggered()'), self.loadAnnotations)
         QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment)
         QObject.connect(self.ui_window.tempButton, SIGNAL ('clicked()'), self.temp_extract)
         QObject.connect(self.ui_window.manualSegButton, SIGNAL ('clicked()'), self.manual_segment)
@@ -73,6 +72,7 @@ class Window(QMainWindow):
                 if (file.endswith(".jpg")):
                     self.fileList.append(os.path.join(root,file))
         self.fileList.sort()
+        self.imageQuantity = fileList.size()
         self.imageIndex = 0
 
     def nextImage(self):
@@ -87,15 +87,6 @@ class Window(QMainWindow):
             self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
             self.opdir = self.fileList[self.imageIndex]
 
-    def loadAnnotations(self): 
-        self.messagePrint("Cargar el directorio de anotaciones de la paciente") 
-        self.folderDialog=QFileDialog(self)
-        self.folderDialog.setDirectory(QDir.currentPath())        
-        self.folderDialog.setFileMode(QFileDialog.FileMode.Directory)
-        self.annotationDir = self.folderDialog.getExistingDirectory()
-        if self.annotationDir:
-            self.annotationExists = True
-            self.messagePrint("Se ha cargado exitosamente el directorio de anotaciones")
     def saveImage(self):
         #Saves segmented image
         pass
@@ -132,14 +123,19 @@ class Window(QMainWindow):
         if (self.inputExists and self.isSegmented):
             mean = mean_temperature(self.i2s.Xarray[:,:,0] , self.Y[:,:,0] , plot = True)
             self.messagePrint("La temperatura media es: " + str(mean))
-        #    show_temperatures("patient" ,self.imagesDir ,self.annotationDir, range_=[22.5 , 33.5] )          
-        #    self.messagePrint("Se extrajo la temperatura exitosamente")
-        elif not self.isSegmented:
+        elif self.inputExists:
             self.messagePrint("No se ha segmentado previamente la imagen. Segmentando...")
             self.segment()
+            self.temp_extract()
         else:
             self.messagePrint("No se han seleccionado imagenes de entrada...")
             self.openFolder(self)
+            self.segment()
+            self.temp_extract()
+
+    def tempPlot(self):
+        pass
+
     
     def figlabels(self):
         #  Get info from directory path name and obtain time indexes based on name
