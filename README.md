@@ -106,15 +106,7 @@ In case AI does not offer desired results, user can choose the *manual segmentat
 
 
 
-### 3.4 Import annotations (WILL DIE SOON)
-
-By launching File/Load Annotations , you can set the directory for annotations for the patient you previously loaded as a directory. This action can also be done with ```Ctrl  + Shift + O ```
-
-![annotations](https://user-images.githubusercontent.com/43280129/122077272-349cb700-cdc1-11eb-9703-69c4450b5f66.gif)
-
-
-
-### 3.5 Get temperature curves
+### 3.4 Get temperature curves
 
 Once you have already imported a directory for patient, you can get the temperature curves. You can press ```Ctrl + T``` for this action. Inmediately, a window will appear, showint the temperature curves based on the input images. It is important to have imported a directory, not an image.
 
@@ -123,12 +115,26 @@ Once you have already imported a directory for patient, you can get the temperat
 
 
 
-### 3.6 Make full plot!
+### 3.5 Make full plot!
 By clicking the *patient full plot* button, a new dialog will open and show the entire sessions plot. This is only avaliable when a folder has been the last file opening action.
 
 
 
-### 3.7 Save report
+### 3.6 Save report
 
 Once you have done all processing, you can save your report as a pdf file by clicking the button "Export report". This action will only make sense if you have imported  a whole directory with the correctly named files. If you execute this action without making all processing previously, it will be done automatically by default.
+
+## 4. Design 
+
+FEET-GUI is developed in such a way that it can work as a 
+
+### 4.1 Preloaded images
+
+As a research, diagnosis, or general interest tool for healthcare in obstetrics, FEET-GUI can work with preloaded images. With this purpose, the _local_ design flow is thought to work robustly with simple local images, manually loaded by the user.
+
+![feet_gui](https://user-images.githubusercontent.com/43280129/123895317-3f109200-d925-11eb-868d-828ce68e41a0.png)
+
+### 4.2 Real time hardware
+
+FEET-GUI is suitabe for ARM for a reason, and that is to achieve real time use during a real birth giving session in which an additional tool for detecting analgesia effects, might be required. For this design, the user will no longer require to manually load the image files, but instead will simply shoot the IR image during the session with the extensile hardware avaliable for this task (WHICH???).
 
