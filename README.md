@@ -55,10 +55,23 @@ python3 main.py
 
 ## 2.2 Virtual environment
 
-STRONG FOCUS ON THIS!!!!!!!!!!!
+One of the requirements for ```feet-gui``` is a module known as ```opencv-contrib-python-headless``` which has conflict with the traditional  ```opencv-python``` package.
+The reason for using the contrib-headless version is due to conflicts with the original version with the PySide package, for both (opencv and PySide) packages, work on instantes with qt that are not compatible with each other.
+
+For this reason, it is suggested to run feet-gui on a virtual environment (specially if you have installed other packages related to opencv or qt).
+This can be done in Linux as follows:
+
 ```
 python -m venv feet-gui
+source feet-gui/bin/activate
 ```
+
+The resulting terminal-emulator state must look some like this:
+
+![image](https://user-images.githubusercontent.com/43280129/123793715-a556cf80-d8a7-11eb-961d-66229c20d986.png)
+
+
+Once you have done this, your shell should be working in this venv. If you had not previously cloned the repository, it is a good moment to do so, by following same steps as 2.1, and then installing the requirements with no probabilities of dependencies issues.
 
 # 3. How to use
 
@@ -73,7 +86,6 @@ First, stand in *Input* (entradas) tab, then, press ```Ctrl + O``` to open a dir
 
 
 ![dialog](https://user-images.githubusercontent.com/43280129/121792260-321b4100-cbb8-11eb-8ee5-b319fa4ae136.gif)
-
 
 
 
@@ -94,7 +106,7 @@ In case AI does not offer desired results, user can choose the *manual segmentat
 
 
 
-### 3.4 Import annotations
+### 3.4 Import annotations (WILL DIE SOON)
 
 By launching File/Load Annotations , you can set the directory for annotations for the patient you previously loaded as a directory. This action can also be done with ```Ctrl  + Shift + O ```
 
