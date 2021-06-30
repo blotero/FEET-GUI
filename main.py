@@ -91,21 +91,24 @@ class Window(QMainWindow):
         #Saves segmented image
         pass
 
-    def feet_segment(self):
-        self.i2s = Image_2_seg()
-        self.i2s.setPath(self.opdir)
-        self.i2s.extract()
-        threshold =  0.5
-        img = plt.imread(self.opdir)/255
-        Y = self.i2s.Y_pred
-        Y = Y / Y.max()
-        Y = np.where( Y >= threshold  , 1 , 0)
-        self.Y = Y[0]
-        Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
-        plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap='gray')
-        self.ui_window.outputImg.setPixmap("outputs/output.jpg")
-        self.messagePrint("Se ha segmentado exitosamente la imagen")
-        self.isSegmented = True
+    def feet_segment(self, full=False):
+        if full:
+            pass
+        else:
+            self.i2s = Image_2_seg()
+            self.i2s.setPath(self.opdir)
+            self.i2s.extract()
+            threshold =  0.5
+            img = plt.imread(self.opdir)/255
+            Y = self.i2s.Y_pred
+            Y = Y / Y.max()
+            Y = np.where( Y >= threshold  , 1 , 0)
+            self.Y = Y[0]
+            Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
+            plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap='gray')
+            self.ui_window.outputImg.setPixmap("outputs/output.jpg")
+            self.messagePrint("Se ha segmentado exitosamente la imagen")
+            self.isSegmented = True
 
     def segment(self):
         if self.inputExists:
@@ -134,7 +137,12 @@ class Window(QMainWindow):
             self.temp_extract()
 
     def tempPlot(self):
-        pass
+        means = []
+        for i in range(self.imageQuantity):
+            means.append(mean_temperatures(
+
+
+
 
     
     def figlabels(self):
