@@ -110,11 +110,21 @@ class Window(QMainWindow):
             self.messagePrint("Se ha segmentado exitosamente la imagen")
             self.isSegmented = True
 
+    def sessionSegment(self):
+        self.messagePrint("Segmentando toda la sesion...")
+        
+
     def segment(self):
-        if self.inputExists:
-            self.feet_segment()
+        if self.ui_window.sessionCheckBox:
+            if self.defaultDirectoryExists:
+                self.sessionSegment()
+            else:
+                self.messagePrint("No se ha seleccionado sesion de entrada")
         else:
-            self.messagePrint("No se ha seleccionado imagen de entrada")
+            if self.inputExists:
+                self.feet_segment()
+            else:
+                self.messagePrint("No se ha seleccionado sesion de entrada")
 
     def manual_segment(self):
         print("Se abrirá diálogo de extracción manual")
@@ -123,23 +133,27 @@ class Window(QMainWindow):
         return
 
     def temp_extract(self):
-        if (self.inputExists and self.isSegmented):
-            mean = mean_temperature(self.i2s.Xarray[:,:,0] , self.Y[:,:,0] , plot = True)
-            self.messagePrint("La temperatura media es: " + str(mean))
-        elif self.inputExists:
-            self.messagePrint("No se ha segmentado previamente la imagen. Segmentando...")
-            self.segment()
-            self.temp_extract()
+        #print(self.ui_window.plotCheckBox.isChecked())
+        if (self.ui_window.plotCheckBox.isChecked()):
+            pass
         else:
-            self.messagePrint("No se han seleccionado imagenes de entrada...")
-            self.openFolder(self)
-            self.segment()
-            self.temp_extract()
+            if (self.inputExists and self.isSegmented):
+                mean = mean_temperature(self.i2s.Xarray[:,:,0] , self.Y[:,:,0] , plot = True)
+                self.messagePrint("La temperatura media es: " + str(mean))
+            elif self.inputExists:
+                self.messagePrint("No se ha segmentado previamente la imagen. Segmentando...")
+                self.segment()
+                self.temp_extract()
+            else:
+                self.messagePrint("No se han seleccionado imagenes de entrada...")
+                self.openFolder()
+                self.segment()
+                self.temp_extract()
 
     def tempPlot(self):
         means = []
         for i in range(self.imageQuantity):
-            means.append(mean_temperatures(
+            means.append(0)
 
 
 
