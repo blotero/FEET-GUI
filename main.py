@@ -87,6 +87,7 @@ class Window(QMainWindow):
             self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
             self.opdir = self.fileList[self.imageIndex]
 
+    
     def saveImage(self):
         #Saves segmented image
         pass
