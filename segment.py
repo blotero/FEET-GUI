@@ -31,8 +31,6 @@ class Session_2_seg():
     def __init__(self):
         self.nothing = None
         
-        
-        
     def whole_extract(self):
         img_size = 224
         self.img = plt.imread(self.imPath)/255

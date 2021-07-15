@@ -4,6 +4,7 @@
 # Disponible en https//:github.com/blotero/FEET-GUI
 
 import os
+import re
 from PIL import Image
 from pathlib import Path
 import sys
@@ -32,6 +33,7 @@ class Window(QMainWindow):
         self.defaultDirectoryExists = False
         self.annotationExists : False
         self.isSegmented = False
+        self.files = None
 
     def load_ui(self):
         loader = QUiLoader()        
@@ -71,22 +73,46 @@ class Window(QMainWindow):
             for file in files:
                 if (file.endswith(".jpg")):
                     self.fileList.append(os.path.join(root,file))
-        self.fileList.sort()
         self.imageQuantity = len(self.fileList)
         self.imageIndex = 0
-        print("Success")
+        self.files = files
+        self.sortFiles()
+
+    def sortFiles(self):
+        """Sort file list to an alphanumeric reasonable sense"""         
+        convert = lambda text: int(text) if text.isdigit() else text 
+        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+        self.fileList =  sorted(self.fileList, key = alphanum_key)
+        self.files =  sorted(self.files, key = alphanum_key)
+
+    def getTime(self):
+
+    #Input: string with image path
+    #Output: int with time in minutes
+ 
+        if (type(self.fileList)==str):
+            self.timeList =  int(self.fileList).rsplit(".")[0][1:]
+        elif type(self.fileList)==list:    
+            out_list = []
+            for i in range(len(self.fileList)):
+                out_list.append(int(self.fileList[i].rsplit(".")[0][1:]))
+            self.timeList =  out_list
+        else:
+            return None
 
     def nextImage(self):
         if self.imageIndex < len(self.fileList)-1:
             self.imageIndex += 1
             self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
             self.opdir = self.fileList[self.imageIndex]
+            self.ui_window.inputLabel.setText(self.files[self.imageIndex])
             
     def previousImage(self):
         if self.imageIndex > 1:
             self.imageIndex -= 1
             self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
             self.opdir = self.fileList[self.imageIndex]
+            self.ui_window.inputLabel.setText(self.files[self.imageIndex])
 
     def saveImage(self):
         #Saves segmented image
@@ -94,7 +120,7 @@ class Window(QMainWindow):
 
     def feet_segment(self, full=False):
         if full:
-            pass
+            print("Whole mode")
         else:
             self.i2s = Image_2_seg()
             self.i2s.setPath(self.opdir)
@@ -113,17 +139,23 @@ class Window(QMainWindow):
 
     def sessionSegment(self):
         self.messagePrint("Segmentando toda la sesion...")
+
+
+        self.messagePrint("Sesion segmentada con exito")
         
 
     def segment(self):
-        if self.ui_window.sessionCheckBox:
+        if self.ui_window.sessionCheckBox.isChecked():
+
             if self.defaultDirectoryExists:
                 self.sessionSegment()
+                print("Entering session segment")
             else:
                 self.messagePrint("No se ha seleccionado sesion de entrada")
         else:
             if self.inputExists:
                 self.feet_segment()
+                print("Entering image segment")
             else:
                 self.messagePrint("No se ha seleccionado sesion de entrada")
 
