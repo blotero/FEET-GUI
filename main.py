@@ -72,8 +72,9 @@ class Window(QMainWindow):
                 if (file.endswith(".jpg")):
                     self.fileList.append(os.path.join(root,file))
         self.fileList.sort()
-        self.imageQuantity = fileList.size()
+        self.imageQuantity = len(self.fileList)
         self.imageIndex = 0
+        print("Success")
 
     def nextImage(self):
         if self.imageIndex < len(self.fileList)-1:
@@ -87,7 +88,6 @@ class Window(QMainWindow):
             self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
             self.opdir = self.fileList[self.imageIndex]
 
-    
     def saveImage(self):
         #Saves segmented image
         pass
@@ -156,10 +156,6 @@ class Window(QMainWindow):
         for i in range(self.imageQuantity):
             means.append(0)
 
-
-
-
-    
     def figlabels(self):
         #  Get info from directory path name and obtain time indexes based on name
         pass
