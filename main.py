@@ -15,7 +15,7 @@ from PySide2.QtWidgets import QApplication, QMainWindow, QGraphicsView, QLabel, 
 from PySide2.QtCore import QFile, QObject, SIGNAL, QDir 
 from PySide2.QtUiTools import QUiLoader 
 from PySide2.QtGui import QImage, QPixmap 
-from segment import Image_2_seg
+from segment import ImageToSegment, SessionToSegment
 from manualseg import manualSeg
 from handler import show_temperatures, get_temperatures
 from temperatures import mean_temperature
@@ -77,6 +77,10 @@ class Window(QMainWindow):
         self.imageIndex = 0
         self.files = files
         self.sortFiles()
+        self.outfiles=[]
+        for i in range(len(files)):
+            self.outfiles.append("output/" + files[i]) #Creating future output file names
+        self.ui_window.inputLabel.setText(self.files[self.imageIndex])
 
     def sortFiles(self):
         """Sort file list to an alphanumeric reasonable sense"""         
@@ -85,7 +89,7 @@ class Window(QMainWindow):
         self.fileList =  sorted(self.fileList, key = alphanum_key)
         self.files =  sorted(self.files, key = alphanum_key)
 
-    def getTime(self):
+    def getTimes(self):
 
     #Input: string with image path
     #Output: int with time in minutes
@@ -106,43 +110,62 @@ class Window(QMainWindow):
             self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
             self.opdir = self.fileList[self.imageIndex]
             self.ui_window.inputLabel.setText(self.files[self.imageIndex])
+
+        if self.sessionIsSegmented:
+            #Sentences to display next output image if session was already
+            #segmented
+            pass
             
     def previousImage(self):
-        if self.imageIndex > 1:
+        if self.imageIndex >= 1:
             self.imageIndex -= 1
             self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
             self.opdir = self.fileList[self.imageIndex]
             self.ui_window.inputLabel.setText(self.files[self.imageIndex])
 
+        if self.sessionIsSegmented:
+            #Sentences to display next output image if session was already
+            #segmented
+            pass
+
     def saveImage(self):
         #Saves segmented image
         pass
 
-    def feet_segment(self, full=False):
-        if full:
-            print("Whole mode")
-        else:
-            self.i2s = Image_2_seg()
-            self.i2s.setPath(self.opdir)
-            self.i2s.extract()
-            threshold =  0.5
-            img = plt.imread(self.opdir)/255
-            Y = self.i2s.Y_pred
-            Y = Y / Y.max()
-            Y = np.where( Y >= threshold  , 1 , 0)
-            self.Y = Y[0]
-            Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
-            plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap='gray')
-            self.ui_window.outputImg.setPixmap("outputs/output.jpg")
-            self.messagePrint("Se ha segmentado exitosamente la imagen")
-            self.isSegmented = True
+    def feetSegment(self):
+        self.messagePrint("Segmentando imagen")
+        self.i2s = ImageToSegment()
+        self.i2s.setPath(self.opdir)
+        self.i2s.extract()
+        self.showSegmentedImage()
+        self.isSegmented = True
+        self.messagePrint("Imagen segmentada exitosamente")
 
     def sessionSegment(self):
         self.messagePrint("Segmentando toda la sesion...")
+        self.s2s = SessionToSegment()
+        self.s2s.setPath(self.defaultDirectory)
+        self.s2s.whole_extract(self.fileList)
+        self.showSegmentedSession()
+        self.messagePrint("Se ha segmentado exitosamente la sesion")
+        self.sessionIsSegmented = True
 
+    def showSegmentedImage(self):
+        #Applies segmented zone to input image, showing only feet
+        threshold =  0.5
+        img = plt.imread(self.opdir)/255
+        Y = self.i2s.Y_pred
+        Y = Y / Y.max()
+        Y = np.where( Y >= threshold  , 1 , 0)
+        self.Y = Y[0]
+        Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
+        plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap='gray')
+        self.ui_window.outputImg.setPixmap("outputs/output.jpg")
+    
+    def showSegmentedSession(self):
+        #Recursively applies showSegmentedImage to whole session
 
-        self.messagePrint("Sesion segmentada con exito")
-        
+        self.ui_window.outputImg.setPixmap(self.outfiles[self.imageIndex])
 
     def segment(self):
         if self.ui_window.sessionCheckBox.isChecked():
@@ -154,7 +177,7 @@ class Window(QMainWindow):
                 self.messagePrint("No se ha seleccionado sesion de entrada")
         else:
             if self.inputExists:
-                self.feet_segment()
+                self.feetSegment()
                 print("Entering image segment")
             else:
                 self.messagePrint("No se ha seleccionado sesion de entrada")
