@@ -15,9 +15,8 @@ from PySide2.QtWidgets import QApplication, QMainWindow, QGraphicsView, QLabel, 
 from PySide2.QtCore import QFile, QObject, SIGNAL, QDir 
 from PySide2.QtUiTools import QUiLoader 
 from PySide2.QtGui import QImage, QPixmap 
-from segment import ImageToSegment, SessionToSegment
+from segment import ImageToSegment, SessionToSegment, remove_small_objects
 from manualseg import manualSeg
-from handler import show_temperatures, get_temperatures
 from temperatures import mean_temperature
 
 class Window(QMainWindow):
@@ -34,6 +33,7 @@ class Window(QMainWindow):
         self.annotationExists : False
         self.isSegmented = False
         self.files = None
+        self.temperaturesWereAcquired = False
 
     def load_ui(self):
         loader = QUiLoader()        
@@ -79,7 +79,7 @@ class Window(QMainWindow):
         self.sortFiles()
         self.outfiles=[]
         for i in range(len(files)):
-            self.outfiles.append("output/" + files[i]) #Creating future output file names
+            self.outfiles.append("outputs/" + files[i]) #Creating future output file names
         self.ui_window.inputLabel.setText(self.files[self.imageIndex])
 
     def sortFiles(self):
@@ -90,16 +90,16 @@ class Window(QMainWindow):
         self.files =  sorted(self.files, key = alphanum_key)
 
     def getTimes(self):
-
-    #Input: string with image path
-    #Output: int with time in minutes
- 
+        """
+        Converts standarized names of file list into a list of 
+        integers with time capture in minutes
+        """
         if (type(self.fileList)==str):
             self.timeList =  int(self.fileList).rsplit(".")[0][1:]
         elif type(self.fileList)==list:    
             out_list = []
             for i in range(len(self.fileList)):
-                out_list.append(int(self.fileList[i].rsplit(".")[0][1:]))
+                out_list.append(int(self.files[i].rsplit(".")[0][1:]))
             self.timeList =  out_list
         else:
             return None
@@ -111,11 +111,14 @@ class Window(QMainWindow):
             self.opdir = self.fileList[self.imageIndex]
             self.ui_window.inputLabel.setText(self.files[self.imageIndex])
 
-        if self.sessionIsSegmented:
-            #Sentences to display next output image if session was already
-            #segmented
-            pass
-            
+            if self.sessionIsSegmented:
+                #Sentences to display next output image if session was already
+                #segmented
+                self.showOutputImageFromSession()
+                if self.temperaturesWereAcquired:
+                    self.messagePrint("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
+                    self.ui_window.temperatureLabel.setText(str(np.round(self.meanTemperatures[self.imageIndex], 3)))
+                
     def previousImage(self):
         if self.imageIndex >= 1:
             self.imageIndex -= 1
@@ -123,10 +126,13 @@ class Window(QMainWindow):
             self.opdir = self.fileList[self.imageIndex]
             self.ui_window.inputLabel.setText(self.files[self.imageIndex])
 
-        if self.sessionIsSegmented:
-            #Sentences to display next output image if session was already
-            #segmented
-            pass
+            if self.sessionIsSegmented:
+                #Sentences to display next output image if session was already
+                #segmented
+                self.showOutputImageFromSession()
+                if self.temperaturesWereAcquired:
+                    self.messagePrint("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
+                    self.ui_window.temperatureLabel.setText(str(np.round(self.meanTemperatures[self.imageIndex], 3)))
 
     def saveImage(self):
         #Saves segmented image
@@ -146,7 +152,8 @@ class Window(QMainWindow):
         self.s2s = SessionToSegment()
         self.s2s.setPath(self.defaultDirectory)
         self.s2s.whole_extract(self.fileList)
-        self.showSegmentedSession()
+        self.produceSegmentedSessionOutput()
+        self.showOutputImageFromSession()
         self.messagePrint("Se ha segmentado exitosamente la sesion")
         self.sessionIsSegmented = True
 
@@ -157,14 +164,26 @@ class Window(QMainWindow):
         Y = self.i2s.Y_pred
         Y = Y / Y.max()
         Y = np.where( Y >= threshold  , 1 , 0)
-        self.Y = Y[0]
+        self.Y =remove_small_objects( Y[0])     #Eventually required by temp_extract
         Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
         plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap='gray')
         self.ui_window.outputImg.setPixmap("outputs/output.jpg")
     
-    def showSegmentedSession(self):
+    def produceSegmentedSessionOutput(self):
         #Recursively applies showSegmentedImage to whole session
+        self.Y=[]
+        for i in range(len(self.outfiles)):
+            threshold =  0.5
+            img = plt.imread(self.fileList[i])/255
+            Y = self.s2s.Y_pred[i]
+            Y = Y / Y.max()
+            Y = np.where( Y >= threshold  , 1 , 0)
+            self.Y.append( remove_small_objects(Y))     #Eventually required by temp_extract
+            Y = cv2.resize(Y, (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
+            plt.imsave(self.outfiles[i], Y*img[:,:,0] , cmap='gray')
 
+
+    def showOutputImageFromSession(self):
         self.ui_window.outputImg.setPixmap(self.outfiles[self.imageIndex])
 
     def segment(self):
@@ -189,27 +208,39 @@ class Window(QMainWindow):
         return
 
     def temp_extract(self):
-        #print(self.ui_window.plotCheckBox.isChecked())
-        if (self.ui_window.plotCheckBox.isChecked()):
-            pass
-        else:
-            if (self.inputExists and self.isSegmented):
-                mean = mean_temperature(self.i2s.Xarray[:,:,0] , self.Y[:,:,0] , plot = True)
+        if (self.inputExists and (self.isSegmented or self.sessionIsSegmented)):
+            if self.ui_window.sessionCheckBox.isChecked():   #If segmentation was for full session
+                self.meanTemperatures = []   #Whole feet mean temperature for all images in session
+                for i in range(len(self.outfiles)):
+                    self.meanTemperatures.append(mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , plot = False))
+                self.messagePrint("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
+                self.temperaturesWereAcquired = True
+            else:      #If segmentation was for single image
+                mean = mean_temperature(self.i2s.Xarray[:,:,0] , self.Y[:,:,0] , plot = False)
                 self.messagePrint("La temperatura media es: " + str(mean))
-            elif self.inputExists:
-                self.messagePrint("No se ha segmentado previamente la imagen. Segmentando...")
-                self.segment()
-                self.temp_extract()
-            else:
-                self.messagePrint("No se han seleccionado imagenes de entrada...")
-                self.openFolder()
-                self.segment()
-                self.temp_extract()
+
+            if (self.ui_window.plotCheckBox.isChecked()):  #If user asked for plot
+                self.messagePrint("Se generara plot de temperatura...")
+                self.getTimes()
+                print(self.timeList)
+                self.tempPlot()
+
+        elif self.inputExists:
+            self.messagePrint("No se ha segmentado previamente la imagen ")
+        else:
+            self.messagePrint("No se han seleccionado imagenes de entrada")
+
+
 
     def tempPlot(self):
-        means = []
-        for i in range(self.imageQuantity):
-            means.append(0)
+        plt.figure()
+        plt.plot(self.timeList , self.meanTemperatures, '-o')
+        plt.title("Temperatura media de pies")
+        plt.xlabel("Tiempo (s)")
+        plt.ylabel("Temperatura (°C)")
+        plt.grid()
+        plt.show()
+        #Produce plot 
 
     def figlabels(self):
         #  Get info from directory path name and obtain time indexes based on name
@@ -279,7 +310,11 @@ class Window(QMainWindow):
         self.messagePrint("Reporte generado exitosamente")
         pass
 
-    def animate(self):
+    def animate(self):      
+        """
+        Produces gif animation based on mean temperatures for whole session
+        Initially, all feet has same color, for section segmentation has been not implemented yet
+        """
         self.messagePrint("Iniciando animacion...")
         pass
 

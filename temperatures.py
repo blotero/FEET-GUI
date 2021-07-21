@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import plotly
 
 def mean_temperature(image , mask , range_=[22.5 , 35.5], plot = False):
     """Get mean temperature of feet image based on mask and scale

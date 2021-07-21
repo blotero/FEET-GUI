@@ -713,6 +713,9 @@
        <property name="text">
         <string>Sesión completa</string>
        </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
       <widget class="QCheckBox" name="plotCheckBox">
        <property name="geometry">
@@ -1729,7 +1732,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1366</width>
-     <height>18</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="palette">
