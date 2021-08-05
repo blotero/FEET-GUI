@@ -22,12 +22,18 @@ Suggested distros for running FEET-GUI in Raspberry PI 4 (top being the most sug
 
 ## 2. Installation and running instructions
 
-## 2.1 Native
+
+## 2.1 Install on Windows
+For installing FEET-GUI on Windows you need to have python 3.9 installed in your system. The easy way to achieve this is simply typing ```python```in your PowerShell or CMD. If you don't have python installed, an instance of the official Microsoft Store will be opened to install the latest available python core.
+
+Additionally, you might want to install git on your machine from https://git-scm.com/downloads. 
+After this, you are ready to run the native installation.
+
+## 2.2 Native
 
 First, choose the desired fork. If you are running ARM architectures (like raspberry pi), it is suggested to clone the ```no-tf``` branch, so you can avoid installing heavy libraries like ```tensorflow``` 
 
-
-If you are using amd64 or x86 architecture, then start by simply cloning the repository into your desired directory. Type in terminal:
+If you are using amd64 or x86 architecture, then start by simply cloning the repository into your desired directory. Type in terminal (or PowerShell in Windows):
 
 ```
 git clone https://github.com/blotero/FEET-GUI
@@ -39,21 +45,21 @@ Otherwise, if you preffer the ligth version, then clone the ```no-tf``` *(no ten
 git clone https://github.com/blotero/FEET-GUI/tree/no-tf
 cd FEET-GUI
 ```
-Install requirements (make sure you have latest version of ```pip```).
+Install requirements (make sure you have latest version of ```pip``` by running ```pip install pip```).
 
 ```
 pip install -r requirements.txt
 ```
-Run in arch based distros:
+Finally, run in arch-linux based distributions and Windows:
 ```
 python main.py
 ```
-Run in other OS:
+Run in Debian based distributions:
 ```
 python3 main.py
 ```
 
-## 2.2 Virtual environment
+## 2.3 Virtual environment
 
 One of the requirements for ```feet-gui``` is a module known as ```opencv-contrib-python-headless``` which has conflict with the traditional  ```opencv-python``` package.
 The reason for using the contrib-headless version is due to conflicts with the original version with the PySide package, for both (opencv and PySide) packages, work on instantes with qt that are not compatible with each other.
@@ -71,7 +77,7 @@ The resulting terminal-emulator state must look some like this:
 ![image](https://user-images.githubusercontent.com/43280129/123793715-a556cf80-d8a7-11eb-961d-66229c20d986.png)
 
 
-Once you have done this, your shell should be working in this venv. If you had not previously cloned the repository, it is a good moment to do so, by following same steps as 2.1, and then installing the requirements with no probabilities of dependencies issues.
+Once you have done this, your shell should be working in this venv. If you had not previously cloned the repository, it is a good moment to do so, by following same steps as 2.2, and then installing the requirements with no dependencies issues.
 
 # 3. How to use
 
