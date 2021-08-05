@@ -3,4 +3,3 @@ opencv-contrib-python-headless
 PySide2
 tensorflow
 scipy
-plotly
