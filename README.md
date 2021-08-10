@@ -28,6 +28,7 @@ For installing FEET-GUI on Windows you need to have python 3.9 installed in your
 
 Additionally, you might want to install git on your machine from https://git-scm.com/downloads. 
 After this, you are ready to run the native installation.
+Finally, you can launch FEET-GUI simply by lauching the ```feet-gui.bat```file.
 
 ## 2.2 Native
 
