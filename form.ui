@@ -510,7 +510,7 @@
      </palette>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -1792,6 +1792,11 @@
        <zorder>frame</zorder>
       </widget>
      </widget>
+    </widget>
+    <widget class="QWidget" name="tab_4">
+     <attribute name="title">
+      <string>Info</string>
+     </attribute>
     </widget>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
