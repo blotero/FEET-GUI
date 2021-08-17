@@ -612,7 +612,7 @@
        </property>
       </widget>
      </widget>
-     <widget class="QFrame" name="frame_3">
+     <widget class="QFrame" name="sessionFrame">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -728,6 +728,9 @@
        </property>
        <property name="text">
         <string>Plot</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </widget>
@@ -1377,10 +1380,137 @@
       <zorder>label_7</zorder>
       <zorder>temperatureFrame</zorder>
      </widget>
-     <zorder>frame_3</zorder>
+     <widget class="QFrame" name="tempScaleFrame">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>370</y>
+        <width>211</width>
+        <height>191</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QLabel" name="scaleTitleLabel">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>20</y>
+         <width>141</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Escalas de temperatura:</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="tempScaleComboBox">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>50</y>
+         <width>101</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <item>
+        <property name="text">
+         <string>Auto</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Personalizado</string>
+        </property>
+       </item>
+      </widget>
+      <widget class="QFrame" name="tempFrame">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>100</y>
+         <width>181</width>
+         <height>80</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLabel" name="minLabel">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>52</width>
+          <height>13</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Min</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="maxLabel">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>50</y>
+          <width>52</width>
+          <height>13</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Max</string>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="minSpinBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>10</y>
+          <width>62</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="value">
+         <double>22.500000000000000</double>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="maxSpinBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>40</y>
+          <width>62</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="value">
+         <double>33.500000000000000</double>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+     <zorder>sessionFrame</zorder>
      <zorder>frame_2</zorder>
      <zorder>frame_4</zorder>
      <zorder>frame_6</zorder>
+     <zorder>tempScaleFrame</zorder>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -1663,6 +1793,11 @@
       </widget>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab_3">
+     <attribute name="title">
+      <string>CLI</string>
+     </attribute>
+    </widget>
    </widget>
    <widget class="QTextBrowser" name="textBrowser">
     <property name="geometry">
@@ -1732,7 +1867,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1366</width>
-     <height>19</height>
+     <height>18</height>
     </rect>
    </property>
    <property name="palette">

@@ -18,6 +18,7 @@ from PySide2.QtGui import QImage, QPixmap
 from segment import ImageToSegment, SessionToSegment, remove_small_objects
 from manualseg import manualSeg
 from temperatures import mean_temperature
+from scipy.interpolate import make_interp_spline, BSpline
 
 class Window(QMainWindow):
     def __init__(self):
@@ -34,6 +35,7 @@ class Window(QMainWindow):
         self.isSegmented = False
         self.files = None
         self.temperaturesWereAcquired = False
+        self.scaleModeAuto = True
 
     def load_ui(self):
         loader = QUiLoader()        
@@ -55,6 +57,7 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.saveButton , SIGNAL ('clicked()'), self.saveImage)
         QObject.connect(self.ui_window.fullPlotButton , SIGNAL ('clicked()'), self.fullPlot)
         QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.exportReport)
+        self.ui_window.tempScaleComboBox.activated.connect(self.toggleScales)
 
     def messagePrint(self, message):
         #INPUT: string to print
@@ -209,14 +212,20 @@ class Window(QMainWindow):
 
     def temp_extract(self):
         if (self.inputExists and (self.isSegmented or self.sessionIsSegmented)):
+            if self.scaleModeAuto == True:
+                #Here there should be the feature to get the temperatures automatically from image
+                scale_range = [22.5 , 35.5]    #MeanTime
+            else:
+                scale_range = [self.ui_window.minSpinBox.value() , self.ui_window.maxSpinBox.value()] 
+
             if self.ui_window.sessionCheckBox.isChecked():   #If segmentation was for full session
                 self.meanTemperatures = []   #Whole feet mean temperature for all images in session
                 for i in range(len(self.outfiles)):
-                    self.meanTemperatures.append(mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , plot = False))
+                    self.meanTemperatures.append(mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , scale_range, plot = False))
                 self.messagePrint("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
                 self.temperaturesWereAcquired = True
             else:      #If segmentation was for single image
-                mean = mean_temperature(self.i2s.Xarray[:,:,0] , self.Y[:,:,0] , plot = False)
+                mean = mean_temperature(self.i2s.Xarray[:,:,0] , self.Y[:,:,0] , scale_range, plot = False)
                 self.messagePrint("La temperatura media es: " + str(mean))
 
             if (self.ui_window.plotCheckBox.isChecked()):  #If user asked for plot
@@ -230,13 +239,23 @@ class Window(QMainWindow):
         else:
             self.messagePrint("No se han seleccionado imagenes de entrada")
 
-
+    def toggleScales(self):
+        print("Combo box state:")
+        print(self.ui_window.tempScaleComboBox.currentIndex())
+        if self.ui_window.tempScaleComboBox.currentIndex()==0:
+            self.scaleModeAuto = True
+        else:
+            self.scaleModeAuto = False
 
     def tempPlot(self):
         plt.figure()
-        plt.plot(self.timeList , self.meanTemperatures, '-o')
+        x = np.linspace(min(self.timeList), max(self.timeList), 200)
+        spl = make_interp_spline(self.timeList, self.meanTemperatures, k=3)
+        y = spl(x) 
+        plt.plot(x , y, '-.', color='salmon')
+        plt.plot(self.timeList , self.meanTemperatures , '-o', color='slategrey')
         plt.title("Temperatura media de pies")
-        plt.xlabel("Tiempo (s)")
+        plt.xlabel("Tiempo (min)")
         plt.ylabel("Temperatura (°C)")
         plt.grid()
         plt.show()
