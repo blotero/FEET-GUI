@@ -510,7 +510,7 @@
      </palette>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -1506,11 +1506,81 @@
        </widget>
       </widget>
      </widget>
+     <widget class="QFrame" name="modelFrame">
+      <property name="geometry">
+       <rect>
+        <x>580</x>
+        <y>370</y>
+        <width>261</width>
+        <height>191</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QLabel" name="label_12">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>10</y>
+         <width>151</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Modelo de segmentación</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>60</y>
+         <width>201</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <item>
+        <property name="text">
+         <string>U-Net VGG16</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>TFLite</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>MobileNetv2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>U-Net</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>FCN</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Segnet</string>
+        </property>
+       </item>
+      </widget>
+     </widget>
      <zorder>sessionFrame</zorder>
      <zorder>frame_2</zorder>
      <zorder>frame_4</zorder>
      <zorder>frame_6</zorder>
      <zorder>tempScaleFrame</zorder>
+     <zorder>modelFrame</zorder>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
