@@ -12,9 +12,9 @@ class ImageToSegment():
         self.X = None
         self.Xarray = None
         self.imageIsLoaded = False
+        self.model = None
 
     def extract(self):
-        self.model = tf.keras.models.load_model('Model1.h5')
         img_size = self.model.input_shape[1]
         self.img = plt.imread(self.imPath)/255
         self.X = tf.convert_to_tensor(self.img)
@@ -28,6 +28,9 @@ class ImageToSegment():
     def setPath(self,im):
         self.imPath = im
         self.imageIsLoaded = True
+
+    def setModel(self,model):
+        self.model = model
         
         
 class SessionToSegment():
@@ -52,6 +55,9 @@ class SessionToSegment():
     def setPath(self,im):
         self.sessionPath = im
         self.PathIsLoaded = True
+
+    def setModel(self,model):
+        self.model = model
 
 def remove_small_objects(img, min_size=1200):
     """Remove all the objects that are smaller than a defined threshold

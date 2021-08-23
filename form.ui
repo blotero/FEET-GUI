@@ -510,7 +510,7 @@
      </palette>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -1534,7 +1534,7 @@
         <string>Modelo de segmentación</string>
        </property>
       </widget>
-      <widget class="QComboBox" name="comboBox">
+      <widget class="QComboBox" name="modelComboBox">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -1543,36 +1543,22 @@
          <height>22</height>
         </rect>
        </property>
-       <item>
-        <property name="text">
-         <string>U-Net VGG16</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>TFLite</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>MobileNetv2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>U-Net</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>FCN</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Segnet</string>
-        </property>
-       </item>
+      </widget>
+      <widget class="QPushButton" name="loadModelButton">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>120</y>
+         <width>101</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Cargar modelo</string>
+       </property>
+       <property name="shortcut">
+        <string>Ctrl+L</string>
+       </property>
       </widget>
      </widget>
      <zorder>sessionFrame</zorder>
@@ -2017,13 +2003,14 @@ p, li { white-space: pre-wrap; }
     <addaction name="separator"/>
     <addaction name="actionCargar_imagen"/>
     <addaction name="actionCargar_carpeta"/>
-    <addaction name="actionCargar_anotaciones"/>
+    <addaction name="actionCargar_modelos"/>
    </widget>
    <widget class="QMenu" name="menuAyuda">
     <property name="title">
      <string>Ayuda</string>
     </property>
     <addaction name="actionAcerca_de"/>
+    <addaction name="actionC_mo_usar"/>
    </widget>
    <widget class="QMenu" name="menuVer">
     <property name="title">
@@ -2075,12 +2062,17 @@ p, li { white-space: pre-wrap; }
     <string>Acerca de</string>
    </property>
   </action>
-  <action name="actionCargar_anotaciones">
+  <action name="actionCargar_modelos">
    <property name="text">
-    <string>Cargar anotaciones</string>
+    <string>Cargar modelos</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+O</string>
+   </property>
+  </action>
+  <action name="actionC_mo_usar">
+   <property name="text">
+    <string>Cómo usar</string>
    </property>
   </action>
  </widget>

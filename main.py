@@ -19,6 +19,8 @@ from segment import ImageToSegment, SessionToSegment, remove_small_objects
 from manualseg import manualSeg
 from temperatures import mean_temperature
 from scipy.interpolate import make_interp_spline, BSpline
+import tensorflow as tf
+import utils
 
 class Window(QMainWindow):
     def __init__(self):
@@ -36,6 +38,8 @@ class Window(QMainWindow):
         self.files = None
         self.temperaturesWereAcquired = False
         self.scaleModeAuto = True
+        self.modelsPathExists = False
+        self.model = None
 
     def load_ui(self):
         loader = QUiLoader()        
@@ -48,6 +52,7 @@ class Window(QMainWindow):
     def make_connect(self):
         QObject.connect(self.ui_window.actionCargar_imagen, SIGNAL ('triggered()'), self.openImage)
         QObject.connect(self.ui_window.actionCargar_carpeta , SIGNAL ('triggered()'), self.openFolder)
+        QObject.connect(self.ui_window.actionCargar_modelos , SIGNAL ('triggered()'), self.getModelsPath)
         QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment)
         QObject.connect(self.ui_window.tempButton, SIGNAL ('clicked()'), self.temp_extract)
         QObject.connect(self.ui_window.manualSegButton, SIGNAL ('clicked()'), self.manual_segment)
@@ -57,6 +62,7 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.saveButton , SIGNAL ('clicked()'), self.saveImage)
         QObject.connect(self.ui_window.fullPlotButton , SIGNAL ('clicked()'), self.fullPlot)
         QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.exportReport)
+        QObject.connect(self.ui_window.loadModelButton , SIGNAL ('clicked()'), self.toggleModel)
         self.ui_window.tempScaleComboBox.activated.connect(self.toggleScales)
 
     def messagePrint(self, message):
@@ -71,18 +77,18 @@ class Window(QMainWindow):
         self.ui_window.textBrowser.reload()
 
     def findImages(self):
-        self.fileList = []
+        self.fileList = []  #Absolute paths
+        self.files = []     #Relative paths
+        self.outfiles=[]    #Relative path to output files
         for root, dirs, files in os.walk(self.defaultDirectory):
             for file in files:
                 if (file.endswith(".jpg")):
                     self.fileList.append(os.path.join(root,file))
+                    self.files.append(file) 
+                    self.outfiles.append("outputs/" + file) #Creating future output file names
         self.imageQuantity = len(self.fileList)
         self.imageIndex = 0
-        self.files = files
         self.sortFiles()
-        self.outfiles=[]
-        for i in range(len(files)):
-            self.outfiles.append("outputs/" + files[i]) #Creating future output file names
         self.ui_window.inputLabel.setText(self.files[self.imageIndex])
 
     def sortFiles(self):
@@ -141,9 +147,27 @@ class Window(QMainWindow):
         #Saves segmented image
         pass
 
+    def getModelsPath(self):
+        self.modelDialog=QFileDialog(self)
+        self.modelDialog.setDirectory(QDir.currentPath())        
+        self.modelDialog.setFileMode(QFileDialog.FileMode.Directory)
+        self.modelsPath = self.modelDialog.getExistingDirectory()
+        if self.modelsPath:
+            self.modelsPathExists = True
+            self.modelList = []
+            for root, dirs, files in os.walk(self.modelsPath):
+                for file in files:
+                    self.modelList.append(os.path.join(root,file))
+            self.modelQuantity = len(self.modelList)
+            self.modelIndex = 0
+            self.models = files
+            self.ui_window.modelComboBox.addItems(self.models)
+
+
     def feetSegment(self):
-        self.messagePrint("Segmentando imagen")
+        self.messagePrint("Segmentando imagen...")
         self.i2s = ImageToSegment()
+        self.i2s.setModel(self.model)
         self.i2s.setPath(self.opdir)
         self.i2s.extract()
         self.showSegmentedImage()
@@ -152,12 +176,15 @@ class Window(QMainWindow):
 
     def sessionSegment(self):
         self.messagePrint("Segmentando toda la sesion...")
+        self.sessionIsSegmented = False
+        print(self.model)
         self.s2s = SessionToSegment()
+        self.s2s.setModel(self.model)
         self.s2s.setPath(self.defaultDirectory)
         self.s2s.whole_extract(self.fileList)
         self.produceSegmentedSessionOutput()
         self.showOutputImageFromSession()
-        self.messagePrint("Se ha segmentado exitosamente la sesion")
+        self.messagePrint("Se ha segmentado exitosamente la sesion con "+ self.models[self.modelIndex])
         self.sessionIsSegmented = True
 
     def showSegmentedImage(self):
@@ -192,13 +219,13 @@ class Window(QMainWindow):
     def segment(self):
         if self.ui_window.sessionCheckBox.isChecked():
 
-            if self.defaultDirectoryExists:
+            if self.defaultDirectoryExists and self.modelsPathExists and self.model!=None:
                 self.sessionSegment()
                 print("Entering session segment")
             else:
-                self.messagePrint("No se ha seleccionado sesion de entrada")
+                self.messagePrint("Error. Por favor verifique que ha cargado el modelo y la sesion de entrada.")
         else:
-            if self.inputExists:
+            if self.inputExists and self.modelsPathExists and self.model!=None:
                 self.feetSegment()
                 print("Entering image segment")
             else:
@@ -246,6 +273,16 @@ class Window(QMainWindow):
             self.scaleModeAuto = True
         else:
             self.scaleModeAuto = False
+
+    def toggleModel(self):
+        self.modelIndex = self.ui_window.modelComboBox.currentIndex()
+        self.messagePrint("Cargando modelo: " + self.models[self.modelIndex]
+                        +" Esto puede tomar unos momentos...")
+        try:
+            self.model =tf.keras.models.load_model(self.modelList[self.modelIndex], custom_objects = {'dice_coef':utils.dice_coef, 'iou_coef':utils.iou_coef})
+            self.messagePrint("Modelo " + self.models[self.modelIndex] + " cargado exitosamente")
+        except:
+            self.messagePrint("Error al cargar el modelo "+ self.models[self.modelIndex])
 
     def tempPlot(self):
         plt.figure()
@@ -295,6 +332,7 @@ class Window(QMainWindow):
             self.opdir = first_image
             self.inputExists = True
             self.findImages()
+            self.sessionIsSegmented = False
 
     def makeTimePlot(self):
         if self.inputExists:
