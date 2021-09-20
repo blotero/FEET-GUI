@@ -45,6 +45,7 @@ class Window(QMainWindow):
         ui_file = QFile(path)
         ui_file.open(QFile.ReadOnly)
         self.ui_window = loader.load(ui_file, self)
+        self.ui_window.showFullScreen()
         ui_file.close()
     
     def make_connect(self):
