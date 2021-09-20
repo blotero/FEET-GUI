@@ -11,14 +11,13 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
-from PySide2.QtWidgets import QApplication, QMainWindow, QGraphicsView, QLabel, QPushButton, QTextBrowser, QAction, QFileDialog, QDialog, QDialog
+from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog 
 from PySide2.QtCore import QFile, QObject, SIGNAL, QDir 
 from PySide2.QtUiTools import QUiLoader 
-from PySide2.QtGui import QImage, QPixmap 
 from segment import ImageToSegment, SessionToSegment, remove_small_objects
 from manualseg import manualSeg
 from temperatures import mean_temperature
-from scipy.interpolate import make_interp_spline, BSpline
+from scipy.interpolate import make_interp_spline 
 import tensorflow as tf
 import utils
 
@@ -64,6 +63,14 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.exportReport)
         QObject.connect(self.ui_window.loadModelButton , SIGNAL ('clicked()'), self.toggleModel)
         self.ui_window.tempScaleComboBox.activated.connect(self.toggleScales)
+
+    def setDefaultConfigSettings(self, model_dir, session_dir):
+        self.config = {'models_directory': model_dir,
+                'session_directory': session_dir }
+
+    def updateUserConfiguration(self):
+        self.modelsPath = self.config['models_directory']
+        self.defaultDirectory = self.config['session_directory']
 
     def messagePrint(self, message):
         #INPUT: string to print
@@ -375,6 +382,7 @@ class Window(QMainWindow):
         self.messagePrint("Iniciando animacion...")
         pass
 
+   
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -40,7 +40,7 @@ class SessionToSegment():
         self.Xarray = None
         
     def whole_extract(self, dirs):
-        img_size = 224
+        img_size = self.model.input_shape[1]
         self.img_array=[]
         for i in range(len(dirs)):
             self.img_array.append(plt.imread(dirs[i])/255)
