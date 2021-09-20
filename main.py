@@ -19,7 +19,6 @@ from manualseg import manualSeg
 from temperatures import mean_temperature
 from scipy.interpolate import make_interp_spline 
 import tflite_runtime.interpreter as tflite
-import utils
 
 class Window(QMainWindow):
     def __init__(self):

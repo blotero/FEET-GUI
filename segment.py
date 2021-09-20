@@ -9,31 +9,7 @@ from cv2 import connectedComponentsWithStats
 import cv2
 
 
-def predict(X):
-    interpreter = tflite.Interpreter(model_path = self.model)
-    interpreter.allocate_tensors()
 
-    input_details = interpreter.get_input_details()
-    output_details = interpreter.get_output_details()
-
-    input_shape = input_details[0]['shape']
-    input_data = np.float32(X)
-
-    interpreter.set_tensor(input_details[0]['index'], input_data)
-
-    interpreter.invoke()  # predict
-
-    output_data = interpreter.get_tensor(output_details[0]['index'])
-    
-    return output_data
-
-def input_shape():
-    interpreter = tflite.Interpreter(model_path = self.model)
-    interpreter.allocate_tensors()
-
-    input_details = interpreter.get_input_details()
-
-    return input_details
 
 class ImageToSegment():
     def __init__(self):
@@ -43,7 +19,7 @@ class ImageToSegment():
         self.imageIsLoaded = False
         self.model = None
 
-    def predict(X, self):
+    def predict(self, X):
         interpreter = tflite.Interpreter(model_path = self.model)
         interpreter.allocate_tensors()
 
@@ -65,12 +41,12 @@ class ImageToSegment():
         interpreter = tflite.Interpreter(model_path = self.model)
         interpreter.allocate_tensors()
 
-        input_details = interpreter.get_input_details()
-
+        input_details = interpreter.get_input_details()[0]['shape'][1]
+        print(input_details)
         return input_details
 
     def extract(self):
-        img_size = self.input_shape()[1]
+        img_size = self.input_shape()
         self.img = plt.imread(self.imPath)/255
         # self.X = tf.convert_to_tensor(self.img)
         self.X = self.img
