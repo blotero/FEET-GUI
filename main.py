@@ -214,8 +214,10 @@ class Window(QMainWindow):
             Y = self.s2s.Y_pred[i]
             Y = Y / Y.max()
             Y = np.where( Y >= threshold  , 1 , 0)
-            self.Y.append( remove_small_objects(Y))     #Eventually required by temp_extract
-            Y = cv2.resize(Y, (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
+
+            self.Y.append(remove_small_objects(Y[0]))     #Eventually required by temp_extract
+            print(self.Y[0].shape)
+            Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
             plt.imsave(self.outfiles[i], Y*img[:,:,0] , cmap='gray')
 
 

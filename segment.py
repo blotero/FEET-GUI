@@ -71,17 +71,47 @@ class SessionToSegment():
         self.X = None
         self.Xarray = None
         
+    def predict(self, X):
+        
+        interpreter = tflite.Interpreter(model_path = self.model)
+        interpreter.allocate_tensors()
+
+        input_details = interpreter.get_input_details()
+        output_details = interpreter.get_output_details()
+        predictions = []
+
+        for i in range(X.shape[0]):
+            input_shape = input_details[0]['shape']
+            input_data = np.float32(X[i])
+            input_data = np.expand_dims(input_data, axis=0)
+            
+            interpreter.set_tensor(input_details[0]['index'], input_data)
+
+            interpreter.invoke()  # predict
+
+            output_data = interpreter.get_tensor(output_details[0]['index'])
+            predictions.append(output_data)
+
+        return predictions
+    
+    def input_shape(self):
+        interpreter = tflite.Interpreter(model_path = self.model)
+        interpreter.allocate_tensors()
+
+        input_details = interpreter.get_input_details()[0]['shape'][1]
+        print(input_details)
+        return input_details
+
     def whole_extract(self, dirs):
-        img_size = self.model.input_shape[1]
+        img_size = self.input_shape()
         self.img_array=[]
         for i in range(len(dirs)):
             self.img_array.append(plt.imread(dirs[i])/255)
         self.img_array=np.array(self.img_array)
-        self.X = tf.convert_to_tensor(self.img_array)
-        self.X = tf.image.resize(self.X , (img_size , img_size))
+        self.X = np.array([cv2.resize(self.img_array[i] , (img_size , img_size), interpolation = cv2.INTER_NEAREST) for i in range(self.img_array.shape[0])])
         self.Xarray  = np.array(self.X)
         self.Xarray = (self.Xarray/self.Xarray.max()).reshape(len(dirs) ,img_size , img_size , 3)
-        self.Y_pred = self.model.predict(self.X)
+        self.Y_pred = self.predict(self.X)
 
     def setPath(self,im):
         self.sessionPath = im
