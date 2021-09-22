@@ -3,9 +3,38 @@
 
 import numpy as np
 import os
-import tensorflow as tf
+import tflite_runtime.interpreter as tflite
 import matplotlib.pyplot as plt
 from cv2 import connectedComponentsWithStats
+import cv2
+
+
+def predict(X):
+    interpreter = tflite.Interpreter(model_path = self.model)
+    interpreter.allocate_tensors()
+
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+
+    input_shape = input_details[0]['shape']
+    input_data = np.float32(X)
+
+    interpreter.set_tensor(input_details[0]['index'], input_data)
+
+    interpreter.invoke()  # predict
+
+    output_data = interpreter.get_tensor(output_details[0]['index'])
+    
+    return output_data
+
+def input_shape():
+    interpreter = tflite.Interpreter(model_path = self.model)
+    interpreter.allocate_tensors()
+
+    input_details = interpreter.get_input_details()
+
+    return input_details
+
 class ImageToSegment():
     def __init__(self):
         self.thereIsX = False
@@ -14,15 +43,42 @@ class ImageToSegment():
         self.imageIsLoaded = False
         self.model = None
 
+    def predict(X, self):
+        interpreter = tflite.Interpreter(model_path = self.model)
+        interpreter.allocate_tensors()
+
+        input_details = interpreter.get_input_details()
+        output_details = interpreter.get_output_details()
+
+        input_shape = input_details[0]['shape']
+        input_data = np.float32(X)
+
+        interpreter.set_tensor(input_details[0]['index'], input_data)
+
+        interpreter.invoke()  # predict
+
+        output_data = interpreter.get_tensor(output_details[0]['index'])
+        
+        return output_data
+
+    def input_shape(self):
+        interpreter = tflite.Interpreter(model_path = self.model)
+        interpreter.allocate_tensors()
+
+        input_details = interpreter.get_input_details()
+
+        return input_details
+
     def extract(self):
-        img_size = self.model.input_shape[1]
+        img_size = self.input_shape()[1]
         self.img = plt.imread(self.imPath)/255
-        self.X = tf.convert_to_tensor(self.img)
-        self.X = tf.image.resize(self.X , (img_size , img_size))
+        # self.X = tf.convert_to_tensor(self.img)
+        self.X = self.img
+        self.X = cv2.resize(self.X, (img_size, img_size), interpolation = cv2.INTER_NEAREST)
         self.Xarray  = np.array(self.X)
         self.Xarray = (self.Xarray/self.Xarray.max()).reshape(img_size , img_size , 3)
-        self.X = tf.expand_dims(self.X,0)
-        self.Y_pred = self.model.predict(self.X)
+        self.X = np.expand_dims(self.X,0)
+        self.Y_pred = self.predict(self.X)
 
         
     def setPath(self,im):

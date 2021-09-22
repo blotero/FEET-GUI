@@ -18,7 +18,7 @@ from segment import ImageToSegment, SessionToSegment, remove_small_objects
 from manualseg import manualSeg
 from temperatures import mean_temperature
 from scipy.interpolate import make_interp_spline 
-import tensorflow as tf
+import tflite_runtime.interpreter as tflite
 import utils
 
 class Window(QMainWindow):
@@ -286,7 +286,7 @@ class Window(QMainWindow):
         self.messagePrint("Cargando modelo: " + self.models[self.modelIndex]
                         +" Esto puede tomar unos momentos...")
         try:
-            self.model =tf.keras.models.load_model(self.modelList[self.modelIndex], custom_objects = {'dice_coef':utils.dice_coef, 'iou_coef':utils.iou_coef})
+            self.model = self.modelList[self.modelIndex]
             self.messagePrint("Modelo " + self.models[self.modelIndex] + " cargado exitosamente")
         except:
             self.messagePrint("Error al cargar el modelo "+ self.models[self.modelIndex])
