@@ -62,7 +62,6 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.fullPlotButton , SIGNAL ('clicked()'), self.fullPlot)
         QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.exportReport)
         QObject.connect(self.ui_window.loadModelButton , SIGNAL ('clicked()'), self.toggleModel)
-        self.ui_window.tempScaleComboBox.activated.connect(self.toggleScales)
 
     def setDefaultConfigSettings(self, model_dir, session_dir):
         self.config = {'models_directory': model_dir,
@@ -248,11 +247,9 @@ class Window(QMainWindow):
 
     def temp_extract(self):
         if (self.inputExists and (self.isSegmented or self.sessionIsSegmented)):
-            if self.scaleModeAuto == True:
-                #Here there should be the feature to get the temperatures automatically from image
-                scale_range = [25 , 45]    #MeanTime
-            else:
-                scale_range = [self.ui_window.minSpinBox.value() , self.ui_window.maxSpinBox.value()] 
+            
+            
+            scale_range = [self.ui_window.minSpinBox.value() , self.ui_window.maxSpinBox.value()] 
 
             if self.ui_window.sessionCheckBox.isChecked():   #If segmentation was for full session
                 self.meanTemperatures = []   #Whole feet mean temperature for all images in session
@@ -274,14 +271,6 @@ class Window(QMainWindow):
             self.messagePrint("No se ha segmentado previamente la imagen ")
         else:
             self.messagePrint("No se han seleccionado imagenes de entrada")
-
-    def toggleScales(self):
-        print("Combo box state:")
-        print(self.ui_window.tempScaleComboBox.currentIndex())
-        if self.ui_window.tempScaleComboBox.currentIndex()==0:
-            self.scaleModeAuto = True
-        else:
-            self.scaleModeAuto = False
 
     def toggleModel(self):
         self.modelIndex = self.ui_window.modelComboBox.currentIndex()
