@@ -457,7 +457,7 @@
   </property>
   <property name="windowIcon">
    <iconset theme="FEET_GUI">
-    <normaloff>icon.png</normaloff>icon.png</iconset>
+    <normaloff>../../../../../.designer/backup/icon.png</normaloff>../../../../../.designer/backup/icon.png</iconset>
   </property>
   <property name="autoFillBackground">
    <bool>true</bool>
@@ -467,9 +467,9 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>10</y>
+      <y>40</y>
       <width>1171</width>
-      <height>641</height>
+      <height>661</height>
      </rect>
     </property>
     <property name="palette">
@@ -520,9 +520,9 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>20</y>
+        <y>10</y>
         <width>400</width>
-        <height>341</height>
+        <height>351</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -544,7 +544,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap>ice.png</pixmap>
+        <pixmap>../../../../../.designer/backup/ice.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -554,7 +554,7 @@
        <property name="geometry">
         <rect>
          <x>150</x>
-         <y>280</y>
+         <y>270</y>
          <width>111</width>
          <height>51</height>
         </rect>
@@ -570,9 +570,14 @@
          <rect>
           <x>30</x>
           <y>20</y>
-          <width>41</width>
-          <height>17</height>
+          <width>61</width>
+          <height>20</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>INPUT</string>
@@ -582,14 +587,19 @@
       <widget class="QPushButton" name="nextImageButton">
        <property name="geometry">
         <rect>
-         <x>320</x>
-         <y>290</y>
-         <width>20</width>
-         <height>24</height>
+         <x>300</x>
+         <y>270</y>
+         <width>61</width>
+         <height>61</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
        <property name="text">
-        <string>+</string>
+        <string>&gt;</string>
        </property>
        <property name="shortcut">
         <string>+</string>
@@ -598,14 +608,19 @@
       <widget class="QPushButton" name="previousImageButton">
        <property name="geometry">
         <rect>
-         <x>80</x>
-         <y>290</y>
-         <width>20</width>
-         <height>24</height>
+         <x>40</x>
+         <y>270</y>
+         <width>61</width>
+         <height>61</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
        <property name="text">
-        <string>-</string>
+        <string>&lt;</string>
        </property>
        <property name="shortcut">
         <string>-</string>
@@ -615,9 +630,9 @@
      <widget class="QFrame" name="sessionFrame">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>30</x>
         <y>370</y>
-        <width>301</width>
+        <width>521</width>
         <height>231</height>
        </rect>
       </property>
@@ -630,11 +645,16 @@
       <widget class="QPushButton" name="segButton">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>20</y>
-         <width>141</width>
-         <height>30</height>
+         <x>10</x>
+         <y>10</y>
+         <width>161</width>
+         <height>81</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Segmentar</string>
@@ -644,29 +664,56 @@
        </property>
       </widget>
       <widget class="QPushButton" name="tempButton">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>80</y>
-         <width>141</width>
-         <height>30</height>
+         <x>10</x>
+         <y>100</y>
+         <width>161</width>
+         <height>81</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+         <underline>false</underline>
+         <strikeout>false</strikeout>
+        </font>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
        <property name="text">
-        <string>Obtener temperaturas</string>
+        <string>Obtener
+ temperaturas</string>
        </property>
        <property name="shortcut">
         <string>Ctrl+T</string>
+       </property>
+       <property name="autoRepeat">
+        <bool>false</bool>
+       </property>
+       <property name="autoExclusive">
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QPushButton" name="manualSegButton">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>50</y>
-         <width>141</width>
-         <height>30</height>
+         <x>330</x>
+         <y>170</y>
+         <width>171</width>
+         <height>51</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Segmentación manual</string>
@@ -675,11 +722,16 @@
       <widget class="QPushButton" name="fullPlotButton">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>110</y>
-         <width>141</width>
-         <height>30</height>
+         <x>330</x>
+         <y>10</y>
+         <width>171</width>
+         <height>71</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Full plot paciente</string>
@@ -688,11 +740,16 @@
       <widget class="QPushButton" name="reportButton">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>140</y>
-         <width>141</width>
-         <height>30</height>
+         <x>330</x>
+         <y>90</y>
+         <width>171</width>
+         <height>71</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Exportar reporte</string>
@@ -704,14 +761,20 @@
       <widget class="QCheckBox" name="sessionCheckBox">
        <property name="geometry">
         <rect>
-         <x>170</x>
-         <y>29</y>
+         <x>180</x>
+         <y>30</y>
          <width>121</width>
-         <height>19</height>
+         <height>41</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>13</pointsize>
+        </font>
+       </property>
        <property name="text">
-        <string>Sesión completa</string>
+        <string>Sesión
+completa</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -720,11 +783,16 @@
       <widget class="QCheckBox" name="plotCheckBox">
        <property name="geometry">
         <rect>
-         <x>170</x>
-         <y>89</y>
+         <x>180</x>
+         <y>130</y>
          <width>80</width>
          <height>19</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>13</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Plot</string>
@@ -762,7 +830,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap>figlabels_r.png</pixmap>
+        <pixmap>../../../../../.designer/backup/figlabels_r.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -781,7 +849,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap>figlabels.png</pixmap>
+        <pixmap>../../../../../.designer/backup/figlabels.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -818,9 +886,9 @@
       <property name="geometry">
        <rect>
         <x>440</x>
-        <y>20</y>
+        <y>10</y>
         <width>400</width>
-        <height>341</height>
+        <height>351</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -842,7 +910,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap>ice.png</pixmap>
+        <pixmap>../../../../../.designer/backup/ice.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -867,24 +935,35 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>20</y>
-          <width>111</width>
-          <height>17</height>
+          <y>0</y>
+          <width>121</width>
+          <height>51</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
         <property name="text">
-         <string>Imagen segmentada</string>
+         <string>Imagen
+segmentada</string>
         </property>
        </widget>
       </widget>
       <widget class="QPushButton" name="saveButton">
        <property name="geometry">
         <rect>
-         <x>180</x>
-         <y>300</y>
-         <width>80</width>
-         <height>24</height>
+         <x>160</x>
+         <y>290</y>
+         <width>111</width>
+         <height>51</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Guardar</string>
@@ -893,7 +972,7 @@
       <widget class="QFrame" name="temperatureFrame">
        <property name="geometry">
         <rect>
-         <x>280</x>
+         <x>300</x>
          <y>270</y>
          <width>101</width>
          <height>31</height>
@@ -1352,9 +1431,14 @@
          <rect>
           <x>20</x>
           <y>10</y>
-          <width>52</width>
-          <height>13</height>
+          <width>71</width>
+          <height>16</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>          °C</string>
@@ -1364,11 +1448,16 @@
       <widget class="QLabel" name="label_7">
        <property name="geometry">
         <rect>
-         <x>160</x>
-         <y>280</y>
-         <width>111</width>
+         <x>150</x>
+         <y>270</y>
+         <width>161</width>
          <height>20</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Temperatura media:</string>
@@ -1383,10 +1472,10 @@
      <widget class="QFrame" name="tempScaleFrame">
       <property name="geometry">
        <rect>
-        <x>350</x>
+        <x>560</x>
         <y>370</y>
-        <width>211</width>
-        <height>191</height>
+        <width>271</width>
+        <height>251</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -1398,11 +1487,16 @@
       <widget class="QLabel" name="scaleTitleLabel">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>20</y>
-         <width>141</width>
+         <x>20</x>
+         <y>10</y>
+         <width>231</width>
          <height>16</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Escalas de temperatura:</string>
@@ -1411,10 +1505,10 @@
       <widget class="QComboBox" name="tempScaleComboBox">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>50</y>
-         <width>101</width>
-         <height>22</height>
+         <x>60</x>
+         <y>40</y>
+         <width>151</width>
+         <height>51</height>
         </rect>
        </property>
        <item>
@@ -1434,10 +1528,10 @@
        </property>
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>20</x>
          <y>100</y>
-         <width>181</width>
-         <height>80</height>
+         <width>241</width>
+         <height>151</height>
         </rect>
        </property>
        <property name="frameShape">
@@ -1450,10 +1544,15 @@
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>20</y>
-          <width>52</width>
-          <height>13</height>
+          <y>10</y>
+          <width>51</width>
+          <height>41</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>Min</string>
@@ -1463,10 +1562,15 @@
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>50</y>
+          <y>90</y>
           <width>52</width>
-          <height>13</height>
+          <height>31</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>Max</string>
@@ -1478,14 +1582,19 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>80</x>
+          <x>90</x>
           <y>10</y>
-          <width>62</width>
-          <height>22</height>
+          <width>101</width>
+          <height>51</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+         </font>
+        </property>
         <property name="value">
-         <double>22.500000000000000</double>
+         <double>25.000000000000000</double>
         </property>
        </widget>
        <widget class="QDoubleSpinBox" name="maxSpinBox">
@@ -1494,14 +1603,19 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>80</x>
-          <y>40</y>
-          <width>62</width>
-          <height>22</height>
+          <x>90</x>
+          <y>80</y>
+          <width>101</width>
+          <height>51</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+         </font>
+        </property>
         <property name="value">
-         <double>33.500000000000000</double>
+         <double>45.000000000000000</double>
         </property>
        </widget>
       </widget>
@@ -1509,10 +1623,10 @@
      <widget class="QFrame" name="modelFrame">
       <property name="geometry">
        <rect>
-        <x>580</x>
+        <x>850</x>
         <y>370</y>
-        <width>261</width>
-        <height>191</height>
+        <width>281</width>
+        <height>251</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -1524,40 +1638,50 @@
       <widget class="QLabel" name="label_12">
        <property name="geometry">
         <rect>
-         <x>60</x>
+         <x>10</x>
          <y>10</y>
-         <width>151</width>
-         <height>16</height>
+         <width>251</width>
+         <height>20</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Modelo de segmentación</string>
        </property>
       </widget>
-      <widget class="QComboBox" name="modelComboBox">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>60</y>
-         <width>201</width>
-         <height>22</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QPushButton" name="loadModelButton">
        <property name="geometry">
         <rect>
-         <x>80</x>
-         <y>120</y>
-         <width>101</width>
-         <height>21</height>
+         <x>50</x>
+         <y>140</y>
+         <width>161</width>
+         <height>91</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Cargar modelo</string>
        </property>
        <property name="shortcut">
         <string>Ctrl+L</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="modelComboBox">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>60</y>
+         <width>161</width>
+         <height>51</height>
+        </rect>
        </property>
       </widget>
      </widget>
@@ -1592,8 +1716,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>1139</width>
-         <height>579</height>
+         <width>1137</width>
+         <height>577</height>
         </rect>
        </property>
        <widget class="QLabel" name="label_9">
@@ -1609,7 +1733,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap>template.svg</pixmap>
+         <pixmap>../../../../../.designer/backup/template.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -1628,7 +1752,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap>cover.svg</pixmap>
+         <pixmap>../../../../../.designer/backup/cover.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -1863,8 +1987,8 @@
    <widget class="QTextBrowser" name="textBrowser">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>460</y>
+      <x>10</x>
+      <y>430</y>
       <width>151</width>
       <height>191</height>
      </rect>
@@ -1876,18 +2000,18 @@
      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Noto Sans'; font-size:11pt; font-style:italic; color:#757575;&quot;&gt;Sin mensajes:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Noto Sans'; font-size:11pt; color:#757575;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Noto Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-style:italic; color:#757575;&quot;&gt;Sin mensajes:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt; color:#757575;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QTreeWidget" name="treeWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
+      <y>40</y>
       <width>161</width>
-      <height>431</height>
+      <height>381</height>
      </rect>
     </property>
     <column>
@@ -1923,13 +2047,34 @@ p, li { white-space: pre-wrap; }
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>1366</width>
-     <height>18</height>
+     <height>30</height>
     </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="baseSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
    </property>
    <property name="palette">
     <palette>

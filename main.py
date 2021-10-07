@@ -250,7 +250,7 @@ class Window(QMainWindow):
         if (self.inputExists and (self.isSegmented or self.sessionIsSegmented)):
             if self.scaleModeAuto == True:
                 #Here there should be the feature to get the temperatures automatically from image
-                scale_range = [22.5 , 35.5]    #MeanTime
+                scale_range = [25 , 45]    #MeanTime
             else:
                 scale_range = [self.ui_window.minSpinBox.value() , self.ui_window.maxSpinBox.value()] 
 
