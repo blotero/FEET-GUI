@@ -2072,8 +2072,9 @@ p, li { white-space: pre-wrap; }
    </widget>
    <widget class="QMenu" name="menuSalir">
     <property name="title">
-     <string>Salir</string>
+     <string>Programa</string>
     </property>
+    <addaction name="actionSalir"/>
    </widget>
    <addaction name="menuFEET_GUI"/>
    <addaction name="menuVer"/>
@@ -2142,6 +2143,11 @@ p, li { white-space: pre-wrap; }
   <action name="actionPantalla_completa">
    <property name="text">
     <string>Pantalla completa</string>
+   </property>
+  </action>
+  <action name="actionSalir">
+   <property name="text">
+    <string>Salir</string>
    </property>
   </action>
  </widget>
