@@ -38,6 +38,7 @@ class Window(QMainWindow):
         self.scaleModeAuto = True
         self.modelsPathExists = False
         self.model = None
+        self.fullScreen = True
 
     def load_ui(self):
         loader = QUiLoader()        
@@ -52,6 +53,9 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.actionCargar_imagen, SIGNAL ('triggered()'), self.openImage)
         QObject.connect(self.ui_window.actionCargar_carpeta , SIGNAL ('triggered()'), self.openFolder)
         QObject.connect(self.ui_window.actionCargar_modelos , SIGNAL ('triggered()'), self.getModelsPath)
+        QObject.connect(self.ui_window.actionPantalla_completa , SIGNAL ('triggered()'), self.toggleFullscreen)
+        QObject.connect(self.ui_window.actionSalir , SIGNAL ('triggered()'), self.exit_)
+        QObject.connect(self.ui_window.actionC_mo_usar , SIGNAL ('triggered()'), self.howToUse)
         QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment)
         QObject.connect(self.ui_window.tempButton, SIGNAL ('clicked()'), self.temp_extract)
         QObject.connect(self.ui_window.manualSegButton, SIGNAL ('clicked()'), self.manual_segment)
@@ -62,6 +66,7 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.fullPlotButton , SIGNAL ('clicked()'), self.fullPlot)
         QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.exportReport)
         QObject.connect(self.ui_window.loadModelButton , SIGNAL ('clicked()'), self.toggleModel)
+
 
     def setDefaultConfigSettings(self, model_dir, session_dir):
         self.config = {'models_directory': model_dir,
@@ -331,6 +336,20 @@ class Window(QMainWindow):
             self.inputExists = True
             self.findImages()
             self.sessionIsSegmented = False
+
+    def toggleFullscreen(self):
+        if self.fullScreen:
+            self.ui_window.showNormal()
+            self.fullScreen = False
+        else:
+            self.ui_window.showFullScreen()
+            self.fullScreen = True
+
+    def exit_(self):
+        sys.exit(app.exec_())
+
+    def howToUse(self):
+        os.system("xdg-open README.md")
 
     def makeTimePlot(self):
         if self.inputExists:
