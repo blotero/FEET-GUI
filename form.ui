@@ -1666,9 +1666,9 @@ media:</string>
        <widget class="QPushButton" name="animateButton">
         <property name="geometry">
          <rect>
-          <x>930</x>
-          <y>300</y>
-          <width>111</width>
+          <x>690</x>
+          <y>280</y>
+          <width>121</width>
           <height>24</height>
          </rect>
         </property>
@@ -1679,9 +1679,9 @@ media:</string>
        <widget class="QFrame" name="frame">
         <property name="geometry">
          <rect>
-          <x>830</x>
-          <y>340</y>
-          <width>301</width>
+          <x>600</x>
+          <y>330</y>
+          <width>351</width>
           <height>111</height>
          </rect>
         </property>
@@ -1707,7 +1707,7 @@ media:</string>
         <widget class="QPlainTextEdit" name="plainTextEdit">
          <property name="geometry">
           <rect>
-           <x>240</x>
+           <x>270</x>
            <y>30</y>
            <width>51</width>
            <height>21</height>
@@ -1717,9 +1717,9 @@ media:</string>
         <widget class="QPushButton" name="refreshTimePlot">
          <property name="geometry">
           <rect>
-           <x>50</x>
+           <x>20</x>
            <y>70</y>
-           <width>171</width>
+           <width>271</width>
            <height>24</height>
           </rect>
          </property>
@@ -1746,7 +1746,7 @@ media:</string>
         <widget class="QPlainTextEdit" name="plainTextEdit_3">
          <property name="geometry">
           <rect>
-           <x>240</x>
+           <x>270</x>
            <y>50</y>
            <width>51</width>
            <height>21</height>
@@ -1812,8 +1812,8 @@ media:</string>
           <rect>
            <x>60</x>
            <y>340</y>
-           <width>81</width>
-           <height>17</height>
+           <width>131</width>
+           <height>31</height>
           </rect>
          </property>
          <property name="text">
@@ -1825,8 +1825,8 @@ media:</string>
           <rect>
            <x>280</x>
            <y>340</y>
-           <width>54</width>
-           <height>17</height>
+           <width>111</width>
+           <height>31</height>
           </rect>
          </property>
          <property name="text">
@@ -2066,11 +2066,16 @@ p, li { white-space: pre-wrap; }
      </font>
     </property>
     <property name="title">
-     <string>Ver</string>
+     <string>Vista</string>
     </property>
     <addaction name="actionPantalla_completa"/>
    </widget>
    <widget class="QMenu" name="menuSalir">
+    <property name="font">
+     <font>
+      <pointsize>15</pointsize>
+     </font>
+    </property>
     <property name="title">
      <string>Programa</string>
     </property>

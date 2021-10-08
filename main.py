@@ -349,7 +349,7 @@ class Window(QMainWindow):
         sys.exit(app.exec_())
 
     def howToUse(self):
-        os.system("xdg-open README.md")
+        os.system("xdg-open README.html")
 
     def makeTimePlot(self):
         if self.inputExists:
