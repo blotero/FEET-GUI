@@ -207,7 +207,11 @@ class Window(QMainWindow):
         Y = np.where( Y >= threshold  , 1 , 0)
         self.Y =remove_small_objects( Y[0])     #Eventually required by temp_extract
         Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
-        plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap='gray')
+        if self.ui_window.rainbowCheckBox.isChecked():
+            cmap = 'rainbow'
+        else:
+            cmap = 'gray'
+        plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap=cmap)
         self.ui_window.outputImg.setPixmap("outputs/output.jpg")
     
     def produceSegmentedSessionOutput(self):
@@ -223,7 +227,11 @@ class Window(QMainWindow):
             self.Y.append(remove_small_objects(Y[0]))     #Eventually required by temp_extract
             print(self.Y[0].shape)
             Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
-            plt.imsave(self.outfiles[i], Y*img[:,:,0] , cmap='gray')
+            if self.ui_window.rainbowCheckBox.isChecked():
+                cmap = 'rainbow'
+            else:
+                cmap = 'gray'
+            plt.imsave(self.outfiles[i], Y*img[:,:,0] , cmap=cmap)
 
 
     def showOutputImageFromSession(self):
