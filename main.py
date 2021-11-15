@@ -24,10 +24,8 @@ class Window(QMainWindow):
     def __init__(self):
         super(Window, self).__init__()
         self.load_ui()        
-        self.figlabels()
         self.imgs = []
         self.subj = []
-       # self.figlabels = cv2.imread('figlabels.png')
         self.make_connect()
         self.inputExists = False
         self.defaultDirectoryExists = False
@@ -37,8 +35,16 @@ class Window(QMainWindow):
         self.temperaturesWereAcquired = False
         self.scaleModeAuto = True
         self.modelsPathExists = False
-        self.model = None
+        self.model = 'default_model.tflite'
         self.fullScreen = True
+        #Loading segmentation models
+        self.s2s = SessionToSegment()
+        self.i2s = ImageToSegment()
+        self.s2s.setModel(self.model)
+        self.i2s.setModel(self.model)
+        self.s2s.loadModel()
+        self.i2s.loadModel()
+        self.ui_window.loadedModelLabel.setText(self.model)
 
     def load_ui(self):
         loader = QUiLoader()        
@@ -56,6 +62,7 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.actionPantalla_completa , SIGNAL ('triggered()'), self.toggleFullscreen)
         QObject.connect(self.ui_window.actionSalir , SIGNAL ('triggered()'), self.exit_)
         QObject.connect(self.ui_window.actionC_mo_usar , SIGNAL ('triggered()'), self.howToUse)
+        QObject.connect(self.ui_window.actionUpdate , SIGNAL ('triggered()'), self.updateSoftware)
         QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment)
         QObject.connect(self.ui_window.tempButton, SIGNAL ('clicked()'), self.temp_extract)
         QObject.connect(self.ui_window.manualSegButton, SIGNAL ('clicked()'), self.manual_segment)
@@ -63,10 +70,8 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.nextImageButton , SIGNAL ('clicked()'), self.nextImage)
         QObject.connect(self.ui_window.previousImageButton , SIGNAL ('clicked()'), self.previousImage)
         QObject.connect(self.ui_window.saveButton , SIGNAL ('clicked()'), self.saveImage)
-        QObject.connect(self.ui_window.fullPlotButton , SIGNAL ('clicked()'), self.fullPlot)
         QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.exportReport)
         QObject.connect(self.ui_window.loadModelButton , SIGNAL ('clicked()'), self.toggleModel)
-
 
     def setDefaultConfigSettings(self, model_dir, session_dir):
         self.config = {'models_directory': model_dir,
@@ -177,7 +182,6 @@ class Window(QMainWindow):
 
     def feetSegment(self):
         self.messagePrint("Segmentando imagen...")
-        self.i2s = ImageToSegment()
         self.i2s.setModel(self.model)
         self.i2s.setPath(self.opdir)
         self.i2s.extract()
@@ -188,14 +192,12 @@ class Window(QMainWindow):
     def sessionSegment(self):
         self.messagePrint("Segmentando toda la sesion...")
         self.sessionIsSegmented = False
-        print(self.model)
-        self.s2s = SessionToSegment()
         self.s2s.setModel(self.model)
         self.s2s.setPath(self.defaultDirectory)
         self.s2s.whole_extract(self.fileList)
         self.produceSegmentedSessionOutput()
         self.showOutputImageFromSession()
-        self.messagePrint("Se ha segmentado exitosamente la sesion con "+ self.models[self.modelIndex])
+        self.messagePrint("Se ha segmentado exitosamente la sesion con "+ self.i2s.model)
         self.sessionIsSegmented = True
 
     def showSegmentedImage(self):
@@ -240,15 +242,13 @@ class Window(QMainWindow):
     def segment(self):
         if self.ui_window.sessionCheckBox.isChecked():
 
-            if self.defaultDirectoryExists and self.modelsPathExists and self.model!=None:
+            if self.defaultDirectoryExists and self.i2s.model!=None and self.s2s.model!=None:
                 self.sessionSegment()
-                print("Entering session segment")
             else:
-                self.messagePrint("Error. Por favor verifique que ha cargado el modelo y la sesion de entrada.")
+                self.messagePrint("Error. Por favor verifique que se ha cargado el modelo y la sesion de entrada.")
         else:
             if self.inputExists and self.modelsPathExists and self.model!=None:
                 self.feetSegment()
-                print("Entering image segment")
             else:
                 self.messagePrint("No se ha seleccionado sesion de entrada")
 
@@ -291,6 +291,11 @@ class Window(QMainWindow):
                         +" Esto puede tomar unos momentos...")
         try:
             self.model = self.modelList[self.modelIndex]
+            self.s2s.setModel(self.model)
+            self.i2s.setModel(self.model)
+            self.s2s.loadModel()
+            self.i2s.loadModel()
+            self.ui_window.loadedModelLabel.setText(self.model)
             self.messagePrint("Modelo " + self.models[self.modelIndex] + " cargado exitosamente")
         except:
             self.messagePrint("Error al cargar el modelo "+ self.models[self.modelIndex])
@@ -307,11 +312,8 @@ class Window(QMainWindow):
         plt.ylabel("Temperatura (°C)")
         plt.grid()
         plt.show()
+        self.messagePrint("Plot de temperatura generado exitosamente")
         #Produce plot 
-
-    def figlabels(self):
-        #  Get info from directory path name and obtain time indexes based on name
-        pass
 
     def openImage(self):
         self.fileDialog=QFileDialog(self)
@@ -377,19 +379,13 @@ class Window(QMainWindow):
         else:
             self.messagePrint("No se puede actualizar el TimePlot. No se ha seleccionado una imagen de entrada")
 
-    def fullPlot(self):
-        self.messagePrint("Preparando full plot...")
-        #show_temperatures("paciente" , fn="mean" , range_ = [22.5 , 33.5])
-        self.messagePrint("Full plot generado exitosamente")
-        pass
-
     def exportReport(self):
         self.messagePrint("Generando reporte...") 
         #GENERATE A PDF REPORT FOR THE PATIENT
         #INPUT: SELF, PATIENT DIR
         #RETURN: NONE
         #ACTION: COMPILE PDF TEXT BASED ON
-        self.messagePrint("Reporte generado exitosamente")
+        self.messagePrint("Funcionalidad no implementada, disponible en futuras versiones.")
         pass
 
     def animate(self):      
@@ -398,9 +394,17 @@ class Window(QMainWindow):
         Initially, all feet has same color, for section segmentation has been not implemented yet
         """
         self.messagePrint("Iniciando animacion...")
+        self.messagePrint("Funcionalidad no implementada, disponible en futuras versiones.")
         pass
 
-   
+    def updateSoftware(self):
+        repoUrl = 'https://github.com/blotero/FEET-GUI.git' 
+        try:
+            os.system("git pull")
+            self.messagePrint("Se ha actualizado exitosamente la interfaz. Se sugiere reiniciar interfaz")
+        except:
+            self.messagePrint("Error al actualizar")
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

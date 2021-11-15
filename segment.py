@@ -20,27 +20,25 @@ class ImageToSegment():
         self.model = None
 
     def predict(self, X):
-        interpreter = tflite.Interpreter(model_path = self.model)
-        interpreter.allocate_tensors()
-
-        input_details = interpreter.get_input_details()
-        output_details = interpreter.get_output_details()
+        input_details = self.interpreter.get_input_details()
+        output_details = self.interpreter.get_output_details()
 
         input_shape = input_details[0]['shape']
         input_data = np.float32(X)
 
-        interpreter.set_tensor(input_details[0]['index'], input_data)
+        self.interpreter.set_tensor(input_details[0]['index'], input_data)
 
-        interpreter.invoke()  # predict
+        self.interpreter.invoke()  # predict
 
-        output_data = interpreter.get_tensor(output_details[0]['index'])
+        output_data = self.interpreter.get_tensor(output_details[0]['index'])
         
         return output_data
 
-    def input_shape(self):
-        interpreter = tflite.Interpreter(model_path = self.model)
-        interpreter.allocate_tensors()
+    def loadModel(self):
+        self.interpreter = tflite.Interpreter(model_path = self.model)
+        self.interpreter.allocate_tensors()
 
+    def input_shape(self):
         input_details = interpreter.get_input_details()[0]['shape'][1]
         print(input_details)
         return input_details
@@ -56,7 +54,6 @@ class ImageToSegment():
         self.X = np.expand_dims(self.X,0)
         self.Y_pred = self.predict(self.X)
 
-        
     def setPath(self,im):
         self.imPath = im
         self.imageIsLoaded = True
@@ -72,12 +69,8 @@ class SessionToSegment():
         self.Xarray = None
         
     def predict(self, X):
-        
-        interpreter = tflite.Interpreter(model_path = self.model)
-        interpreter.allocate_tensors()
-
-        input_details = interpreter.get_input_details()
-        output_details = interpreter.get_output_details()
+        input_details = self.interpreter.get_input_details()
+        output_details = self.interpreter.get_output_details()
         predictions = []
 
         for i in range(X.shape[0]):
@@ -85,20 +78,21 @@ class SessionToSegment():
             input_data = np.float32(X[i])
             input_data = np.expand_dims(input_data, axis=0)
             
-            interpreter.set_tensor(input_details[0]['index'], input_data)
+            self.interpreter.set_tensor(input_details[0]['index'], input_data)
 
-            interpreter.invoke()  # predict
+            self.interpreter.invoke()  # predict
 
-            output_data = interpreter.get_tensor(output_details[0]['index'])
+            output_data = self.interpreter.get_tensor(output_details[0]['index'])
             predictions.append(output_data)
 
         return predictions
     
-    def input_shape(self):
-        interpreter = tflite.Interpreter(model_path = self.model)
-        interpreter.allocate_tensors()
+    def loadModel(self):
+        self.interpreter = tflite.Interpreter(model_path = self.model)
+        self.interpreter.allocate_tensors()
 
-        input_details = interpreter.get_input_details()[0]['shape'][1]
+    def input_shape(self):
+        input_details = self.interpreter.get_input_details()[0]['shape'][1]
         print(input_details)
         return input_details
 
