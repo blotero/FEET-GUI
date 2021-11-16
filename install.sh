@@ -1,7 +1,7 @@
 #!/bin/sh
 
 path=$(pwd)
-install_path=~/.local/bin/feetgui
+install_path=/usr/bin/feetgui
 
 echo "Using path " $path " as source path"
 echo "Installing executable into " $install_path " ..."
