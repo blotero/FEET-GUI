@@ -826,29 +826,11 @@ completa</string>
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="saveButton">
-       <property name="geometry">
-        <rect>
-         <x>160</x>
-         <y>280</y>
-         <width>111</width>
-         <height>51</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>15</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Guardar</string>
-       </property>
-      </widget>
       <widget class="QFrame" name="temperatureFrame">
        <property name="geometry">
         <rect>
-         <x>340</x>
-         <y>300</y>
+         <x>390</x>
+         <y>310</y>
          <width>101</width>
          <height>31</height>
         </rect>
@@ -1323,30 +1305,34 @@ completa</string>
       <widget class="QLabel" name="label_7">
        <property name="geometry">
         <rect>
-         <x>290</x>
-         <y>270</y>
-         <width>91</width>
-         <height>61</height>
+         <x>200</x>
+         <y>300</y>
+         <width>181</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>11</pointsize>
+         <pointsize>14</pointsize>
         </font>
        </property>
        <property name="text">
-        <string>Temperatura
-media:</string>
+        <string>Temperatura media:</string>
        </property>
       </widget>
       <widget class="QCheckBox" name="rainbowCheckBox">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>300</y>
+         <x>40</x>
+         <y>310</y>
          <width>141</width>
          <height>23</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Rainbow</string>
@@ -1356,7 +1342,6 @@ media:</string>
        </property>
       </widget>
       <zorder>outputImg</zorder>
-      <zorder>saveButton</zorder>
       <zorder>label_7</zorder>
       <zorder>temperatureFrame</zorder>
       <zorder>rainbowCheckBox</zorder>

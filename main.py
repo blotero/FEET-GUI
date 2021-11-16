@@ -69,7 +69,6 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.refreshTimePlot , SIGNAL ('clicked()'), self.makeTimePlot)
         QObject.connect(self.ui_window.nextImageButton , SIGNAL ('clicked()'), self.nextImage)
         QObject.connect(self.ui_window.previousImageButton , SIGNAL ('clicked()'), self.previousImage)
-        QObject.connect(self.ui_window.saveButton , SIGNAL ('clicked()'), self.saveImage)
         QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.exportReport)
         QObject.connect(self.ui_window.loadModelButton , SIGNAL ('clicked()'), self.toggleModel)
 
