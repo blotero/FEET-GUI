@@ -10,7 +10,7 @@ echo "#!/bin/sh" > $install_path
 echo "cd " $path >> $install_path
 echo "python main.py" >> $install_path
 ln $install_path ~/Desktop/
-chmod +x ~/.local/bin/feetgui
+chmod +x $install_path
 
 echo "Succesfully installed FEET-GUI"
 echo "Run it by simply typing feetgui in your terminal"
