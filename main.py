@@ -12,13 +12,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog 
-from PySide2.QtCore import QFile, QObject, SIGNAL, QDir 
+from PySide2.QtCore import QFile, QObject, SIGNAL, QDir, QTimer
 from PySide2.QtUiTools import QUiLoader 
 from segment import ImageToSegment, SessionToSegment, remove_small_objects
 from manualseg import manualSeg
 from temperatures import mean_temperature
 from scipy.interpolate import make_interp_spline 
 import tflite_runtime.interpreter as tflite
+import cv2
+from PySide2.QtWidgets import *
+from PySide2.QtCore import *
+from PySide2.QtGui import *
+import qimage2ndarray # for a memory leak,see gist
 
 class Window(QMainWindow):
     def __init__(self):
@@ -45,6 +50,29 @@ class Window(QMainWindow):
         self.s2s.loadModel()
         self.i2s.loadModel()
         self.ui_window.loadedModelLabel.setText(self.model)
+        self.setup_camera()
+        # self.displayFrame()
+
+    def setup_camera(self):
+        """Initialize camera.
+        """
+        self.capture = cv2.VideoCapture(0)
+        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.displayFrame)
+        self.timer.start(30)
+
+
+    def displayFrame(self):
+        ret, frame = self.capture.read()
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        image = qimage2ndarray.array2qimage(frame)
+        image = QImage(frame, frame.shape[1], frame.shape[0], 
+                       frame.strides[0], QImage.Format_RGB888)
+        self.ui_window.inputImg.setPixmap(QPixmap.fromImage(image))
+
 
     def load_ui(self):
         loader = QUiLoader()        
@@ -131,7 +159,7 @@ class Window(QMainWindow):
     def nextImage(self):
         if self.imageIndex < len(self.fileList)-1:
             self.imageIndex += 1
-            self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
+            # self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
             self.opdir = self.fileList[self.imageIndex]
             self.ui_window.inputLabel.setText(self.files[self.imageIndex])
 
@@ -146,7 +174,7 @@ class Window(QMainWindow):
     def previousImage(self):
         if self.imageIndex >= 1:
             self.imageIndex -= 1
-            self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
+            # self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
             self.opdir = self.fileList[self.imageIndex]
             self.ui_window.inputLabel.setText(self.files[self.imageIndex])
 
@@ -328,7 +356,7 @@ class Window(QMainWindow):
         self.imagesDir = os.path.dirname(self.opdir) 
         if self.opdir:
             self.inputExists = True
-            self.ui_window.inputImg.setPixmap(self.opdir)
+            # self.ui_window.inputImg.setPixmap(self.opdir)
 
     def openFolder(self):
         self.folderDialog=QFileDialog(self)
@@ -340,7 +368,7 @@ class Window(QMainWindow):
             self.defaultDirectoryExists = True
             first_image = str(self.defaultDirectory + "/t0.jpg")
             print(first_image)
-            self.ui_window.inputImg.setPixmap(first_image)
+            # self.ui_window.inputImg.setPixmap(first_image)
             self.opdir = first_image
             self.inputExists = True
             self.findImages()
