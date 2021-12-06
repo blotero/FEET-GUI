@@ -24,6 +24,7 @@ from PySide2.QtWidgets import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 import qimage2ndarray # for a memory leak,see gist
+from datetime import date
 
 class Window(QMainWindow):
     def __init__(self):
@@ -66,12 +67,12 @@ class Window(QMainWindow):
 
 
     def displayFrame(self):
-        ret, frame = self.capture.read()
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        image = qimage2ndarray.array2qimage(frame)
-        image = QImage(frame, frame.shape[1], frame.shape[0], 
-                       frame.strides[0], QImage.Format_RGB888)
-        self.ui_window.inputImg.setPixmap(QPixmap.fromImage(image))
+        self.ret, self.frame = self.capture.read()
+        self.frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
+        # image = qimage2ndarray.array2qimage(self.frame)
+        self.image = QImage(self.frame, self.frame.shape[1], self.frame.shape[0], 
+                       self.frame.strides[0], QImage.Format_RGB888)
+        self.ui_window.inputImg.setPixmap(QPixmap.fromImage(self.image))
 
 
     def load_ui(self):
@@ -83,6 +84,27 @@ class Window(QMainWindow):
         self.ui_window.showFullScreen()
         ui_file.close()
     
+    def capture_image(self):
+        
+        if len(os.listdir(self.session_dir)) <= 1:
+            image_number = len(os.listdir(self.session_dir))
+        else:
+            image_number = 5*len(os.listdir(self.session_dir)) - 5
+        
+        save_name = f't{image_number}.jpg'
+        plt.imsave(os.path.join(self.session_dir, save_name), self.frame)
+        self.ui_window.outputImg.setPixmap(QPixmap.fromImage(self.image))
+        self.ui_window.imgName.setText(save_name[:-4])
+
+    def createSession(self):
+        self.name = self.ui_window.nameField.text()
+        self.dir_name = self.name.replace(' ','_')
+        if self.dir_name == '':
+            self.dir_name = str(date.today())
+        self.session_dir = os.path.join('outputs',self.dir_name)
+        os.mkdir(self.session_dir)
+        
+        
     def make_connect(self):
         QObject.connect(self.ui_window.actionCargar_imagen, SIGNAL ('triggered()'), self.openImage)
         QObject.connect(self.ui_window.actionCargar_carpeta , SIGNAL ('triggered()'), self.openFolder)
@@ -93,12 +115,11 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.actionUpdate , SIGNAL ('triggered()'), self.updateSoftware)
         QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment)
         QObject.connect(self.ui_window.tempButton, SIGNAL ('clicked()'), self.temp_extract)
-        QObject.connect(self.ui_window.manualSegButton, SIGNAL ('clicked()'), self.manual_segment)
+        QObject.connect(self.ui_window.captureButton, SIGNAL ('clicked()'), self.capture_image)
         QObject.connect(self.ui_window.refreshTimePlot , SIGNAL ('clicked()'), self.makeTimePlot)
-        QObject.connect(self.ui_window.nextImageButton , SIGNAL ('clicked()'), self.nextImage)
-        QObject.connect(self.ui_window.previousImageButton , SIGNAL ('clicked()'), self.previousImage)
         QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.exportReport)
         QObject.connect(self.ui_window.loadModelButton , SIGNAL ('clicked()'), self.toggleModel)
+        QObject.connect(self.ui_window.createSession, SIGNAL ('clicked()'), self.createSession)
 
     def setDefaultConfigSettings(self, model_dir, session_dir):
         self.config = {'models_directory': model_dir,

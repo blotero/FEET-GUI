@@ -466,7 +466,7 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>180</x>
       <y>40</y>
       <width>1021</width>
       <height>661</height>
@@ -542,10 +542,10 @@
       <widget class="QLabel" name="inputImg">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>20</y>
-         <width>320</width>
-         <height>240</height>
+         <x>10</x>
+         <y>10</y>
+         <width>451</width>
+         <height>331</height>
         </rect>
        </property>
        <property name="text">
@@ -556,82 +556,6 @@
        </property>
        <property name="scaledContents">
         <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QFrame" name="frame_5">
-       <property name="geometry">
-        <rect>
-         <x>180</x>
-         <y>290</y>
-         <width>111</width>
-         <height>51</height>
-        </rect>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <widget class="QLabel" name="inputLabel">
-        <property name="geometry">
-         <rect>
-          <x>30</x>
-          <y>20</y>
-          <width>61</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>14</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>INPUT</string>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QPushButton" name="nextImageButton">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>280</y>
-         <width>61</width>
-         <height>61</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>20</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>➡️</string>
-       </property>
-       <property name="shortcut">
-        <string>+</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="previousImageButton">
-       <property name="geometry">
-        <rect>
-         <x>90</x>
-         <y>280</y>
-         <width>61</width>
-         <height>61</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>20</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>⬅️</string>
-       </property>
-       <property name="shortcut">
-        <string>-</string>
        </property>
       </widget>
      </widget>
@@ -709,7 +633,7 @@
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="manualSegButton">
+      <widget class="QPushButton" name="captureButton">
        <property name="geometry">
         <rect>
          <x>320</x>
@@ -724,7 +648,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Segmentación manual</string>
+        <string>Capturar</string>
        </property>
       </widget>
       <widget class="QPushButton" name="reportButton">
@@ -1341,10 +1265,24 @@ completa</string>
         <bool>true</bool>
        </property>
       </widget>
+      <widget class="QLabel" name="imgName">
+       <property name="geometry">
+        <rect>
+         <x>410</x>
+         <y>260</y>
+         <width>81</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
       <zorder>outputImg</zorder>
       <zorder>label_7</zorder>
       <zorder>temperatureFrame</zorder>
       <zorder>rainbowCheckBox</zorder>
+      <zorder>imgName</zorder>
      </widget>
      <widget class="QFrame" name="tempScaleFrame">
       <property name="geometry">
@@ -1482,6 +1420,70 @@ completa</string>
      <zorder>frame_6</zorder>
      <zorder>tempScaleFrame</zorder>
     </widget>
+    <widget class="QWidget" name="tab_4">
+     <attribute name="title">
+      <string>Info</string>
+     </attribute>
+     <widget class="QLabel" name="label_11">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>30</y>
+        <width>131</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Nombre:</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="createSession">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>190</y>
+        <width>171</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Crear Sesión</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_13">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>110</y>
+        <width>131</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Edad:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="nameField">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>40</y>
+        <width>231</width>
+        <height>32</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>120</y>
+        <width>61</width>
+        <height>32</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
       <string>Salidas</string>
@@ -1506,8 +1508,8 @@ completa</string>
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>1139</width>
-         <height>579</height>
+         <width>1137</width>
+         <height>577</height>
         </rect>
        </property>
        <widget class="QLabel" name="label_9">
@@ -1727,11 +1729,6 @@ completa</string>
       </widget>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_4">
-     <attribute name="title">
-      <string>Info</string>
-     </attribute>
-    </widget>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
       <string>Configuración</string>
@@ -1871,9 +1868,9 @@ completa</string>
      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Noto Sans'; font-size:11pt; font-style:italic; color:#757575;&quot;&gt;Sin mensajes:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Noto Sans'; font-size:11pt; color:#757575;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Noto Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-style:italic; color:#757575;&quot;&gt;Sin mensajes:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt; color:#757575;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QTreeWidget" name="treeWidget">
@@ -1926,7 +1923,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1200</width>
-     <height>42</height>
+     <height>49</height>
     </rect>
    </property>
    <property name="sizePolicy">
