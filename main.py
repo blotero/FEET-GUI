@@ -23,8 +23,9 @@ import cv2
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *
-import qimage2ndarray # for a memory leak,see gist
+#import qimage2ndarray # for a memory leak,see gist
 from datetime import date
+from datetime import datetime
 
 class Window(QMainWindow):
     def __init__(self):
@@ -52,14 +53,14 @@ class Window(QMainWindow):
         self.i2s.loadModel()
         self.ui_window.loadedModelLabel.setText(self.model)
         self.setup_camera()
-        # self.displayFrame()
+        self.sessionIsCreated = False
 
     def setup_camera(self):
         """Initialize camera.
         """
         self.capture = cv2.VideoCapture(0)
-        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
-        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
+        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.displayFrame)
@@ -85,6 +86,8 @@ class Window(QMainWindow):
         ui_file.close()
     
     def capture_image(self):
+        if (not self.sessionIsCreated):
+            self.createSession()
         
         if len(os.listdir(self.session_dir)) <= 1:
             image_number = len(os.listdir(self.session_dir))
@@ -100,7 +103,9 @@ class Window(QMainWindow):
         self.name = self.ui_window.nameField.text()
         self.dir_name = self.name.replace(' ','_')
         if self.dir_name == '':
-            self.dir_name = str(date.today())
+            today = datetime.today()
+            self.dir_name = today.strftime("%Y-%m-%d_%H:%M")            
+        self.sessionIsCreated = True
         self.session_dir = os.path.join('outputs',self.dir_name)
         os.mkdir(self.session_dir)
         
@@ -261,7 +266,10 @@ class Window(QMainWindow):
             cmap = 'rainbow'
         else:
             cmap = 'gray'
-        plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap=cmap)
+        plt.figure()
+        plt.plot(Y*img[:,:,0])
+        plt.savefig("outputs/output.jpg")
+        #plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap=cmap)
         self.ui_window.outputImg.setPixmap("outputs/output.jpg")
     
     def produceSegmentedSessionOutput(self):
@@ -281,7 +289,10 @@ class Window(QMainWindow):
                 cmap = 'rainbow'
             else:
                 cmap = 'gray'
-            plt.imsave(self.outfiles[i], Y*img[:,:,0] , cmap=cmap)
+            plt.figure()
+            plt.imshow(Y*img[:,:,0])
+            plt.savefig("outputs/output.jpg")
+            #plt.imsave(self.outfiles[i], Y*img[:,:,0] , cmap=cmap)
 
 
     def showOutputImageFromSession(self):
