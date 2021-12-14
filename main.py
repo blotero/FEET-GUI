@@ -5,7 +5,6 @@
 
 import os
 import re
-from PIL import Image
 from pathlib import Path
 import sys
 import matplotlib.pyplot as plt
@@ -18,25 +17,41 @@ from segment import ImageToSegment, SessionToSegment, remove_small_objects
 from manualseg import manualSeg
 from temperatures import mean_temperature
 from scipy.interpolate import make_interp_spline 
-import tflite_runtime.interpreter as tflite
 import cv2
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *
-#import qimage2ndarray # for a memory leak,see gist
-from datetime import date
 from datetime import datetime
+
+
+class UnauthorizedException(Exception):
+    def __init__(self, URL):
+        self.URL = URL
+        self.message = "Error syncing local information to remote repository in: " + str(URL)
+        super.__init__(self.message)
+
+
+class NotImplementedError(Exception):
+    def __init__(self):
+        self.message = "This feature has not been implemented" 
+        super.__init__(self.message)
+
+    
+class RemotePullException(Exception):
+    def __init__(self, repoURL):
+        self.message = "Error pulling new changes into local DB from origin: " + str(repoURL)
+        super.__init__(self.message)
+    
 
 class Window(QMainWindow):
     def __init__(self):
         super(Window, self).__init__()
-        self.load_ui()        
+        self.loadUI()        
         self.imgs = []
         self.subj = []
         self.make_connect()
         self.inputExists = False
         self.defaultDirectoryExists = False
-        self.annotationExists : False
         self.isSegmented = False
         self.files = None
         self.temperaturesWereAcquired = False
@@ -52,10 +67,13 @@ class Window(QMainWindow):
         self.s2s.loadModel()
         self.i2s.loadModel()
         self.ui_window.loadedModelLabel.setText(self.model)
-        self.setup_camera()
+        self.setupCamera()
         self.sessionIsCreated = False
+        self.driveURL = None
+        self.rcloneIsConfigured = False
+        self.repoUrl = 'https://github.com/blotero/FEET-GUI.git' 
 
-    def setup_camera(self):
+    def setupCamera(self):
         """Initialize camera.
         """
         self.capture = cv2.VideoCapture(0)
@@ -76,7 +94,7 @@ class Window(QMainWindow):
         self.ui_window.inputImg.setPixmap(QPixmap.fromImage(self.image))
 
 
-    def load_ui(self):
+    def loadUI(self):
         loader = QUiLoader()        
         path = os.fspath(Path(__file__).resolve().parent / "form.ui")
         ui_file = QFile(path)
@@ -100,16 +118,50 @@ class Window(QMainWindow):
         self.ui_window.imgName.setText(save_name[:-4])
 
     def createSession(self):
+        """
+        Creates a new session, including a directory in ./outputs/<session_dir> with given input parameters
+        from GUI
+        The session is named as the current timestamp if current session_dir is null
+        """
         self.name = self.ui_window.nameField.text()
         self.dir_name = self.name.replace(' ','_')
         if self.dir_name == '':
             today = datetime.today()
             self.dir_name = today.strftime("%Y-%m-%d_%H:%M")            
-        self.sessionIsCreated = True
-        self.session_dir = os.path.join('outputs',self.dir_name)
-        os.mkdir(self.session_dir)
+        try:
+            self.session_dir = os.path.join('outputs',self.dir_name)
+            os.mkdir(self.session_dir)
+            self.sessionIsCreated = True
+            self.messagePrint("Sesión " + self.session_dir + " creada exitosamente." )
+        except:
+            self.messagePrint("Fallo al crear la sesión. Lea el manual de ayuda para encontrar solución, o reporte bugs al " + self.bugsURL)
         
-        
+    def syncLocalInfoToDrive(self):
+        """
+        Syncs info from the output directory to the configured sync path
+        """
+        self.messagePrint("Sincronizando información al repositorio remoto...")
+        try:
+            status = os.system("rclone copy outputs drive:")
+            self.messagePrint("Sincronizando información al repositorio remoto...")
+            if status == 0:
+                if self.rcloneIsConfigured:
+                    raise UnauthorizedException(self.driveURL)
+                raise Exception("Error de sincronización")
+            self.messagePrint("Se ha sincronizado exitosamente la información")
+        except UnauthorizedException as ue:
+            self.messagePrint("Error de autorización durante la sincronización. Dirígase a Ayuda > Acerca de para más información.")
+            print(ue)
+        except Exception as e:
+            self.messagePrint("Error al sincronizar la información al repositorio. Verifique que ha seguido los pasos de instalación y configuración de rclone. Para más información, dirígase a Ayuda > Acerca de.")
+            print(e)
+
+    def repoConfigDialog(self):
+        """
+        Shows a dialog window for first time configuring the remote repository sync for the current device
+        """
+        raise NotImplementedError()
+
     def make_connect(self):
         QObject.connect(self.ui_window.actionCargar_imagen, SIGNAL ('triggered()'), self.openImage)
         QObject.connect(self.ui_window.actionCargar_carpeta , SIGNAL ('triggered()'), self.openFolder)
@@ -118,6 +170,8 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.actionSalir , SIGNAL ('triggered()'), self.exit_)
         QObject.connect(self.ui_window.actionC_mo_usar , SIGNAL ('triggered()'), self.howToUse)
         QObject.connect(self.ui_window.actionUpdate , SIGNAL ('triggered()'), self.updateSoftware)
+        QObject.connect(self.ui_window.actionRepoSync , SIGNAL ('triggered()'), self.syncLocalInfoToDrive)
+        QObject.connect(self.ui_window.actionRepoConfig , SIGNAL ('triggered()'), self.repoConfigDialog)
         QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment)
         QObject.connect(self.ui_window.tempButton, SIGNAL ('clicked()'), self.temp_extract)
         QObject.connect(self.ui_window.captureButton, SIGNAL ('clicked()'), self.capture_image)
@@ -440,12 +494,14 @@ class Window(QMainWindow):
 
     def exportReport(self):
         self.messagePrint("Generando reporte...") 
-        #GENERATE A PDF REPORT FOR THE PATIENT
-        #INPUT: SELF, PATIENT DIR
-        #RETURN: NONE
-        #ACTION: COMPILE PDF TEXT BASED ON
-        self.messagePrint("Funcionalidad no implementada, disponible en futuras versiones.")
-        pass
+        """
+        GENERATE A PDF REPORT FOR THE PATIENT
+        INPUT: SELF, PATIENT DIR
+        RETURN: NONE
+        ACTION: COMPILE PDF TEXT BASED ON
+        """
+        self.messagePrint("Desarrollo no implementado, disponible en futuras versiones.")
+        raise NotImplementedError()
 
     def animate(self):      
         """
@@ -453,16 +509,16 @@ class Window(QMainWindow):
         Initially, all feet has same color, for section segmentation has been not implemented yet
         """
         self.messagePrint("Iniciando animacion...")
-        self.messagePrint("Funcionalidad no implementada, disponible en futuras versiones.")
-        pass
+        self.messagePrint("Desarrollo no implementado, disponible en futuras versiones.")
+        raise NotImplementedError()
 
     def updateSoftware(self):
-        repoUrl = 'https://github.com/blotero/FEET-GUI.git' 
         try:
             os.system("git pull")
             self.messagePrint("Se ha actualizado exitosamente la interfaz. Se sugiere reiniciar interfaz")
         except:
             self.messagePrint("Error al actualizar")
+            raise RemotePullException()
 
 
 if __name__ == "__main__":

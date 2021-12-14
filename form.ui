@@ -2083,11 +2083,19 @@ p, li { white-space: pre-wrap; }
     <property name="title">
      <string>Archivo</string>
     </property>
+    <widget class="QMenu" name="menuRepositorio_remoto">
+     <property name="title">
+      <string>Repositorio remoto</string>
+     </property>
+     <addaction name="actionRepoConfig"/>
+     <addaction name="actionRepoSync"/>
+    </widget>
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="actionCargar_imagen"/>
     <addaction name="actionCargar_carpeta"/>
     <addaction name="actionCargar_modelos"/>
+    <addaction name="menuRepositorio_remoto"/>
    </widget>
    <widget class="QMenu" name="menuAyuda">
     <property name="font">
@@ -2201,6 +2209,16 @@ p, li { white-space: pre-wrap; }
   <action name="actionUpdate">
    <property name="text">
     <string>Actualizar</string>
+   </property>
+  </action>
+  <action name="actionRepoConfig">
+   <property name="text">
+    <string>Configurar</string>
+   </property>
+  </action>
+  <action name="actionRepoSync">
+   <property name="text">
+    <string>Sincronizar</string>
    </property>
   </action>
  </widget>
