@@ -172,8 +172,8 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.actionUpdate , SIGNAL ('triggered()'), self.updateSoftware)
         QObject.connect(self.ui_window.actionRepoSync , SIGNAL ('triggered()'), self.syncLocalInfoToDrive)
         QObject.connect(self.ui_window.actionRepoConfig , SIGNAL ('triggered()'), self.repoConfigDialog)
-        QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment)
-        QObject.connect(self.ui_window.tempButton, SIGNAL ('clicked()'), self.temp_extract)
+        QObject.connect(self.ui_window.segButtonImport, SIGNAL ('clicked()'), self.segment)
+        QObject.connect(self.ui_window.tempButtonImport, SIGNAL ('clicked()'), self.temp_extract)
         QObject.connect(self.ui_window.captureButton, SIGNAL ('clicked()'), self.capture_image)
         QObject.connect(self.ui_window.nextImageButton , SIGNAL ('clicked()'), self.nextImage)
         QObject.connect(self.ui_window.previousImageButton , SIGNAL ('clicked()'), self.previousImage)
@@ -240,7 +240,7 @@ class Window(QMainWindow):
     def nextImage(self):
         if self.imageIndex < len(self.fileList)-1:
             self.imageIndex += 1
-            # self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
+            self.ui_window.inputImgImport.setPixmap(self.fileList[self.imageIndex])
             self.opdir = self.fileList[self.imageIndex]
             self.ui_window.inputLabel.setText(self.files[self.imageIndex])
 
@@ -250,12 +250,12 @@ class Window(QMainWindow):
                 self.showOutputImageFromSession()
                 if self.temperaturesWereAcquired:
                     self.messagePrint("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
-                    self.ui_window.temperatureLabel.setText(str(np.round(self.meanTemperatures[self.imageIndex], 3)))
+                    self.ui_window.temperatureLabelImport.setText(str(np.round(self.meanTemperatures[self.imageIndex], 3)))
                 
     def previousImage(self):
         if self.imageIndex >= 1:
             self.imageIndex -= 1
-            # self.ui_window.inputImg.setPixmap(self.fileList[self.imageIndex])
+            self.ui_window.inputImgImport.setPixmap(self.fileList[self.imageIndex])
             self.opdir = self.fileList[self.imageIndex]
             self.ui_window.inputLabel.setText(self.files[self.imageIndex])
 
@@ -317,7 +317,7 @@ class Window(QMainWindow):
         Y = np.where( Y >= threshold  , 1 , 0)
         self.Y =remove_small_objects( Y[0])     #Eventually required by temp_extract
         Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
-        if self.ui_window.rainbowCheckBox.isChecked():
+        if self.ui_window.rainbowCheckBoxImport.isChecked():
             cmap = 'rainbow'
         else:
             cmap = 'gray'
@@ -325,7 +325,7 @@ class Window(QMainWindow):
         plt.plot(Y*img[:,:,0])
         plt.savefig("outputs/output.jpg")
         #plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap=cmap)
-        self.ui_window.outputImg.setPixmap("outputs/output.jpg")
+        self.ui_window.outputImgImport.setPixmap("outputs/output.jpg")
     
     def produceSegmentedSessionOutput(self):
         #Recursively applies showSegmentedImage to whole session
@@ -351,7 +351,7 @@ class Window(QMainWindow):
 
 
     def showOutputImageFromSession(self):
-        self.ui_window.outputImg.setPixmap(self.outfiles[self.imageIndex])
+        self.ui_window.outputImgImport.setPixmap(self.outfiles[self.imageIndex])
 
     def segment(self):
         if self.ui_window.sessionCheckBox.isChecked():
@@ -376,7 +376,7 @@ class Window(QMainWindow):
         if (self.inputExists and (self.isSegmented or self.sessionIsSegmented)):
             
             
-            scale_range = [self.ui_window.minSpinBox.value() , self.ui_window.maxSpinBox.value()] 
+            scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()] 
 
             if self.ui_window.sessionCheckBox.isChecked():   #If segmentation was for full session
                 self.meanTemperatures = []   #Whole feet mean temperature for all images in session
@@ -443,7 +443,7 @@ class Window(QMainWindow):
         self.imagesDir = os.path.dirname(self.opdir) 
         if self.opdir:
             self.inputExists = True
-            # self.ui_window.inputImg.setPixmap(self.opdir)
+            self.ui_window.inputImgImport.setPixmap(self.opdir)
 
     def openFolder(self):
         self.folderDialog=QFileDialog(self)
@@ -455,7 +455,7 @@ class Window(QMainWindow):
             self.defaultDirectoryExists = True
             first_image = str(self.defaultDirectory + "/t0.jpg")
             print(first_image)
-            # self.ui_window.inputImg.setPixmap(first_image)
+            self.ui_window.inputImgImport.setPixmap(first_image)
             self.opdir = first_image
             self.inputExists = True
             self.findImages()
