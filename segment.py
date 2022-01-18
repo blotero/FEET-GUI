@@ -39,7 +39,7 @@ class ImageToSegment():
         self.interpreter.allocate_tensors()
 
     def input_shape(self):
-        input_details = interpreter.get_input_details()[0]['shape'][1]
+        input_details = self.interpreter.get_input_details()[0]['shape'][1]
         print(input_details)
         return input_details
 

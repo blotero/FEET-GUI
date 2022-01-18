@@ -112,10 +112,10 @@ class Window(QMainWindow):
         else:
             image_number = 5*len(os.listdir(self.session_dir)) - 5
         
-        save_name = f't{image_number}.jpg'
-        plt.imsave(os.path.join(self.session_dir, save_name), self.frame)
+        self.save_name = f't{image_number}.jpg'
+        plt.imsave(os.path.join(self.session_dir, self.save_name), self.frame)
         self.ui_window.outputImg.setPixmap(QPixmap.fromImage(self.image))
-        self.ui_window.imgName.setText(save_name[:-4])
+        self.ui_window.imgName.setText(self.save_name[:-4])
 
     def createSession(self):
         """
@@ -180,6 +180,32 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.exportReport)
         QObject.connect(self.ui_window.loadModelButton , SIGNAL ('clicked()'), self.toggleModel)
         QObject.connect(self.ui_window.createSession, SIGNAL ('clicked()'), self.createSession)
+        QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment_capture)
+    
+    def segment_capture(self):
+        self.messagePrint("Segmentando imagen...")
+        self.i2s.setModel(self.model)
+        self.i2s.setPath(os.path.join(self.session_dir,self.save_name))
+        self.i2s.loadModel()
+        self.i2s.extract()
+        threshold =  0.5
+        img = plt.imread(os.path.join(self.session_dir, self.save_name))/255
+        Y = self.i2s.Y_pred
+        Y = Y / Y.max()
+        Y = np.where( Y >= threshold  , 1 , 0)
+        self.Y =remove_small_objects( Y[0])     #Eventually required by temp_extract
+        Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
+        if self.ui_window.rainbowCheckBoxImport.isChecked():
+            cmap = 'rainbow'
+        else:
+            cmap = 'gray'
+        # plt.figure()
+        # plt.plot(Y*img[:,:,0])
+        # plt.savefig("outputs/output.jpg")
+        plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap=cmap)
+        self.ui_window.outputImg.setPixmap("outputs/output.jpg")
+        self.isSegmented = True
+        self.messagePrint("Imagen segmentada exitosamente")
 
     def setDefaultConfigSettings(self, model_dir, session_dir):
         self.config = {'models_directory': model_dir,
@@ -344,10 +370,11 @@ class Window(QMainWindow):
                 cmap = 'rainbow'
             else:
                 cmap = 'gray'
-            plt.figure()
-            plt.imshow(Y*img[:,:,0])
-            plt.savefig("outputs/output.jpg")
-            #plt.imsave(self.outfiles[i], Y*img[:,:,0] , cmap=cmap)
+            # plt.figure()
+            # plt.imshow(Y*img[:,:,0])
+            # plt.axis('off')
+            # plt.savefig(self.outfiles[i])
+            plt.imsave(self.outfiles[i], Y*img[:,:,0] , cmap=cmap)
 
 
     def showOutputImageFromSession(self):
