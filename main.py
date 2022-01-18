@@ -175,7 +175,8 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment)
         QObject.connect(self.ui_window.tempButton, SIGNAL ('clicked()'), self.temp_extract)
         QObject.connect(self.ui_window.captureButton, SIGNAL ('clicked()'), self.capture_image)
-        QObject.connect(self.ui_window.refreshTimePlot , SIGNAL ('clicked()'), self.makeTimePlot)
+        QObject.connect(self.ui_window.nextImageButton , SIGNAL ('clicked()'), self.nextImage)
+        QObject.connect(self.ui_window.previousImageButton , SIGNAL ('clicked()'), self.previousImage)
         QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.exportReport)
         QObject.connect(self.ui_window.loadModelButton , SIGNAL ('clicked()'), self.toggleModel)
         QObject.connect(self.ui_window.createSession, SIGNAL ('clicked()'), self.createSession)
@@ -473,24 +474,6 @@ class Window(QMainWindow):
 
     def howToUse(self):
         os.system("xdg-open README.html")
-
-    def makeTimePlot(self):
-        if self.inputExists:
-            x=np.array([0,1,5,10,15,20])
-            y=np.array([35.5, 35.7 , 36 , 37.2 , 37.3, 37.5])
-            fig=plt.figure(figsize=(9.6,4))
-            plt.plot(x,y,label='Paciente 1')
-            plt.legend()
-            plt.grid()
-            plt.xlabel("Tiempo [minutos]")
-            plt.ylabel("Temperatura [°C]")
-            plt.title("Time plot")
-            #plt.show()
-            plt.savefig('/ouputs/fresh.png')
-            self.ui_window.timePlot.setPixmap('/outputs/outputs//fresh.png')
-            self.messagePrint("Se ha actualizado el TimePlot")
-        else:
-            self.messagePrint("No se puede actualizar el TimePlot. No se ha seleccionado una imagen de entrada")
 
     def exportReport(self):
         self.messagePrint("Generando reporte...") 
