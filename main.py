@@ -77,11 +77,13 @@ class Window(QMainWindow):
         self.digits_model.allocate_tensors()
         
     def predict_number(self,image):
-        
+
         image_2 = cv2.resize(image, (28, 28), interpolation = cv2.INTER_NEAREST)
-        image_2 = image_2[:,:,0]
-        image_2 = np.where(image_2>0.2, 1, 0)
+        
+        image_2 = cv2.cvtColor(image_2, cv2.COLOR_BGR2GRAY)
+        
         image_2 = np.expand_dims(image_2, -1)
+
         image_2 = np.expand_dims(image_2, 0)
         input_details = self.digits_model.get_input_details()
         output_details = self.digits_model.get_output_details()
@@ -99,9 +101,9 @@ class Window(QMainWindow):
         
      
     def extract_scales(self, x):
-        lower_digit_1 = self.predict_number(x[446: 466, 576: 590])
-        lower_digit_2 = self.predict_number(x[446: 466, 590: 604])
-        lower_digit_3 = self.predict_number(x[446: 466, 610: 624])
+        lower_digit_1 = self.predict_number(x[445: 467, 575: 591])
+        lower_digit_2 = self.predict_number(x[445: 467, 589: 605])
+        lower_digit_3 = self.predict_number(x[445: 467, 609: 625])
         
         upper_digit_1 = self.predict_number(x[14: 34, 576: 590])
         upper_digit_2 = self.predict_number(x[14: 34, 590: 604])
@@ -122,7 +124,7 @@ class Window(QMainWindow):
     def setupCamera(self):
         """Initialize camera.
         """
-        self.capture = cv2.VideoCapture(0)
+        self.capture = cv2.VideoCapture(2)
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
@@ -346,7 +348,7 @@ class Window(QMainWindow):
                 self.showOutputImageFromSession()
                 if self.temperaturesWereAcquired:
                     self.messagePrint("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
-                    self.ui_window.temperatureLabel.setText(str(np.round(self.meanTemperatures[self.imageIndex], 3)))
+                    self.ui_window.temperatureLabelImport.setText(str(np.round(self.meanTemperatures[self.imageIndex], 3)))
 
     def saveImage(self):
         #Saves segmented image
