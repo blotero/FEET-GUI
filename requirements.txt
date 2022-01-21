@@ -1,5 +1,5 @@
 matplotlib
 opencv-contrib-python-headless
 PySide2
-tensorflow
+tflite-runtime
 scipy
