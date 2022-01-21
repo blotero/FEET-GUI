@@ -110,6 +110,12 @@ class Window(QMainWindow):
 
         return lower_bound, upper_bound
 
+    def extract_multiple_scales(self, X):
+        scales = []
+        for i in range(X.shape[0]):
+            scales.append(self.extract_scales(X[i]))
+        return scales
+
     def setupCamera(self):
         """Initialize camera.
         """
@@ -216,6 +222,7 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.actionRepoSync , SIGNAL ('triggered()'), self.syncLocalInfoToDrive)
         QObject.connect(self.ui_window.actionRepoConfig , SIGNAL ('triggered()'), self.repoConfigDialog)
         QObject.connect(self.ui_window.segButtonImport, SIGNAL ('clicked()'), self.segment)
+        #QObject.connect(self.ui_window.tempButton, SIGNAL ('clicked()'), self.temp_extract)
         QObject.connect(self.ui_window.tempButtonImport, SIGNAL ('clicked()'), self.temp_extract)
         QObject.connect(self.ui_window.captureButton, SIGNAL ('clicked()'), self.capture_image)
         QObject.connect(self.ui_window.nextImageButton , SIGNAL ('clicked()'), self.nextImage)
@@ -444,9 +451,11 @@ class Window(QMainWindow):
 
     def temp_extract(self):
         if (self.inputExists and (self.isSegmented or self.sessionIsSegmented)):
-            
-            
-            scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()] 
+            if self.ui_window.autoScaleCheckBox.isChecked:
+                #Get automatic scales
+                scale_range = self.extract_multiple_scales(np.uint8(self.s2s.img_array))
+            else:
+                scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()] 
 
             if self.ui_window.sessionCheckBox.isChecked():   #If segmentation was for full session
                 self.meanTemperatures = []   #Whole feet mean temperature for all images in session
