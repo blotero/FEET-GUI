@@ -77,8 +77,10 @@ class Window(QMainWindow):
         self.digits_model.allocate_tensors()
         
     def predict_number(self,image):
+        
         image_2 = cv2.resize(image, (28, 28), interpolation = cv2.INTER_NEAREST)
         image_2 = image_2[:,:,0]
+        image_2 = np.where(image_2>0.2, 1, 0)
         image_2 = np.expand_dims(image_2, -1)
         image_2 = np.expand_dims(image_2, 0)
         input_details = self.digits_model.get_input_details()
@@ -100,7 +102,7 @@ class Window(QMainWindow):
         lower_digit_1 = self.predict_number(x[446: 466, 576: 590])
         lower_digit_2 = self.predict_number(x[446: 466, 590: 604])
         lower_digit_3 = self.predict_number(x[446: 466, 610: 624])
-
+        
         upper_digit_1 = self.predict_number(x[14: 34, 576: 590])
         upper_digit_2 = self.predict_number(x[14: 34, 590: 604])
         upper_digit_3 = self.predict_number(x[14: 34, 610: 624])
@@ -114,6 +116,7 @@ class Window(QMainWindow):
         scales = []
         for i in range(X.shape[0]):
             scales.append(self.extract_scales(X[i]))
+            
         return scales
 
     def setupCamera(self):
@@ -129,13 +132,15 @@ class Window(QMainWindow):
 
 
     def displayFrame(self):
-        self.ret, self.frame = self.capture.read()
-        self.frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
-        # image = qimage2ndarray.array2qimage(self.frame)
-        self.image = QImage(self.frame, self.frame.shape[1], self.frame.shape[0], 
-                       self.frame.strides[0], QImage.Format_RGB888)
-        self.ui_window.inputImg.setPixmap(QPixmap.fromImage(self.image))
-
+        try:
+            self.ret, self.frame = self.capture.read()
+            self.frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
+            # image = qimage2ndarray.array2qimage(self.frame)
+            self.image = QImage(self.frame, self.frame.shape[1], self.frame.shape[0], 
+                        self.frame.strides[0], QImage.Format_RGB888)
+            self.ui_window.inputImg.setPixmap(QPixmap.fromImage(self.image))
+        except:
+            pass
 
     def loadUI(self):
         loader = QUiLoader()        
@@ -451,19 +456,27 @@ class Window(QMainWindow):
 
     def temp_extract(self):
         if (self.inputExists and (self.isSegmented or self.sessionIsSegmented)):
-            if self.ui_window.autoScaleCheckBox.isChecked:
+            if self.ui_window.autoScaleCheckBoxImport.isChecked and self.ui_window.sessionCheckBox.isChecked():
                 #Get automatic scales
-                scale_range = self.extract_multiple_scales(np.uint8(self.s2s.img_array))
-            else:
+                scale_range = self.extract_multiple_scales(self.s2s.img_array)
+                print(scale_range)
+                self.ui_window.minSpinBoxImport.setValue(scale_range[self.imageIndex][0])
+                self.ui_window.maxSpinBoxImport.setValue(scale_range[self.imageIndex][1])
+            elif not self.ui_window.autoScaleCheckBoxImport.isChecked():
                 scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()] 
 
             if self.ui_window.sessionCheckBox.isChecked():   #If segmentation was for full session
                 self.meanTemperatures = []   #Whole feet mean temperature for all images in session
-                for i in range(len(self.outfiles)):
-                    self.meanTemperatures.append(mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , scale_range, plot = False))
+                if self.ui_window.autoScaleCheckBoxImport.isChecked():
+                    for i in range(len(self.outfiles)):
+                        self.meanTemperatures.append(mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , scale_range[i], plot = False))
+                else:
+                    for i in range(len(self.outfiles)):
+                        self.meanTemperatures.append(mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , scale_range, plot = False))
                 self.messagePrint("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
                 self.temperaturesWereAcquired = True
             else:      #If segmentation was for single image
+                scale_range = self.extract_scales(self.i2s.Xarray)
                 mean = mean_temperature(self.i2s.Xarray[:,:,0] , self.Y[:,:,0] , scale_range, plot = False)
                 self.messagePrint("La temperatura media es: " + str(mean))
 
