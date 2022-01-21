@@ -22,6 +22,7 @@ from PySide2.QtWidgets import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from datetime import datetime
+import tflite_runtime.interpreter as tflite
 
 
 class UnauthorizedException(Exception):
@@ -72,6 +73,42 @@ class Window(QMainWindow):
         self.driveURL = None
         self.rcloneIsConfigured = False
         self.repoUrl = 'https://github.com/blotero/FEET-GUI.git' 
+        self.digits_model = tflite.Interpreter(model_path = './digits_recognition.tflite')
+        self.digits_model.allocate_tensors()
+        
+    def predict_number(self,image):
+        image_2 = cv2.resize(image, (28, 28), interpolation = cv2.INTER_NEAREST)
+        image_2 = image_2[:,:,0]
+        image_2 = np.expand_dims(image_2, -1)
+        image_2 = np.expand_dims(image_2, 0)
+        input_details = self.digits_model.get_input_details()
+        output_details = self.digits_model.get_output_details()
+
+        input_shape = input_details[0]['shape']
+        input_data = np.float32(image_2)
+
+        self.digits_model.set_tensor(input_details[0]['index'], input_data)
+
+        self.digits_model.invoke()  # predict
+
+        output_data = self.digits_model.get_tensor(output_details[0]['index'])
+
+        return np.argmax(output_data)  
+        
+     
+    def extract_scales(self, x):
+        lower_digit_1 = self.predict_number(x[446: 466, 576: 590])
+        lower_digit_2 = self.predict_number(x[446: 466, 590: 604])
+        lower_digit_3 = self.predict_number(x[446: 466, 610: 624])
+
+        upper_digit_1 = self.predict_number(x[14: 34, 576: 590])
+        upper_digit_2 = self.predict_number(x[14: 34, 590: 604])
+        upper_digit_3 = self.predict_number(x[14: 34, 610: 624])
+
+        lower_bound = lower_digit_1*10 + lower_digit_2 + lower_digit_3*0.1
+        upper_bound = upper_digit_1*10 + upper_digit_2 + upper_digit_3*0.1
+
+        return lower_bound, upper_bound
 
     def setupCamera(self):
         """Initialize camera.
@@ -116,7 +153,13 @@ class Window(QMainWindow):
         plt.imsave(os.path.join(self.session_dir, self.save_name), self.frame)
         self.ui_window.outputImg.setPixmap(QPixmap.fromImage(self.image))
         self.ui_window.imgName.setText(self.save_name[:-4])
-
+        
+        if self.ui_window.autoScaleCheckBox.isChecked():
+            # Read and set the temperature range:
+            temp_scale = self.extract_scales(self.frame)
+            self.ui_window.minSpinBox.setValue(temp_scale[0])
+            self.ui_window.maxSpinBox.setValue(temp_scale[1])
+            self.messagePrint(f"Escala leida: {temp_scale}. Por favor verifique que sea la correcta y corrijala en caso de que no lo sea.")
     def createSession(self):
         """
         Creates a new session, including a directory in ./outputs/<session_dir> with given input parameters
