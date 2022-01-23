@@ -80,7 +80,7 @@ class Window(QMainWindow):
 
         image_2 = cv2.resize(image, (28, 28), interpolation = cv2.INTER_NEAREST)
         
-        image_2 = cv2.cvtColor(image_2, cv2.COLOR_BGR2GRAY)
+        image_2 = cv2.cvtColor(np.uint8(image_2), cv2.COLOR_BGR2GRAY)
         
         image_2 = np.expand_dims(image_2, -1)
 
