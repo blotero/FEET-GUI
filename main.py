@@ -24,7 +24,7 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from datetime import datetime
 import tflite_runtime.interpreter as tflite
-
+import easyocr
 
 class RemotePullException(Exception):
     def __init__(self, repoURL):
@@ -85,6 +85,7 @@ class Window(QMainWindow):
         self.repoUrl = 'https://github.com/blotero/FEET-GUI.git' 
         self.digits_model = tflite.Interpreter(model_path = './digits_recognition.tflite')
         self.digits_model.allocate_tensors()
+        self.reader = easyocr.Reader(['en'])
         
     def predict_number(self,image):
         """
@@ -113,6 +114,20 @@ class Window(QMainWindow):
         return np.argmax(output_data)  
         
      
+    def extract_scales_2(self,x):
+        
+        x = np.uint8(x[:,560:,:])
+        
+        result = self.reader.readtext(x,detail=0)
+        print(result)    
+        result = [float(number) for number in result]
+        
+        lower = min(result)
+        upper = max(result)
+        
+        return lower, upper
+     
+     
     def extract_scales(self, x):
         """
         Extracts float lower and upper scales from a thermal image
@@ -136,7 +151,7 @@ class Window(QMainWindow):
         """
         scales = []
         for i in range(X.shape[0]):
-            scales.append(self.extract_scales(X[i]))
+            scales.append(self.extract_scales_2(X[i]))
             
         return scales
 
@@ -558,8 +573,7 @@ class Window(QMainWindow):
                 #Get automatic scales
                 scale_range = self.extract_multiple_scales(self.s2s.img_array)
                 print(scale_range)
-                self.ui_window.minSpinBoxImport.setValue(scale_range[self.imageIndex][0])
-                self.ui_window.maxSpinBoxImport.setValue(scale_range[self.imageIndex][1])
+                
             elif not self.ui_window.autoScaleCheckBoxImport.isChecked():
                 scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()] 
 
@@ -572,9 +586,15 @@ class Window(QMainWindow):
                     for i in range(len(self.outfiles)):
                         self.meanTemperatures.append(mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , scale_range, plot = False))
                 self.message_print("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
+                self.message_print(f"La escala leida es: {scale_range[self.imageIndex]}")
+                self.ui_window.minSpinBoxImport.setValue(scale_range[self.imageIndex][0])
+                self.ui_window.maxSpinBoxImport.setValue(scale_range[self.imageIndex][1])
                 self.temperaturesWereAcquired = True
             else:      #If segmentation was for single image
-                scale_range = self.extract_scales(self.i2s.Xarray)
+                if ui_window.autoScaleCheckBoxImport.isChecked():
+                    scale_range = self.extract_scales_2(self.i2s.Xarray)
+                else:
+                    scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()]
                 mean = mean_temperature(self.i2s.Xarray[:,:,0] , self.Y[:,:,0] , scale_range, plot = False)
                 self.message_print("La temperatura media es: " + str(mean))
 

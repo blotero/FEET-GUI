@@ -45,13 +45,13 @@ class ImageToSegment():
 
     def extract(self):
         img_size = self.input_shape()
-        self.img = plt.imread(self.imPath)/255
+        self.img = plt.imread(self.imPath)
         # self.X = tf.convert_to_tensor(self.img)
         self.X = self.img
         self.X = cv2.resize(self.X, (img_size, img_size), interpolation = cv2.INTER_NEAREST)
         self.Xarray  = np.array(self.X)
         self.Xarray = (self.Xarray/self.Xarray.max()).reshape(img_size , img_size , 3)
-        self.X = np.expand_dims(self.X,0)
+        self.X = np.expand_dims(self.X,0)/255.
         self.Y_pred = self.predict(self.X)
 
     def setPath(self,im):
@@ -100,9 +100,9 @@ class SessionToSegment():
         img_size = self.input_shape()
         self.img_array=[]
         for i in range(len(dirs)):
-            self.img_array.append(plt.imread(dirs[i])/255)
+            self.img_array.append(plt.imread(dirs[i]))
         self.img_array=np.array(self.img_array)
-        self.X = np.array([cv2.resize(self.img_array[i] , (img_size , img_size), interpolation = cv2.INTER_NEAREST) for i in range(self.img_array.shape[0])])
+        self.X = np.array([cv2.resize(self.img_array[i] , (img_size , img_size), interpolation = cv2.INTER_NEAREST) for i in range(self.img_array.shape[0])])/255.
         self.Xarray  = np.array(self.X)
         self.Xarray = (self.Xarray/self.Xarray.max()).reshape(len(dirs) ,img_size , img_size , 3)
         self.Y_pred = self.predict(self.X)
