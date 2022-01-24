@@ -225,7 +225,7 @@ class Window(QMainWindow):
         
         if self.ui_window.autoScaleCheckBox.isChecked():
             # Read and set the temperature range:
-            temp_scale = self.extract_scales(self.frame)
+            temp_scale = self.extract_scales_2(self.frame)
             self.ui_window.minSpinBox.setValue(temp_scale[0])
             self.ui_window.maxSpinBox.setValue(temp_scale[1])
             self.message_print(f"Escala leida: {temp_scale}. Por favor verifique que sea la correcta y corrijala en caso de que no lo sea.")
