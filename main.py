@@ -66,7 +66,7 @@ class Window(QMainWindow):
         self.files = None
         self.temperaturesWereAcquired = False
         self.scaleModeAuto = True
-        self.modelsPathExists = False
+        self.modelsPathExists = True   #As soon as the model is present in the expected path
         self.model = 'default_model.tflite'
         self.fullScreen = True
         #Loading segmentation models
@@ -118,7 +118,7 @@ class Window(QMainWindow):
     def extract_scales_2(self,x):
         
         x = np.uint8(x[:,560:,:])
-        
+        print(x) 
         result = self.reader.readtext(x,detail=0)
         print(result)    
         try:
@@ -304,7 +304,6 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.loadModelButton , SIGNAL ('clicked()'), self.toggle_model)
         QObject.connect(self.ui_window.createSession, SIGNAL ('clicked()'), self.create_session)
         QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment_capture)
-        QObject.connect(self.ui_window.inputColormapComboBox, SIGNAL ('clicked()'), self.segment_capture)
         #Comboboxes:
         self.ui_window.inputColormapComboBox.currentIndexChanged['QString'].connect(self.toggle_input_colormap)
 
@@ -433,6 +432,8 @@ class Window(QMainWindow):
                 if self.temperaturesWereAcquired:
                     self.message_print("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
                     self.ui_window.temperatureLabelImport.setText(str(np.round(self.meanTemperatures[self.imageIndex], 3)))
+                    self.ui_window.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
+                    self.ui_window.maxSpinBoxImport.setValue(self.scale_range[self.imageIndex][1])
                 
     def previous_image(self):
         """
@@ -450,7 +451,10 @@ class Window(QMainWindow):
                 self.show_output_image_from_session()
                 if self.temperaturesWereAcquired:
                     self.message_print("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
-                    self.ui_window.temperatureLabelImport.setText(str(np.round(self.meanTemperatures[self.imageIndex], 3)))
+                    rounded_temp = np.round(self.meanTemperatures[self.imageIndex], 3)
+                    self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
+                    self.ui_window.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
+                    self.ui_window.maxSpinBoxImport.setValue(self.scale_range[self.imageIndex][1])
 
     def save_image(self):
         """
@@ -523,7 +527,7 @@ class Window(QMainWindow):
         plt.figure()
         plt.plot(Y*img[:,:,0])
         plt.savefig("outputs/output.jpg")
-        #plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap=cmap)
+        plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap=cmap)
         self.ui_window.outputImgImport.setPixmap("outputs/output.jpg")
     
     def produce_segmented_session_output(self):
@@ -574,6 +578,9 @@ class Window(QMainWindow):
             if self.inputExists and self.modelsPathExists and self.model!=None:
                 self.feet_segment()
             else:
+                print(self.inputExists)
+                print(self.modelsPathExists)
+                print(self.model)
                 self.message_print("No se ha seleccionado imagen de entrada")
 
 
@@ -593,34 +600,39 @@ class Window(QMainWindow):
         if (self.inputExists and (self.isSegmented or self.sessionIsSegmented)):
             if self.ui_window.autoScaleCheckBoxImport.isChecked and self.input_type==1:
                 #Get automatic scales
-                scale_range = self.extract_multiple_scales(self.s2s.img_array)
-                print(scale_range)
+                self.scale_range = self.extract_multiple_scales(self.s2s.img_array)
+                print(self.scale_range)
                 
             elif not self.ui_window.autoScaleCheckBoxImport.isChecked():
-                scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()] 
+                self.scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()] 
 
             if self.input_type==1:   #If segmentation was for full session
                 self.meanTemperatures = []   #Whole feet mean temperature for all images in session
                 if self.ui_window.autoScaleCheckBoxImport.isChecked():
                     for i in range(len(self.outfiles)):
-                        self.meanTemperatures.append(mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , scale_range[i], plot = False))
+                        self.meanTemperatures.append(mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range[i], plot = False))
                 else:
                     for i in range(len(self.outfiles)):
-                        self.meanTemperatures.append(mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , scale_range, plot = False))
+                        self.meanTemperatures.append(mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range, plot = False))
                 self.message_print("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
-                self.message_print(f"La escala leida es: {scale_range[self.imageIndex]}")
-                self.ui_window.minSpinBoxImport.setValue(scale_range[self.imageIndex][0])
-                self.ui_window.maxSpinBoxImport.setValue(scale_range[self.imageIndex][1])
+                self.message_print(f"La escala leida es: {self.scale_range[self.imageIndex]}")
+                rounded_temp = np.round(self.meanTemperatures[self.imageIndex], 3)
+                self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
+                self.ui_window.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
+                self.ui_window.maxSpinBoxImport.setValue(self.scale_range[self.imageIndex][1])
                 self.temperaturesWereAcquired = True
             else:      #If segmentation was for single image
-                if ui_window.autoScaleCheckBoxImport.isChecked():
-                    scale_range = self.extract_scales_2(self.i2s.Xarray)
+                if self.ui_window.autoScaleCheckBoxImport.isChecked():
+                    self.scale_range = self.extract_scales_2(self.i2s.img)
                 else:
-                    scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()]
-                mean = mean_temperature(self.i2s.Xarray[:,:,0] , self.Y[:,:,0] , scale_range, plot = False)
+                    self.scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()]
+                time.sleep(1.5)
+                mean = mean_temperature(self.i2s.Xarray[:,:,0] , self.Y[:,:,0] , self.scale_range, plot = False)
                 self.message_print("La temperatura media es: " + str(mean))
+                rounded_temp = np.round(mean, 3)
+                self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
 
-            if (self.ui_window.plotCheckBox.isChecked()):  #If user asked for plot
+            if (self.ui_window.plotCheckBox.isChecked() and self.input_type==1):  #If user asked for plot
                 self.message_print("Se generara plot de temperatura...")
                 self.get_times()
                 print(self.timeList)
@@ -697,7 +709,7 @@ class Window(QMainWindow):
             self.inputExists = True
             self.ui_window.inputImgImport.setPixmap(self.opdir)
             self.message_print(f"Se ha importado exiosamente la imagen {self.opdir} ")
-            #Change to import tab
+            self.ui_window.tabWidget.setProperty('currentIndex', 1)
 
     def open_folder(self):
         """
@@ -718,7 +730,7 @@ class Window(QMainWindow):
             self.inputExists = True
             self.find_images()
             self.sessionIsSegmented = False
-            #Change to import tab
+            self.ui_window.tabWidget.setProperty('currentIndex', 1)
 
     def toggle_fullscreen(self):
         """
