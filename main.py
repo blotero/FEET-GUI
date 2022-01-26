@@ -86,6 +86,7 @@ class Window(QMainWindow):
         self.digits_model = tflite.Interpreter(model_path = './digits_recognition.tflite')
         self.digits_model.allocate_tensors()
         self.reader = easyocr.Reader(['en'])
+        self.set_default_input_cmap()
         
     def predict_number(self,image):
         """
@@ -120,10 +121,15 @@ class Window(QMainWindow):
         
         result = self.reader.readtext(x,detail=0)
         print(result)    
-        result = [float(number) for number in result]
+        try:
+            result = [float(number) for number in result]
+        except:
+            self.message_print("No se ha podido detectar escalas automáticamente. Dejando rango por defecto: [25, 45]")
+            return 25, 45
         
         lower = min(result)
         upper = max(result)
+        self.message_print(f"Escala leida: {lower, upper}. Por favor verifique que sea la correcta y corríjala en caso de que no lo sea.")
         
         return lower, upper
      
@@ -228,7 +234,6 @@ class Window(QMainWindow):
             temp_scale = self.extract_scales_2(self.frame)
             self.ui_window.minSpinBox.setValue(temp_scale[0])
             self.ui_window.maxSpinBox.setValue(temp_scale[1])
-            self.message_print(f"Escala leida: {temp_scale}. Por favor verifique que sea la correcta y corrijala en caso de que no lo sea.")
 
     def create_session(self):
         """
@@ -290,7 +295,7 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.actionRepoSync , SIGNAL ('triggered()'), self.sync_local_info_to_drive)
         QObject.connect(self.ui_window.actionRepoConfig , SIGNAL ('triggered()'), self.repo_config_dialog)
         QObject.connect(self.ui_window.segButtonImport, SIGNAL ('clicked()'), self.segment)
-        #QObject.connect(self.ui_window.tempButton, SIGNAL ('clicked()'), self.temp_extract)
+        QObject.connect(self.ui_window.tempButton, SIGNAL ('clicked()'), self.temp_extract)
         QObject.connect(self.ui_window.tempButtonImport, SIGNAL ('clicked()'), self.temp_extract)
         QObject.connect(self.ui_window.captureButton, SIGNAL ('clicked()'), self.capture_image)
         QObject.connect(self.ui_window.nextImageButton , SIGNAL ('clicked()'), self.next_image)
@@ -299,7 +304,20 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.loadModelButton , SIGNAL ('clicked()'), self.toggle_model)
         QObject.connect(self.ui_window.createSession, SIGNAL ('clicked()'), self.create_session)
         QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment_capture)
-    
+        QObject.connect(self.ui_window.inputColormapComboBox, SIGNAL ('clicked()'), self.segment_capture)
+        #Comboboxes:
+        self.ui_window.inputColormapComboBox.currentIndexChanged['QString'].connect(self.toggle_input_colormap)
+
+    def toggle_input_colormap(self):
+        self.input_cmap = self.accepted_cmaps[self.ui_window.inputColormapComboBox.currentIndex()]
+        self.message_print(f"Se ha cambiado exitosamente el colormap de entrada a {self.input_cmap}")
+
+    def set_default_input_cmap(self):
+        self.accepted_cmaps = ['pink', 'rainbow', 'gray', 'jet']
+        self.input_cmap = self.accepted_cmaps[0]
+        self.ui_window.inputColormapComboBox.addItems(self.accepted_cmaps)
+
+
     def segment_capture(self):
         """
         Segment newly acquired capture with current loaded segmentation model
@@ -348,7 +366,8 @@ class Window(QMainWindow):
         """
         log_path = "outputs/logs.html"
         out_file = open(log_path , "w")
-        out_file.write(message)
+        final_msg = f' <meta charset="UTF-8"> \n {message}'
+        out_file.write(final_msg)
         out_file.close()
         self.ui_window.textBrowser.setSource(log_path)
         self.ui_window.textBrowser.reload()
@@ -544,16 +563,19 @@ class Window(QMainWindow):
         """
         Makes segmentation action depending on the current state (single image or whole session)
         """
-        if self.ui_window.sessionCheckBox.isChecked():
+        if self.input_type == 1:
+            #Session
             if self.defaultDirectoryExists and self.i2s.model!=None and self.s2s.model!=None:
                 self.session_segment()
             else:
-                self.message_print("Error. Por favor verifique que se ha cargado el modelo y la sesion de entrada.")
-        else:
+                self.message_print("Error. Por favor verifique que se ha cargado el modelo y la sesión de entrada.")
+        elif self.input_type == 0:
+            #Single image
             if self.inputExists and self.modelsPathExists and self.model!=None:
                 self.feet_segment()
             else:
-                self.message_print("No se ha seleccionado sesion de entrada")
+                self.message_print("No se ha seleccionado imagen de entrada")
+
 
     def manual_segment(self):
         """
@@ -569,7 +591,7 @@ class Window(QMainWindow):
         Extract temperatures from a segmented image or a whole session
         """
         if (self.inputExists and (self.isSegmented or self.sessionIsSegmented)):
-            if self.ui_window.autoScaleCheckBoxImport.isChecked and self.ui_window.sessionCheckBox.isChecked():
+            if self.ui_window.autoScaleCheckBoxImport.isChecked and self.input_type==1:
                 #Get automatic scales
                 scale_range = self.extract_multiple_scales(self.s2s.img_array)
                 print(scale_range)
@@ -577,7 +599,7 @@ class Window(QMainWindow):
             elif not self.ui_window.autoScaleCheckBoxImport.isChecked():
                 scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()] 
 
-            if self.ui_window.sessionCheckBox.isChecked():   #If segmentation was for full session
+            if self.input_type==1:   #If segmentation was for full session
                 self.meanTemperatures = []   #Whole feet mean temperature for all images in session
                 if self.ui_window.autoScaleCheckBoxImport.isChecked():
                     for i in range(len(self.outfiles)):
@@ -606,6 +628,16 @@ class Window(QMainWindow):
 
         elif self.inputExists:
             self.message_print("No se ha segmentado previamente la imagen ")
+        elif self.ui_window.tabWidget.currentIndex() == 0:
+            self.message_print("Obteniendo temperaturas para la última captura...")
+            time.sleep(1)
+            if not self.sessionIsCreated:
+                self.message_print("No se ha creado una sesión de entrada. Presione capturar para crear una sesión por defecto o cree una con los parámetros deseados")
+                return
+            if len(os.listdir(self.session_dir)) < 1:
+                self.message_print("No se ha hecho ninguna captura.")
+                return
+
         else:
             self.message_print("No se han seleccionado imagenes de entrada")
 
@@ -661,8 +693,11 @@ class Window(QMainWindow):
         self.opdir = self.fileDialog.getOpenFileName()[0]
         self.imagesDir = os.path.dirname(self.opdir) 
         if self.opdir:
+            self.input_type = 0
             self.inputExists = True
             self.ui_window.inputImgImport.setPixmap(self.opdir)
+            self.message_print(f"Se ha importado exiosamente la imagen {self.opdir} ")
+            #Change to import tab
 
     def open_folder(self):
         """
@@ -674,6 +709,7 @@ class Window(QMainWindow):
         self.defaultDirectory = self.folderDialog.getExistingDirectory()
         self.imagesDir = self.defaultDirectory
         if self.defaultDirectory:
+            self.input_type = 1
             self.defaultDirectoryExists = True
             first_image = str(self.defaultDirectory + "/t0.jpg")
             print(first_image)
@@ -682,6 +718,7 @@ class Window(QMainWindow):
             self.inputExists = True
             self.find_images()
             self.sessionIsSegmented = False
+            #Change to import tab
 
     def toggle_fullscreen(self):
         """

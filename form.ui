@@ -691,28 +691,6 @@ p, li { white-space: pre-wrap; }
         <string>Ctrl+Shift+E</string>
        </property>
       </widget>
-      <widget class="QCheckBox" name="sessionCheckBox">
-       <property name="geometry">
-        <rect>
-         <x>180</x>
-         <y>30</y>
-         <width>121</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>13</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Sesión
-completa</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
       <widget class="QCheckBox" name="plotCheckBox">
        <property name="geometry">
         <rect>
@@ -2274,28 +2252,6 @@ completa</string>
         <string>Ctrl+Shift+E</string>
        </property>
       </widget>
-      <widget class="QCheckBox" name="sessionCheckBoxImport">
-       <property name="geometry">
-        <rect>
-         <x>170</x>
-         <y>40</y>
-         <width>101</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>13</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Sesión
-completa</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
       <widget class="QCheckBox" name="plotCheckBoxImport">
        <property name="geometry">
         <rect>
@@ -2846,6 +2802,50 @@ completa</string>
        </property>
        <property name="text">
         <string>TextLabel</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QFrame" name="frame_5">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>310</y>
+        <width>271</width>
+        <height>121</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QLabel" name="label_14">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>10</y>
+         <width>241</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Mapa de color de entrada</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="inputColormapComboBox">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>60</y>
+         <width>211</width>
+         <height>41</height>
+        </rect>
        </property>
       </widget>
      </widget>
