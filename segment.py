@@ -48,7 +48,7 @@ class ImageToSegment():
         if cmap == 'rainbow':  # If cmap is rainbow, convert to grayscale
             self.img = plt.imread(self.imPath)
             self.img = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-            new_img = np.emtpy((self.img.shape[0], self.img.shape[1], 3))
+            new_img = np.empty((self.img.shape[0], self.img.shape[1], 3))
             new_img[:,:,0] = new_img[:,:,1] = new_img[:,:,2] = self.img # Add three channels to be compatible with dl models
             self.img = new_img
         
