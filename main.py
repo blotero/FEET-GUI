@@ -25,7 +25,6 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from datetime import datetime
 import tflite_runtime.interpreter as tflite
-import easyocr
 
 class RemotePullException(Exception):
     def __init__(self, repoURL):
@@ -87,7 +86,6 @@ class Window(QMainWindow):
         self.repoUrl = 'https://github.com/blotero/FEET-GUI.git' 
         self.digits_model = tflite.Interpreter(model_path = './digits_recognition.tflite')
         self.digits_model.allocate_tensors()
-        self.reader = easyocr.Reader(['en'])
         self.set_default_input_cmap()
         self.file_system_model = QFileSystemModel()
         self.file_system_model.setRootPath(QDir.currentPath())
@@ -148,7 +146,11 @@ class Window(QMainWindow):
         upper_seg = x[14: 34, 576: 624,0]
         lower_prediction = self.predict_number_with_pytesseract(lower_seg)
         upper_prediction = self.predict_number_with_pytesseract(upper_seg)
-
+        
+        if lower_prediction == -100:
+            lower_prediction = 25
+        if upper_prediction == -100:
+            upper_prediction = 45
         return lower_prediction, upper_prediction
 
      
@@ -349,7 +351,7 @@ class Window(QMainWindow):
         self.message_print(f"Se ha cambiado exitosamente el colormap de entrada a {self.input_cmap}")
 
     def set_default_input_cmap(self):
-        self.accepted_cmaps = ['pink', 'rainbow', 'gray', 'jet']
+        self.accepted_cmaps = ['rainbow','pink', 'gray', 'jet']
         self.input_cmap = self.accepted_cmaps[0]
         self.ui_window.inputColormapComboBox.addItems(self.accepted_cmaps)
 
@@ -363,7 +365,7 @@ class Window(QMainWindow):
         self.i2s.setPath(os.path.join(self.session_dir,self.save_name))
         self.i2s.loadModel()
         self.i2s.extract()
-        threshold =  0.5
+        threshold =  0.5   
         img = plt.imread(os.path.join(self.session_dir, self.save_name))/255
         Y = self.i2s.Y_pred
         Y = Y / Y.max()
