@@ -364,7 +364,7 @@ class Window(QMainWindow):
         self.i2s.setModel(self.model)
         self.i2s.setPath(os.path.join(self.session_dir,self.save_name))
         self.i2s.loadModel()
-        self.i2s.extract()
+        self.i2s.extract(cmap = self.input_cmap)
         threshold =  0.5   
         img = plt.imread(os.path.join(self.session_dir, self.save_name))/255
         Y = self.i2s.Y_pred
@@ -552,7 +552,7 @@ class Window(QMainWindow):
         self.sessionIsSegmented = False
         self.s2s.setModel(self.model)
         self.s2s.setPath(self.defaultDirectory)
-        self.s2s.whole_extract(self.fileList)
+        self.s2s.whole_extract(self.fileList, cmap = self.input_cmap)
         self.produce_segmented_session_output()
         self.show_output_image_from_session()
         self.message_print("Se ha segmentado exitosamente la sesion con "+ self.i2s.model)

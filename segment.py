@@ -43,9 +43,18 @@ class ImageToSegment():
         print(input_details)
         return input_details
 
-    def extract(self):
-        img_size = self.input_shape()
-        self.img = plt.imread(self.imPath)
+    def extract(self, cmap = 'rainbow'):
+        img_size = self.input_shape() # Input shape of the cnn
+        if cmap == 'rainbow':  # If cmap is rainbow, convert to grayscale
+            self.img = plt.imread(self.imPath)
+            self.img = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+            new_img = np.emtpy((self.img.shape[0], self.img.shape[1], 3))
+            new_img[:,:,0] = new_img[:,:,1] = new_img[:,:,2] = self.img # Add three channels to be compatible with dl models
+            self.img = new_img
+        
+        if cmap == 'gray':
+            self.img = plt.imread(self.imPath)
+
         # self.X = tf.convert_to_tensor(self.img)
         self.X = self.img
         self.X = cv2.resize(self.X, (img_size, img_size), interpolation = cv2.INTER_NEAREST)
@@ -96,11 +105,23 @@ class SessionToSegment():
         print(input_details)
         return input_details
 
-    def whole_extract(self, dirs):
+    def whole_extract(self, dirs, cmap = 'rainbow'):
         img_size = self.input_shape()
         self.img_array=[]
-        for i in range(len(dirs)):
-            self.img_array.append(plt.imread(dirs[i]))
+        if cmap == 'gray':
+            for i in range(len(dirs)):
+                self.img_array.append(plt.imread(dirs[i]))
+        
+        if cmap == 'rainbow': # If input images are in rainbow, convert them to grayscale
+            for i in range(len(dirs)):
+                img = plt.imread(dirs[i])
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                new_img = np.empty((img.shape[0], img.shape[1], 3)) # Add three more channels to the image
+                new_img[:,:,0] = new_img[:,:,1] = new_img[:,:,2] = img
+                img = new_img
+
+                self.img_array.append(img)
+
         self.img_array=np.array(self.img_array)
         self.X = np.array([cv2.resize(self.img_array[i] , (img_size , img_size), interpolation = cv2.INTER_NEAREST) for i in range(self.img_array.shape[0])])/255.
         self.Xarray  = np.array(self.X)
