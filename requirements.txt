@@ -3,3 +3,5 @@ opencv-contrib-python-headless
 PySide2
 tflite-runtime
 scipy
+tesseract
+tesseract-ocr

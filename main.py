@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 import time
+import pytesseract
 from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog 
 from PySide2.QtCore import QFile, QObject, SIGNAL, QDir, QTimer
 from PySide2.QtUiTools import QUiLoader 
@@ -60,6 +61,7 @@ class Window(QMainWindow):
         self.imgs = []
         self.subj = []
         self.make_connect()
+        self.init_logs()
         self.inputExists = False
         self.defaultDirectoryExists = False
         self.isSegmented = False
@@ -87,6 +89,9 @@ class Window(QMainWindow):
         self.digits_model.allocate_tensors()
         self.reader = easyocr.Reader(['en'])
         self.set_default_input_cmap()
+        self.file_system_model = QFileSystemModel()
+        self.file_system_model.setRootPath(QDir.currentPath())
+        self.ui_window.treeView.setModel(self.file_system_model)
         
     def predict_number(self,image):
         """
@@ -114,6 +119,38 @@ class Window(QMainWindow):
 
         return np.argmax(output_data)  
         
+    def predict_number_with_pytesseract(self, img):
+        """
+        Obtain number from section of an image
+        """
+        uint8img = img.astype("uint8")
+        print(np.unique(uint8img))
+        print(uint8img.shape)
+        thresh = cv2.threshold(uint8img , 100, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)[1]
+        text = pytesseract.image_to_string(thresh,   config = '--psm 7')
+        #Text cleaning and replacement...
+        clean_text = text.replace(']', '1')
+        try:
+            num = float(clean_text)
+            if num>=100:
+                num/=10
+        except:
+            print("Could not convert string into number")
+            return -100
+        return num
+
+
+    def extract_scales_with_pytesseract(self,x):
+        """
+        Extracts float lower and upper scales from a thermal image with pytesseract
+        """
+        lower_seg = x[445: 467, 575: 625,0]
+        upper_seg = x[14: 34, 576: 624,0]
+        lower_prediction = self.predict_number_with_pytesseract(lower_seg)
+        upper_prediction = self.predict_number_with_pytesseract(upper_seg)
+
+        return lower_prediction, upper_prediction
+
      
     def extract_scales_2(self,x):
         
@@ -157,7 +194,7 @@ class Window(QMainWindow):
         """
         scales = []
         for i in range(X.shape[0]):
-            scales.append(self.extract_scales_2(X[i]))
+            scales.append(self.extract_scales_with_pytesseract(X[i]))
             
         return scales
 
@@ -231,7 +268,7 @@ class Window(QMainWindow):
         
         if self.ui_window.autoScaleCheckBox.isChecked():
             # Read and set the temperature range:
-            temp_scale = self.extract_scales_2(self.frame)
+            temp_scale = self.extract_scales_with_pytesseract(self.frame)
             self.ui_window.minSpinBox.setValue(temp_scale[0])
             self.ui_window.maxSpinBox.setValue(temp_scale[1])
 
@@ -345,6 +382,7 @@ class Window(QMainWindow):
         self.isSegmented = True
         self.message_print("Imagen segmentada exitosamente")
 
+
     def set_default_config_settings(self, model_dir, session_dir):
         """
         Sets default config settings
@@ -359,17 +397,26 @@ class Window(QMainWindow):
         self.modelsPath = self.config['models_directory']
         self.defaultDirectory = self.config['session_directory']
 
+    def init_logs(self):
+        log_path = "outputs/logs.html"
+        open(log_path, 'w').close()
+        out_file = open(log_path , "a")
+        final_msg = f'<meta charset="UTF-8">\n'
+        out_file.write(final_msg)
+        out_file.close()
+
     def message_print(self, message):
         """
         Prints on interface console
         """
         log_path = "outputs/logs.html"
-        out_file = open(log_path , "w")
-        final_msg = f' <meta charset="UTF-8"> \n {message}'
+        out_file = open(log_path , "a")
+        final_msg = f"\n <br> >>> </br>  {message}\n"
         out_file.write(final_msg)
         out_file.close()
         self.ui_window.textBrowser.setSource(log_path)
         self.ui_window.textBrowser.reload()
+
 
     def find_images(self):
         """
@@ -431,7 +478,8 @@ class Window(QMainWindow):
                 self.show_output_image_from_session()
                 if self.temperaturesWereAcquired:
                     self.message_print("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
-                    self.ui_window.temperatureLabelImport.setText(str(np.round(self.meanTemperatures[self.imageIndex], 3)))
+                    rounded_temp = np.round(self.meanTemperatures[self.imageIndex], 3)
+                    self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
                     self.ui_window.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
                     self.ui_window.maxSpinBoxImport.setValue(self.scale_range[self.imageIndex][1])
                 
@@ -597,7 +645,9 @@ class Window(QMainWindow):
         """
         Extract temperatures from a segmented image or a whole session
         """
+        self.message_print("Obteniendo temperaturas...")
         if (self.inputExists and (self.isSegmented or self.sessionIsSegmented)):
+            self.message_print("Obteniendo temperaturas de la sesión...")
             if self.ui_window.autoScaleCheckBoxImport.isChecked and self.input_type==1:
                 #Get automatic scales
                 self.scale_range = self.extract_multiple_scales(self.s2s.img_array)
@@ -623,7 +673,7 @@ class Window(QMainWindow):
                 self.temperaturesWereAcquired = True
             else:      #If segmentation was for single image
                 if self.ui_window.autoScaleCheckBoxImport.isChecked():
-                    self.scale_range = self.extract_scales_2(self.i2s.img)
+                    self.scale_range = self.extract_scales_with_pytesseract(self.i2s.img)
                 else:
                     self.scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()]
                 time.sleep(1.5)
@@ -632,15 +682,20 @@ class Window(QMainWindow):
                 rounded_temp = np.round(mean, 3)
                 self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
 
-            if (self.ui_window.plotCheckBox.isChecked() and self.input_type==1):  #If user asked for plot
+            if (self.ui_window.plotCheckBoxImport.isChecked() and self.input_type==1):  #If user asked for plot
                 self.message_print("Se generara plot de temperatura...")
                 self.get_times()
                 print(self.timeList)
                 self.temp_plot()
 
         elif self.inputExists:
-            self.message_print("No se ha segmentado previamente la imagen ")
+            #If input exists but session has not been segmented
+            self.message_print("No se ha segmentado previamente la sesión. Segmentando... ")
+            time.sleep(1)
+            self.session_segment()
+            self.temp_extract()
         elif self.ui_window.tabWidget.currentIndex() == 0:
+            #Live video tab
             self.message_print("Obteniendo temperaturas para la última captura...")
             time.sleep(1)
             if not self.sessionIsCreated:
@@ -731,6 +786,9 @@ class Window(QMainWindow):
             self.find_images()
             self.sessionIsSegmented = False
             self.ui_window.tabWidget.setProperty('currentIndex', 1)
+            self.message_print(f"Se ha importado exiosamente la sesión {self.defaultDirectory} ")
+            self.file_system_model.setRootPath(QDir(self.defaultDirectory))
+            self.ui_window.treeView.setModel(self.file_system_model)
 
     def toggle_fullscreen(self):
         """
