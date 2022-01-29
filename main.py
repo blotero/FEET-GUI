@@ -51,7 +51,6 @@ class NotImplementedError(Exception):
         super.__init__(self.message)
 
     
-    
 
 class Window(QMainWindow):
     def __init__(self):
@@ -122,8 +121,8 @@ class Window(QMainWindow):
         Obtain number from section of an image
         """
         uint8img = img.astype("uint8")
-        print(np.unique(uint8img))
-        print(uint8img.shape)
+        #print(np.unique(uint8img))
+        #print(uint8img.shape)
         thresh = cv2.threshold(uint8img , 100, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)[1]
         text = pytesseract.image_to_string(thresh,   config = '--psm 7')
         #Text cleaning and replacement...
@@ -155,11 +154,13 @@ class Window(QMainWindow):
 
      
     def extract_scales_2(self,x):
-        
+        """
+        Exctract scales with easyocr (deprecated)
+        """
         x = np.uint8(x[:,560:,:])
-        print(x) 
+        #print(x) 
         result = self.reader.readtext(x,detail=0)
-        print(result)    
+        #print(result)    
         try:
             result = [float(number) for number in result]
         except:
@@ -351,7 +352,7 @@ class Window(QMainWindow):
         self.message_print(f"Se ha cambiado exitosamente el colormap de entrada a {self.input_cmap}")
 
     def set_default_input_cmap(self):
-        self.accepted_cmaps = ['rainbow','pink', 'gray', 'jet']
+        self.accepted_cmaps = ['Hierro','Gris', 'Arcoiris', 'Lava']
         self.input_cmap = self.accepted_cmaps[0]
         self.ui_window.inputColormapComboBox.addItems(self.accepted_cmaps)
 
@@ -418,6 +419,7 @@ class Window(QMainWindow):
         out_file.close()
         self.ui_window.textBrowser.setSource(log_path)
         self.ui_window.textBrowser.reload()
+        self.ui_window.textBrowser.moveCursor(QTextCursor.End)
 
 
     def find_images(self):
@@ -479,7 +481,7 @@ class Window(QMainWindow):
                 #segmented
                 self.show_output_image_from_session()
                 if self.temperaturesWereAcquired:
-                    self.message_print("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
+                    self.message_print(f"La temperatura media de pies es:  {self.meanTemperatures[self.imageIndex]:.4f} para el tiempo:{self.files[self.imageIndex].replace['.jpg','']}")
                     rounded_temp = np.round(self.meanTemperatures[self.imageIndex], 3)
                     self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
                     self.ui_window.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
@@ -500,7 +502,7 @@ class Window(QMainWindow):
                 #segmented
                 self.show_output_image_from_session()
                 if self.temperaturesWereAcquired:
-                    self.message_print("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
+                    self.message_print(f"La temperatura media de pies es:  {self.meanTemperatures[self.imageIndex]:.4f} para el tiempo:{self.files[self.imageIndex].replace['.jpg','']}")
                     rounded_temp = np.round(self.meanTemperatures[self.imageIndex], 3)
                     self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
                     self.ui_window.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
@@ -548,7 +550,7 @@ class Window(QMainWindow):
         """
         Segments a whole feet session
         """
-        self.message_print("Segmentando toda la sesion...")
+        time.sleep(0.5)
         self.sessionIsSegmented = False
         self.s2s.setModel(self.model)
         self.s2s.setPath(self.defaultDirectory)
@@ -593,7 +595,6 @@ class Window(QMainWindow):
             Y = np.where( Y >= threshold  , 1 , 0)
 
             self.Y.append(remove_small_objects(Y[0]))     #Eventually required by temp_extract
-            print(self.Y[0].shape)
             Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
             if self.ui_window.rainbowCheckBox.isChecked():
                 cmap = 'rainbow'
@@ -620,6 +621,7 @@ class Window(QMainWindow):
         if self.input_type == 1:
             #Session
             if self.defaultDirectoryExists and self.i2s.model!=None and self.s2s.model!=None:
+                self.message_print("Segmentando toda la sesión...")
                 self.session_segment()
             else:
                 self.message_print("Error. Por favor verifique que se ha cargado el modelo y la sesión de entrada.")
@@ -628,9 +630,6 @@ class Window(QMainWindow):
             if self.inputExists and self.modelsPathExists and self.model!=None:
                 self.feet_segment()
             else:
-                print(self.inputExists)
-                print(self.modelsPathExists)
-                print(self.model)
                 self.message_print("No se ha seleccionado imagen de entrada")
 
 
@@ -653,7 +652,6 @@ class Window(QMainWindow):
             if self.ui_window.autoScaleCheckBoxImport.isChecked and self.input_type==1:
                 #Get automatic scales
                 self.scale_range = self.extract_multiple_scales(self.s2s.img_array)
-                print(self.scale_range)
                 
             elif not self.ui_window.autoScaleCheckBoxImport.isChecked():
                 self.scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()] 
@@ -687,7 +685,6 @@ class Window(QMainWindow):
             if (self.ui_window.plotCheckBoxImport.isChecked() and self.input_type==1):  #If user asked for plot
                 self.message_print("Se generara plot de temperatura...")
                 self.get_times()
-                print(self.timeList)
                 self.temp_plot()
 
         elif self.inputExists:
@@ -706,6 +703,7 @@ class Window(QMainWindow):
             if len(os.listdir(self.session_dir)) < 1:
                 self.message_print("No se ha hecho ninguna captura.")
                 return
+
 
         else:
             self.message_print("No se han seleccionado imagenes de entrada")
@@ -781,7 +779,7 @@ class Window(QMainWindow):
             self.input_type = 1
             self.defaultDirectoryExists = True
             first_image = str(self.defaultDirectory + "/t0.jpg")
-            print(first_image)
+            #print(first_image)
             self.ui_window.inputImgImport.setPixmap(first_image)
             self.opdir = first_image
             self.inputExists = True

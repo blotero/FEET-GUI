@@ -108,11 +108,11 @@ class SessionToSegment():
     def whole_extract(self, dirs, cmap = 'rainbow'):
         img_size = self.input_shape()
         self.img_array=[]
-        if cmap == 'gray':
+        if cmap == 'Gris':
             for i in range(len(dirs)):
                 self.img_array.append(plt.imread(dirs[i]))
         
-        if cmap == 'rainbow': # If input images are in rainbow, convert them to grayscale
+        if cmap == 'Hierro': # If input images are in gnuplot2, convert them to grayscale
             for i in range(len(dirs)):
                 img = plt.imread(dirs[i])
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
