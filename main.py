@@ -481,7 +481,7 @@ class Window(QMainWindow):
                 #segmented
                 self.show_output_image_from_session()
                 if self.temperaturesWereAcquired:
-                    self.message_print(f"La temperatura media de pies es:  {self.meanTemperatures[self.imageIndex]:.4f} para el tiempo:{self.files[self.imageIndex].replace['.jpg','']}")
+                    self.message_print(f"La temperatura media de pies es:  {self.meanTemperatures[self.imageIndex]:.4f} para el tiempo:{self.files[self.imageIndex].replace('.jpg','')}")
                     rounded_temp = np.round(self.meanTemperatures[self.imageIndex], 3)
                     self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
                     self.ui_window.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
@@ -502,7 +502,7 @@ class Window(QMainWindow):
                 #segmented
                 self.show_output_image_from_session()
                 if self.temperaturesWereAcquired:
-                    self.message_print(f"La temperatura media de pies es:  {self.meanTemperatures[self.imageIndex]:.4f} para el tiempo:{self.files[self.imageIndex].replace['.jpg','']}")
+                    self.message_print(f"La temperatura media de pies es:  {self.meanTemperatures[self.imageIndex]:.4f} para el tiempo:{self.files[self.imageIndex].replace('.jpg','')}")
                     rounded_temp = np.round(self.meanTemperatures[self.imageIndex], 3)
                     self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
                     self.ui_window.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
