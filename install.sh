@@ -1,15 +1,16 @@
 #!/bin/sh
 
 path=$(pwd)
-install_path=/usr/local/bin/feetgui
+install_path=$HOME/.local/bin/feetgui
 PYENV_VERSION=3.9.0
 python_env_path=$HOME/.pyenv/versions/$PYENV_VERSION/
 python=$python_env_path/bin/python
-pip=$python_bin -m
+pip=$python_env_path/bin/pip
 
 #Create python environment
 
-pacman -S pyenv
+sudo pacman -S pyenv
+sudo pacman -S python-pytesseract
 echo "Succesfully installed pyenv"
 pyenv install 3.9.0
 
