@@ -26,4 +26,4 @@ def mean_temperature(image , mask , range_=[22.5 , 35.5], plot = False):
         #plt.clim(range_[0] , range_[1])
         plt.show()
 
-    return mean
+    return mean, temp

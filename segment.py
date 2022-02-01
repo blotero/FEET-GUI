@@ -45,14 +45,14 @@ class ImageToSegment():
 
     def extract(self, cmap = 'rainbow'):
         img_size = self.input_shape() # Input shape of the cnn
-        if cmap == 'rainbow':  # If cmap is rainbow, convert to grayscale
+        if cmap == 'Hierro':  # If cmap is rainbow, convert to grayscale
             self.img = plt.imread(self.imPath)
             self.img = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
             new_img = np.empty((self.img.shape[0], self.img.shape[1], 3))
             new_img[:,:,0] = new_img[:,:,1] = new_img[:,:,2] = self.img # Add three channels to be compatible with dl models
             self.img = new_img
         
-        if cmap == 'gray':
+        if cmap == 'Gris':
             self.img = plt.imread(self.imPath)
 
         # self.X = tf.convert_to_tensor(self.img)
@@ -135,7 +135,7 @@ class SessionToSegment():
     def setModel(self,model):
         self.model = model
 
-def remove_small_objects(img, min_size=1200):
+def remove_small_objects(img, min_size=3000):
     """Remove all the objects that are smaller than a defined threshold
     Parameters
     ----------

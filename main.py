@@ -340,7 +340,8 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.captureButton, SIGNAL ('clicked()'), self.capture_image)
         QObject.connect(self.ui_window.nextImageButton , SIGNAL ('clicked()'), self.next_image)
         QObject.connect(self.ui_window.previousImageButton , SIGNAL ('clicked()'), self.previous_image)
-        QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.export_report)
+        #QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.export_report)
+        QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.generate_full_session_plot)
         QObject.connect(self.ui_window.loadModelButton , SIGNAL ('clicked()'), self.toggle_model)
         QObject.connect(self.ui_window.createSession, SIGNAL ('clicked()'), self.create_session)
         QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment_capture)
@@ -658,12 +659,20 @@ class Window(QMainWindow):
 
             if self.input_type==1:   #If segmentation was for full session
                 self.meanTemperatures = []   #Whole feet mean temperature for all images in session
+                self.temp_list = []
                 if self.ui_window.autoScaleCheckBoxImport.isChecked():
                     for i in range(len(self.outfiles)):
-                        self.meanTemperatures.append(mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range[i], plot = False))
+                        mean_out = mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range[i], plot = False)
+                        self.meanTemperatures.append(mean_out[0])
+                        self.temp_list.append(mean_out[1])
+                    self.temp_arr = np.array(self.temp_list)
                 else:
                     for i in range(len(self.outfiles)):
-                        self.meanTemperatures.append(mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range, plot = False))
+                        mean_out = mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range, plot = False)
+                        self.meanTemperatures.append(mean_out[0])
+                        self.temp_list.append(mean_out[1])
+                    self.temp_arr = np.array(self.temp_list)
+
                 self.message_print("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
                 self.message_print(f"La escala leida es: {self.scale_range[self.imageIndex]}")
                 rounded_temp = np.round(self.meanTemperatures[self.imageIndex], 3)
@@ -743,6 +752,19 @@ class Window(QMainWindow):
         plt.show()
         self.message_print("Plot de temperatura generado exitosamente")
         #Produce plot 
+
+
+    def generate_full_session_plot(self):
+        min_session_temp = np.min(self.temp_arr)
+        min_session_temp = np.max(self.temp_arr)
+
+        plt.figure()
+        for i in range(self.temp_arr.shape[0]):
+            plt.subplot(5,5,i+1)
+            plt.imshow(self.temp_arr[i][:,:560])
+
+        plt.colorbar()
+        plt.show()
 
     def open_image(self):
         """
