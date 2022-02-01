@@ -4,4 +4,5 @@ PySide2
 tflite-runtime
 scipy
 tesseract
+pytesseract
 tesseract-ocr
