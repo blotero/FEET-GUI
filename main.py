@@ -15,7 +15,7 @@ import pytesseract
 from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog 
 from PySide2.QtCore import QFile, QObject, SIGNAL, QDir, QTimer
 from PySide2.QtUiTools import QUiLoader 
-from segment import ImageToSegment, SessionToSegment, remove_small_objects
+from segment import ImageToSegment, SessionToSegment
 from manualseg import manualSeg
 from temperatures import mean_temperature
 from scipy.interpolate import make_interp_spline 
@@ -880,6 +880,5 @@ class Window(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
-    window.show()
-    window.ui_window.show()  
+    window.ui_window.show()
     sys.exit(app.exec_())

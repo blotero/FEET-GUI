@@ -24,7 +24,7 @@ def closing(img,diameter=15):
     return ndimage.binary_closing(img, circle_structure(diameter))
 
 
-def remove_small_objects(img, min_size=7500,connectivity=4):
+def remove_small_objects(img, min_size=2500,connectivity=4):
     """Remove all the objects that are smaller than a defined threshold
     Parameters
     ----------
