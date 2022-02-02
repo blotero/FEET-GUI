@@ -12,10 +12,11 @@ def mean_temperature(image , mask , range_=[22.5 , 35.5], plot = False):
     """
     temp = image*(range_[1] - range_[0]) + range_[0]
     print(np.unique(temp))
+    print(f"Dimensiones mask : {mask.shape}")
     temp*=mask
     mean = (temp[temp!=0]).mean()
     print(np.unique(temp))
-
+ 
     print(mean)
     if plot:
         plt.figure()

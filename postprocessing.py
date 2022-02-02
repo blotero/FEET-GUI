@@ -1,0 +1,68 @@
+from scipy import ndimage
+import numpy as np
+import cv2
+from functools import partial
+
+
+def circle_structure(diameter):
+    """
+    ndimage.binary_opening(img, circle_structure(15))
+    ndimage.binary_closing(img, circle_structure(15))
+    """
+    radius = diameter // 2
+    x = np.arange(-radius, radius+1)
+    x, y = np.meshgrid(x, x)
+    r = x**2 + y**2
+    return r < radius**2
+
+
+def opening(img,diameter=15):
+    return ndimage.binary_opening(img, circle_structure(diameter))
+
+
+def closing(img,diameter=15):
+    return ndimage.binary_closing(img, circle_structure(diameter))
+
+
+def remove_small_objects(img, min_size=7500,connectivity=4):
+    """Remove all the objects that are smaller than a defined threshold
+    Parameters
+    ----------
+    img : np.ndarray
+        Input image to clean
+    min_size : int, optional
+        Threshold to be used to remove all smaller objects, by default 1200
+    Returns
+    -------
+    np.ndarray
+        Cleaned image
+    """
+    img2 = np.copy(img)
+    img2 = np.uint8(img2)
+    nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(img2, connectivity=connectivity)
+    # connectedComponentswithStats yields every seperated component with information on each of them, such as size
+    # the following part is just taking out the background which is also considered a component, but most of the time we don't want that.
+    sizes = stats[1:, -1]
+    nb_components = nb_components - 1
+
+    # your answer image
+    # for every component in the image, you keep it only if it's above min_size
+    for i in range(0, nb_components):
+        if sizes[i] < min_size:
+            img2[output == i + 1] = 0
+
+    return img2 
+
+
+
+default_steps = [partial(opening,diameter=4),
+            partial(remove_small_objects,connectivity=4),
+            partial(closing,diameter=4),
+         ]   
+
+
+def posprocessing(mask,steps = default_steps):
+    mask = np.squeeze(mask)
+    for step in steps:
+        mask = step(mask)
+    return mask[...,None].astype('float32')
