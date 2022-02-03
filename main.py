@@ -484,8 +484,8 @@ class Window(QMainWindow):
                 #segmented
                 self.show_output_image_from_session()
                 if self.temperaturesWereAcquired:
-                    self.message_print(f"La temperatura media de pies es:  {self.meanTemperatures[self.imageIndex]:.4f} para el tiempo:{self.files[self.imageIndex].replace('.jpg','')}")
-                    rounded_temp = np.round(self.meanTemperatures[self.imageIndex], 3)
+                    self.message_print(f"La temperatura media de pies es:  {np.round(self.meanTemperatures[self.imageIndex], 2)} para el tiempo:{self.files[self.imageIndex].replace('.jpg','')}")
+                    rounded_temp = np.round(self.meanTemperatures[self.imageIndex], 2)
                     self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
                     self.ui_window.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
                     self.ui_window.maxSpinBoxImport.setValue(self.scale_range[self.imageIndex][1])
@@ -505,8 +505,8 @@ class Window(QMainWindow):
                 #segmented
                 self.show_output_image_from_session()
                 if self.temperaturesWereAcquired:
-                    self.message_print(f"La temperatura media de pies es:  {self.meanTemperatures[self.imageIndex]:.4f} para el tiempo:{self.files[self.imageIndex].replace('.jpg','')}")
-                    rounded_temp = np.round(self.meanTemperatures[self.imageIndex], 3)
+                    self.message_print(f"La temperatura media de pies es:  {np.round(self.meanTemperatures[self.imageIndex], 2)} para el tiempo:{self.files[self.imageIndex].replace('.jpg','')}")
+                    rounded_temp = np.round(self.meanTemperatures[self.imageIndex], 2)
                     self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
                     self.ui_window.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
                     self.ui_window.maxSpinBoxImport.setValue(self.scale_range[self.imageIndex][1])
@@ -669,15 +669,15 @@ class Window(QMainWindow):
                 self.temp_list = []
                 if self.ui_window.autoScaleCheckBoxImport.isChecked():
                     for i in range(len(self.outfiles)):
-                        mean_out = mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range[i], plot = False)
-                        self.meanTemperatures.append(mean_out[0])
-                        self.temp_list.append(mean_out[1])
+                        mean_out, temp = mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range[i], plot = False)
+                        self.meanTemperatures.append(mean_out)
+                        self.temp_list.append(temp)
                     self.temp_arr = np.array(self.temp_list)
                 else:
                     for i in range(len(self.outfiles)):
-                        mean_out = mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range, plot = False)
-                        self.meanTemperatures.append(mean_out[0])
-                        self.temp_list.append(mean_out[1])
+                        mean_out, temp = mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range, plot = False)
+                        self.meanTemperatures.append(mean_out)
+                        self.temp_list.append(temp)
                     self.temp_arr = np.array(self.temp_list)
 
                 self.message_print("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
@@ -693,7 +693,7 @@ class Window(QMainWindow):
                 else:
                     self.scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()]
                 time.sleep(1.5)
-                mean = mean_temperature(self.i2s.Xarray[:,:,0] , self.Y[:,:,0] , self.scale_range, plot = False)
+                mean, _ = mean_temperature(self.i2s.Xarray[:,:,0] , self.Y[:,:,0] , self.scale_range, plot = False)
                 self.message_print("La temperatura media es: " + str(mean))
                 rounded_temp = np.round(mean, 3)
                 self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
@@ -719,7 +719,7 @@ class Window(QMainWindow):
             if len(os.listdir(self.session_dir)) < 1:
                 self.message_print("No se ha hecho ninguna captura.")
                 return
-
+            #HERE COMES TO LOGIC FOR OBTAINING FULL PLOT FOR LIVE VIDEO
 
         else:
             self.message_print("No se han seleccionado imagenes de entrada")
@@ -816,8 +816,8 @@ class Window(QMainWindow):
             self.sessionIsSegmented = False
             self.ui_window.tabWidget.setProperty('currentIndex', 1)
             self.message_print(f"Se ha importado exiosamente la sesión {self.defaultDirectory} ")
-            self.file_system_model.setRootPath(QDir(self.defaultDirectory))
-            self.ui_window.treeView.setModel(self.file_system_model)
+            #self.file_system_model.setRootPath(QDir(self.defaultDirectory))
+            #self.ui_window.treeView.setModel(self.file_system_model)
 
     def toggle_fullscreen(self):
         """
@@ -880,5 +880,6 @@ class Window(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
+    window.show()
     window.ui_window.show()
     sys.exit(app.exec_())
