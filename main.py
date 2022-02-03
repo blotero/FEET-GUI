@@ -26,6 +26,8 @@ from PySide2.QtGui import *
 from datetime import datetime
 import tflite_runtime.interpreter as tflite
 from postprocessing import posprocessing
+from report import plot_report
+
 
 class RemotePullException(Exception):
     def __init__(self, repoURL):
@@ -666,19 +668,25 @@ class Window(QMainWindow):
 
             if self.input_type==1:   #If segmentation was for full session
                 self.meanTemperatures = []   #Whole feet mean temperature for all images in session
-                self.temp_list = []
+                segmented_temps = []
+                original_temps = []
                 if self.ui_window.autoScaleCheckBoxImport.isChecked():
                     for i in range(len(self.outfiles)):
-                        mean_out, temp = mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range[i], plot = False)
+                        mean_out, temp, original_temp = mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range[i], plot = False)
                         self.meanTemperatures.append(mean_out)
-                        self.temp_list.append(temp)
-                    self.temp_arr = np.array(self.temp_list)
+                        segmented_temps.append(temp)
+                        original_temps.append(original_temp)
+                    self.segmented_temps = np.array(segmented_temps)
+                    self.original_temps = np.array(original_temps)
                 else:
                     for i in range(len(self.outfiles)):
-                        mean_out, temp = mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range, plot = False)
+                        mean_out, temp, original_temp = mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range, plot = False)
                         self.meanTemperatures.append(mean_out)
-                        self.temp_list.append(temp)
-                    self.temp_arr = np.array(self.temp_list)
+                        segmented_temps.append(temp)
+                        original_temps.append(original_temp)
+                    self.segmented_temps = np.array(segmented_temps)
+                    self.original_temps = np.array(original_temps)
+
 
                 self.message_print("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
                 self.message_print(f"La escala leida es: {self.scale_range[self.imageIndex]}")
@@ -701,7 +709,7 @@ class Window(QMainWindow):
             if (self.ui_window.plotCheckBoxImport.isChecked() and self.input_type==1):  #If user asked for plot
                 self.message_print("Se generara plot de temperatura...")
                 self.get_times()
-                self.temp_plot()
+                # self.temp_plot()
 
         elif self.inputExists:
             #If input exists but session has not been segmented
@@ -762,16 +770,10 @@ class Window(QMainWindow):
 
 
     def generate_full_session_plot(self):
-        min_session_temp = np.min(self.temp_arr)
-        min_session_temp = np.max(self.temp_arr)
-
-        plt.figure()
-        for i in range(self.temp_arr.shape[0]):
-            plt.subplot(5,5,i+1)
-            plt.imshow(self.temp_arr[i][:,:560])
-
-        plt.colorbar()
-        plt.show()
+        
+        plot_report(img_temps = self.original_temps, segmented_temps = self.segmented_temps, mean_temps = self.meanTemperatures, times = self.timeList, 
+                    path = os.path.join(self.session_dir,report))
+        
 
     def open_image(self):
         """

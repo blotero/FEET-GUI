@@ -37,7 +37,7 @@ def mean_temperature(image , mask , range_=[22.5 , 35.5], plot = False):
         left_mean = (left_temp[left_mask!=0]).mean()
         right_mean = (right_temp[right_mask!=0]).mean()
         means = [left_mean, right_mean]        
-        return means, temp
+        return means, temp, original_temp
     else:
         mean = (temp[mask!=0]).mean()
-        return mean, temp
+        return mean, temp, original_temp
