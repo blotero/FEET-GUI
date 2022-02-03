@@ -3,6 +3,19 @@ import numpy as np
 import cv2
 from functools import partial
 
+class PostProcessing():
+    def __init__(self,  small_object_threshold):
+        self.small_object_threshold = small_object_threshold
+        self.default_steps = [partial(opening,diameter=4),
+                    partial(remove_small_objects,min_size = self.small_object_threshold, connectivity=4),
+                    partial(closing,diameter=4),
+                 ]   
+
+    def execute(self, mask):
+        mask = np.squeeze(mask)
+        for step in self.default_steps:
+            mask = step(mask)
+        return mask[...,None].astype('float32')
 
 def circle_structure(diameter):
     """
@@ -52,17 +65,3 @@ def remove_small_objects(img, min_size=2500,connectivity=4):
             img2[output == i + 1] = 0
 
     return img2 
-
-
-
-default_steps = [partial(opening,diameter=4),
-            partial(remove_small_objects,connectivity=4),
-            partial(closing,diameter=4),
-         ]   
-
-
-def posprocessing(mask,steps = default_steps):
-    mask = np.squeeze(mask)
-    for step in steps:
-        mask = step(mask)
-    return mask[...,None].astype('float32')

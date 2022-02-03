@@ -530,7 +530,7 @@
         <x>10</x>
         <y>10</y>
         <width>471</width>
-        <height>351</height>
+        <height>391</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -582,9 +582,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>370</y>
+        <y>410</y>
         <width>571</width>
-        <height>231</height>
+        <height>151</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -596,8 +596,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QPushButton" name="segButton">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>10</y>
+         <x>320</x>
+         <y>30</y>
          <width>161</width>
          <height>81</height>
         </rect>
@@ -614,49 +614,11 @@ p, li { white-space: pre-wrap; }
         <string>Ctrl+F</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="tempButton">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>100</y>
-         <width>161</width>
-         <height>81</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>15</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
-         <underline>false</underline>
-         <strikeout>false</strikeout>
-        </font>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Obtener
- temperaturas</string>
-       </property>
-       <property name="shortcut">
-        <string>Ctrl+T</string>
-       </property>
-       <property name="autoRepeat">
-        <bool>false</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>false</bool>
-       </property>
-      </widget>
       <widget class="QPushButton" name="captureButton">
        <property name="geometry">
         <rect>
-         <x>310</x>
-         <y>100</y>
+         <x>40</x>
+         <y>30</y>
          <width>231</width>
          <height>81</height>
         </rect>
@@ -669,92 +631,6 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>Capturar</string>
        </property>
-      </widget>
-      <widget class="QCheckBox" name="plotCheckBox">
-       <property name="geometry">
-        <rect>
-         <x>180</x>
-         <y>130</y>
-         <width>80</width>
-         <height>19</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>13</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Plot</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="nextImageButtonLive">
-       <property name="geometry">
-        <rect>
-         <x>310</x>
-         <y>20</y>
-         <width>50</width>
-         <height>50</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>28</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>➡️</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="previousImageButtonLive">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>20</y>
-         <width>50</width>
-         <height>50</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>28</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>⬅️</string>
-       </property>
-      </widget>
-      <widget class="QFrame" name="frame_26">
-       <property name="geometry">
-        <rect>
-         <x>380</x>
-         <y>20</y>
-         <width>151</width>
-         <height>51</height>
-        </rect>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <widget class="QLabel" name="inputLabelLive">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>131</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
       </widget>
      </widget>
      <widget class="QFrame" name="frame_6">
@@ -1329,9 +1205,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>590</x>
-        <y>370</y>
+        <y>410</y>
         <width>401</width>
-        <height>191</height>
+        <height>151</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -1340,24 +1216,6 @@ p, li { white-space: pre-wrap; }
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QLabel" name="scaleTitleLabel">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>20</y>
-         <width>231</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Escalas de temperatura:</string>
-       </property>
-      </widget>
       <widget class="QFrame" name="tempFrame">
        <property name="enabled">
         <bool>true</bool>
@@ -1365,8 +1223,8 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>50</y>
-         <width>191</width>
+         <y>10</y>
+         <width>231</width>
          <height>131</height>
         </rect>
        </property>
@@ -1381,7 +1239,7 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>10</x>
           <y>70</y>
-          <width>51</width>
+          <width>71</width>
           <height>41</height>
          </rect>
         </property>
@@ -1391,7 +1249,7 @@ p, li { white-space: pre-wrap; }
          </font>
         </property>
         <property name="text">
-         <string>Min</string>
+         <string>Min °C</string>
         </property>
        </widget>
        <widget class="QDoubleSpinBox" name="minSpinBox">
@@ -1400,7 +1258,7 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="geometry">
          <rect>
-          <x>80</x>
+          <x>110</x>
           <y>70</y>
           <width>101</width>
           <height>51</height>
@@ -1420,7 +1278,7 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>10</x>
           <y>20</y>
-          <width>52</width>
+          <width>81</width>
           <height>31</height>
          </rect>
         </property>
@@ -1430,7 +1288,7 @@ p, li { white-space: pre-wrap; }
          </font>
         </property>
         <property name="text">
-         <string>Max</string>
+         <string>Max °C</string>
         </property>
        </widget>
        <widget class="QDoubleSpinBox" name="maxSpinBox">
@@ -1439,7 +1297,7 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="geometry">
          <rect>
-          <x>80</x>
+          <x>110</x>
           <y>10</y>
           <width>101</width>
           <height>51</height>
@@ -1458,10 +1316,10 @@ p, li { white-space: pre-wrap; }
       <widget class="QCheckBox" name="autoScaleCheckBox">
        <property name="geometry">
         <rect>
-         <x>230</x>
-         <y>110</y>
-         <width>171</width>
-         <height>21</height>
+         <x>280</x>
+         <y>50</y>
+         <width>101</width>
+         <height>61</height>
         </rect>
        </property>
        <property name="font">
@@ -1470,7 +1328,8 @@ p, li { white-space: pre-wrap; }
         </font>
        </property>
        <property name="text">
-        <string>Detectar escalas</string>
+        <string>Detectar 
+ escalas</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -1484,7 +1343,7 @@ p, li { white-space: pre-wrap; }
     </widget>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
-      <string>Importar</string>
+      <string>Análisis</string>
      </attribute>
      <widget class="QFrame" name="tempScaleFrame_6">
       <property name="geometry">
@@ -2440,7 +2299,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>190</y>
+        <y>450</y>
         <width>171</width>
         <height>61</height>
        </rect>
@@ -2453,8 +2312,8 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>70</x>
-        <y>110</y>
-        <width>131</width>
+        <y>80</y>
+        <width>121</width>
         <height>41</height>
        </rect>
       </property>
@@ -2465,18 +2324,87 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="nameField">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>370</x>
         <y>40</y>
-        <width>231</width>
+        <width>251</width>
         <height>32</height>
        </rect>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_2">
+     <widget class="QLineEdit" name="ageField">
       <property name="geometry">
        <rect>
-        <x>210</x>
-        <y>120</y>
+        <x>370</x>
+        <y>90</y>
+        <width>61</width>
+        <height>32</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_15">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>130</y>
+        <width>271</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Semanas gestantes:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="weeksField">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>130</y>
+        <width>61</width>
+        <height>32</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_16">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>180</y>
+        <width>271</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Peso</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_17">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>230</y>
+        <width>271</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Estatura</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="weightField">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>180</y>
+        <width>61</width>
+        <height>32</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="heightField">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>230</y>
         <width>61</width>
         <height>32</height>
        </rect>
@@ -2890,6 +2818,82 @@ p, li { white-space: pre-wrap; }
          <width>211</width>
          <height>41</height>
         </rect>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QFrame" name="frame_7">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>220</y>
+        <width>271</width>
+        <height>211</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QSpinBox" name="morphoSpinBox">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>80</y>
+         <width>141</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="minimum">
+        <number>200</number>
+       </property>
+       <property name="maximum">
+        <number>7500</number>
+       </property>
+       <property name="value">
+        <number>2500</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_18">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>241</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Umbral morfológico</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_19">
+       <property name="geometry">
+        <rect>
+         <x>180</x>
+         <y>100</y>
+         <width>41</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>px</string>
        </property>
       </widget>
      </widget>

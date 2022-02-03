@@ -5,6 +5,7 @@ import matplotlib.cm as cmx
 
 #Input Parameters
 def plot_report(img_temps, segmented_temps, mean_temps, times, path = './outputs/report'):
+    exit_code = 0
     num_rows = 3
     num_cols = img_temps.shape[0]
     fig_title = 'Report'
@@ -46,7 +47,17 @@ def plot_report(img_temps, segmented_temps, mean_temps, times, path = './outputs
         axs[0][j].set_title("$t"+"_{"+str(times[j])+"}$", family='serif', size=15, weight=900)
 
     #Plot mean temperatures
-    
+    #print(f"mean temps: {mean_temps}")
+
+    for i,couple in enumerate(mean_temps):
+        if type(couple) is not list:
+            if not np.isnan(couple):
+                mean_temps[i] = [couple, couple]
+            else:
+                mean_temps[i] = [0, 0]
+                print("Warning, nan was fount in temp values")
+                exit_code = 1
+
     mean_temps = np.array(mean_temps)
     
     left_temps = mean_temps[:,0]
@@ -77,3 +88,4 @@ def plot_report(img_temps, segmented_temps, mean_temps, times, path = './outputs
     format = 'pdf'
     plt.savefig(path+'.'+format,format=format, bbox_inches='tight')
     plt.show()
+    return exit_code

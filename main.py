@@ -6,6 +6,7 @@
 import os
 import re
 from pathlib import Path
+import json
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,7 +26,7 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from datetime import datetime
 import tflite_runtime.interpreter as tflite
-from postprocessing import posprocessing
+from postprocessing import PostProcessing
 from report import plot_report
 
 
@@ -92,6 +93,8 @@ class Window(QMainWindow):
         self.file_system_model = QFileSystemModel()
         self.file_system_model.setRootPath(QDir.currentPath())
         self.ui_window.treeView.setModel(self.file_system_model)
+        plt.style.use('bmh')
+        self.session_info = {}
         
     def predict_number(self,image):
         """
@@ -204,6 +207,18 @@ class Window(QMainWindow):
             
         return scales
 
+
+    def populate_session_info(self):
+        """
+        Fill dictionary attribute with the parms given by the info tab
+        """
+        self.session_info['Nombre'] = self.name
+        self.session_info['Edad'] = self.ui_window.ageField.text()
+        self.session_info['Semanas_de_gestacion'] = self.ui_window.weeksField.text()
+        self.session_info['Estatura'] = self.ui_window.heightField.text()
+        self.session_info['Peso'] = self.ui_window.weightField.text()
+
+
     def setup_camera(self):
         """
         Initialize camera.
@@ -271,6 +286,9 @@ class Window(QMainWindow):
         plt.imsave(os.path.join(self.session_dir, self.save_name), self.frame)
         self.ui_window.outputImg.setPixmap(QPixmap.fromImage(self.image))
         self.ui_window.imgName.setText(self.save_name[:-4])
+        this_image = f"{self.defaultDirectory}/t{image_number}.jpg"
+        self.ui_window.inputImgImport.setPixmap(this_image)
+        self.find_images()
         
         if self.ui_window.autoScaleCheckBox.isChecked():
             # Read and set the temperature range:
@@ -285,17 +303,21 @@ class Window(QMainWindow):
         The session is named as the current timestamp if current session_dir is null
         """
         self.name = self.ui_window.nameField.text()
-        self.dir_name = self.name.replace(' ','_')
-        if self.dir_name == '':
-            today = datetime.today()
-            self.dir_name = today.strftime("%Y-%m-%d_%H:%M")            
+        formatted_today = datetime.today().strftime("%Y-%m-%d_%H:%M")            
+        self.dir_name = f"{self.name.replace(' ','_')}{formatted_today}"
         try:
             self.session_dir = os.path.join('outputs',self.dir_name)
             os.mkdir(self.session_dir)
             self.sessionIsCreated = True
             self.message_print("Sesión " + self.session_dir + " creada exitosamente." )
-        except:
+            self.defaultDirectoryExists = True
+            self.defaultDirectory = os.path.abspath(self.session_dir)
+            self.inputExists = True
+            self.sessionIsSegmented = False
+            self.input_type = 2 #Video input capture
+        except Exception as ex:
             self.message_print("Fallo al crear la sesión. Lea el manual de ayuda para encontrar solución, o reporte bugs al " + self.bugsURL)
+            print(ex)
         
     def sync_local_info_to_drive(self):
         """
@@ -338,7 +360,6 @@ class Window(QMainWindow):
         QObject.connect(self.ui_window.actionRepoSync , SIGNAL ('triggered()'), self.sync_local_info_to_drive)
         QObject.connect(self.ui_window.actionRepoConfig , SIGNAL ('triggered()'), self.repo_config_dialog)
         QObject.connect(self.ui_window.segButtonImport, SIGNAL ('clicked()'), self.segment)
-        QObject.connect(self.ui_window.tempButton, SIGNAL ('clicked()'), self.temp_extract)
         QObject.connect(self.ui_window.tempButtonImport, SIGNAL ('clicked()'), self.temp_extract)
         QObject.connect(self.ui_window.captureButton, SIGNAL ('clicked()'), self.capture_image)
         QObject.connect(self.ui_window.nextImageButton , SIGNAL ('clicked()'), self.next_image)
@@ -375,8 +396,10 @@ class Window(QMainWindow):
         Y = self.i2s.Y_pred
         Y = Y / Y.max()
         Y = np.where( Y >= threshold  , 1 , 0)
-        self.Y =posprocessing( Y[0])[0]     #Eventually required by temp_extract
-        Y = posprocessing(Y[0])
+        post_processing = PostProcessing(self.ui_window.morphoSpinBox.value())
+        u = post_processing.execute(Y[0])
+        self.Y = u[0]     #Eventually required by temp_extract
+        Y = np.copy(u)
         Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
         if self.ui_window.rainbowCheckBoxImport.isChecked():
             cmap = 'rainbow'
@@ -593,17 +616,18 @@ class Window(QMainWindow):
         Produce output images from a whole session and         """
         #Recursively applies show_segmented_image to whole session
         self.Y=[]
+        post_processing = PostProcessing(self.ui_window.morphoSpinBox.value())
         for i in range(len(self.outfiles)):
             threshold =  0.5
             img = plt.imread(self.fileList[i])/255
             Y = self.s2s.Y_pred[i]
             Y = Y / Y.max()
             Y = np.where( Y >= threshold  , 1 , 0)
-            Y = posprocessing(Y[0])
+            Y = post_processing.execute(Y[0])
             
             self.Y.append(Y)    #Eventually required by temp_extract
             
-            print(f"Dimensiones de la salida: {Y.shape}")
+            #print(f"Dimensiones de la salida: {Y.shape}")
             Y = cv2.resize(Y, (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
             
             if self.ui_window.rainbowCheckBox.isChecked():
@@ -628,7 +652,7 @@ class Window(QMainWindow):
         """
         Makes segmentation action depending on the current state (single image or whole session)
         """
-        if self.input_type == 1:
+        if self.input_type >= 1:
             #Session
             if self.defaultDirectoryExists and self.i2s.model!=None and self.s2s.model!=None:
                 self.message_print("Segmentando toda la sesión...")
@@ -641,6 +665,7 @@ class Window(QMainWindow):
                 self.feet_segment()
             else:
                 self.message_print("No se ha seleccionado imagen de entrada")
+
 
 
     def manual_segment(self):
@@ -659,14 +684,14 @@ class Window(QMainWindow):
         self.message_print("Obteniendo temperaturas...")
         if (self.inputExists and (self.isSegmented or self.sessionIsSegmented)):
             self.message_print("Obteniendo temperaturas de la sesión...")
-            if self.ui_window.autoScaleCheckBoxImport.isChecked and self.input_type==1:
+            if self.ui_window.autoScaleCheckBoxImport.isChecked and self.input_type>=1:
                 #Get automatic scales
                 self.scale_range = self.extract_multiple_scales(self.s2s.img_array)
                 
             elif not self.ui_window.autoScaleCheckBoxImport.isChecked():
                 self.scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()] 
 
-            if self.input_type==1:   #If segmentation was for full session
+            if self.input_type>=1:   #If segmentation was for full session
                 self.meanTemperatures = []   #Whole feet mean temperature for all images in session
                 segmented_temps = []
                 original_temps = []
@@ -706,7 +731,7 @@ class Window(QMainWindow):
                 rounded_temp = np.round(mean, 3)
                 self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
 
-            if (self.ui_window.plotCheckBoxImport.isChecked() and self.input_type==1):  #If user asked for plot
+            if (self.ui_window.plotCheckBoxImport.isChecked() and self.input_type>=1):  #If user asked for plot
                 self.message_print("Se generara plot de temperatura...")
                 self.get_times()
                 # self.temp_plot()
@@ -770,9 +795,19 @@ class Window(QMainWindow):
 
 
     def generate_full_session_plot(self):
-        
-        plot_report(img_temps = self.original_temps, segmented_temps = self.segmented_temps, mean_temps = self.meanTemperatures, times = self.timeList, 
-                    path = os.path.join(self.session_dir,report))
+        if not self.temperaturesWereAcquired :
+            self.message_print("No se han extraido las temperaturas, extrayendo...")
+            self.temp_extract()
+            self.generate_full_session_plot()
+        else:
+            exit_value = plot_report(img_temps = self.original_temps, segmented_temps = self.segmented_temps, mean_temps = self.meanTemperatures, times = self.timeList, 
+                        path = os.path.join(self.defaultDirectory,'report'))
+            if exit_value == 0:
+                self.message_print("Se ha generado exitosamente el plot completo de sesión")
+            else:
+                self.message_print("Advertencia, se ha encontrado un valor no válido (nan) en los dígitos de escala de temperatura. Verifique que la imagen es del formato y referencia de cámara correctos")
+            self.populate_session_info()
+            self.export_report()
         
 
     def open_image(self):
@@ -810,7 +845,7 @@ class Window(QMainWindow):
             self.input_type = 1
             self.defaultDirectoryExists = True
             first_image = str(self.defaultDirectory + "/t0.jpg")
-            #print(first_image)
+            print(first_image)
             self.ui_window.inputImgImport.setPixmap(first_image)
             self.opdir = first_image
             self.inputExists = True
@@ -843,14 +878,10 @@ class Window(QMainWindow):
 
     def export_report(self):
         """
-        GENERATE A PDF REPORT FOR THE PATIENT
-        INPUT: SELF, PATIENT DIR
-        RETURN: NONE
-        ACTION: COMPILE PDF TEXT BASED ON
+        Generates a json document with session information
         """
-        self.message_print("Generando reporte...") 
-        self.message_print("Desarrollo no implementado, disponible en futuras versiones.")
-        raise NotImplementedError()
+        with open(f"{self.defaultDirectory}/report.json", "w") as outfile:
+            json.dump(self.session_info, outfile)
 
     def animate(self):      
         """
