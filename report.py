@@ -9,10 +9,11 @@ def plot_report(img_temps, segmented_temps, mean_temps, times, path = './outputs
     num_rows = 3
     num_cols = img_temps.shape[0]
     fig_title = 'Report'
-    figsize = 12,8,
+    figsize = 15,8,
 
     #Definiton of grid layout
     fig = plt.figure(figsize=figsize)
+    fig.set_size_inches(figsize[0], figsize[1])
     fig.suptitle(fig_title, fontsize=24, fontweight='bold')
 
     axs = []
@@ -42,7 +43,7 @@ def plot_report(img_temps, segmented_temps, mean_temps, times, path = './outputs
             else:
                 raise ValueError('Error')
 
-    ind_t = [0,1,5,10,15]
+    # ind_t = [0,1,5,10,15]
     for j in range(num_cols):
         axs[0][j].set_title("$t"+"_{"+str(times[j])+"}$", family='serif', size=15, weight=900)
 
@@ -63,21 +64,22 @@ def plot_report(img_temps, segmented_temps, mean_temps, times, path = './outputs
     left_temps = mean_temps[:,0]
     right_temps = mean_temps[:,1]
     
-    axs_temp.plot(times , left_temps , '-o', color='salmon',label = 'Pie Izquierdo')
-    axs_temp.plot(times , right_temps , '-o', color='blue', label = 'Pie Derecho')
+    axs_temp.plot(times , left_temps , '-o', color='salmon',label = 'Pie Derecho')
+    axs_temp.plot(times , right_temps , '-o', color='blue', label = 'Pie Izquierdo')
     # axs_temp.set_ylim([np.min(segmented_temps[segmented_temps != 0]), np.max(segmented_temps)])
     # axs_temp.set_yticks(np.linspace(np.min(segmented_temps[segmented_temps != 0]), np.max(segmented_temps),5))
     axs_temp.set_title("Temperatura media de pies")
     axs_temp.set_xlabel("Tiempo (min)")
     axs_temp.set_ylabel("Temperatura (°C)")
-    axs_temp.grid()
+    axs_temp.grid(visible= True)
     axs_temp.legend()
-    # fig.tight_layout(rect=[0, 0, 1, 0.95])
-    fig.tight_layout()
+    # fig.tight_layout()
+    fig.tight_layout(rect=[0, 0, 0.9, 1])
+
 
     #Plot clorbar
     cax = fig.add_axes([axs[-1][-1].get_position().x1 + 0.05,axs[-1][-1].get_position().y0,0.02,axs[0][-1].get_position().y1-axs[-1][-1].get_position().y0])
-    #Mappeable objects for connectivities colorbar
+    #Mappeable objects for connectivities colorbar1
     sm = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
     sm.set_array(segmented_temps)
     cbar = fig.colorbar(sm, cax=cax, ticks=np.linspace(np.min(segmented_temps[segmented_temps != 0]), np.max(segmented_temps), 5))
@@ -85,7 +87,9 @@ def plot_report(img_temps, segmented_temps, mean_temps, times, path = './outputs
         t.set_fontsize(10)
 
     #Save image
+
+    fig.show()
+
     format = 'pdf'
     plt.savefig(path+'.'+format,format=format, bbox_inches='tight')
-    plt.show()
     return exit_code
