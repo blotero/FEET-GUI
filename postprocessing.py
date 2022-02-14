@@ -7,7 +7,7 @@ class PostProcessing():
     def __init__(self,  small_object_threshold):
         self.small_object_threshold = small_object_threshold
         self.default_steps = [partial(opening,diameter=4),
-                    partial(remove_small_objects,min_size = self.small_object_threshold, connectivity=4),
+                    partial(remove_small_objects,min_size = self.small_object_threshold),
                     partial(closing,diameter=4),
                  ]   
 
@@ -37,7 +37,7 @@ def closing(img,diameter=15):
     return ndimage.binary_closing(img, circle_structure(diameter))
 
 
-def remove_small_objects(img, min_size=2500,connectivity=4):
+def remove_small_objects(img, min_size=2500):
     """Remove all the objects that are smaller than a defined threshold
     Parameters
     ----------
@@ -50,6 +50,7 @@ def remove_small_objects(img, min_size=2500,connectivity=4):
     np.ndarray
         Cleaned image
     """
+    connectivity=8
     img2 = np.copy(img)
     img2 = np.uint8(img2)
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(img2, connectivity=connectivity)
