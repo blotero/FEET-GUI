@@ -6,3 +6,5 @@ scipy
 tesseract
 pytesseract
 tesseract-ocr
+docopt
+
