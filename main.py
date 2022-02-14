@@ -28,7 +28,7 @@ from datetime import datetime
 import tflite_runtime.interpreter as tflite
 from postprocessing import PostProcessing
 from report import plot_report
-
+from dermatomes import get_dermatomes
 
 class RemotePullException(Exception):
     def __init__(self, repoURL):
@@ -616,6 +616,7 @@ class Window(QMainWindow):
         Produce output images from a whole session and         """
         #Recursively applies show_segmented_image to whole session
         self.Y=[]
+        self.dermatomes_mask = []
         post_processing = PostProcessing(self.ui_window.morphoSpinBox.value())
         for i in range(len(self.outfiles)):
             threshold =  0.5
@@ -625,6 +626,9 @@ class Window(QMainWindow):
             Y = np.where( Y >= threshold  , 1 , 0)
             Y = post_processing.execute(Y[0])
             
+            dermatomes = get_dermatomes(Y.astype('uint8'))
+
+            self.dermatomes_mask.append(dermatomes)
             self.Y.append(Y)    #Eventually required by temp_extract
             
             #print(f"Dimensiones de la salida: {Y.shape}")

@@ -125,10 +125,8 @@ def get_dermatomes(fixed_image,path_right_foot='images/dermatomes.png',path_left
        50-51 -> Saphenous
     """
     #all in hxw
-    fixed_image = fixed_image[...,0]
-    
+    fixed_image = fixed_image[...,0]*255
     right_foot = cv2.flip(cv2.imread(path_right_foot)[...,2],1)
-
     left_foot = cv2.imread(path_left_foot)[...,2] 
     left_foot[(left_foot!=0)&(left_foot!=255)] = left_foot[(left_foot!=0)&(left_foot!=255)] + 1 
 
