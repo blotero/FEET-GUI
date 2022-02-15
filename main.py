@@ -18,7 +18,7 @@ from PySide2.QtCore import QFile, QObject, SIGNAL, QDir, QTimer
 from PySide2.QtUiTools import QUiLoader 
 from segment import ImageToSegment, SessionToSegment
 from manualseg import manualSeg
-from temperatures import mean_temperature
+from temperatures import mean_temperature, dermatomes_temperatures
 from scipy.interpolate import make_interp_spline 
 import cv2
 from PySide2.QtWidgets import *
@@ -28,7 +28,8 @@ from datetime import datetime
 import tflite_runtime.interpreter as tflite
 from postprocessing import PostProcessing
 from report import plot_report
-from dermatomes import get_dermatomes
+
+
 
 class RemotePullException(Exception):
     def __init__(self, repoURL):
@@ -616,7 +617,6 @@ class Window(QMainWindow):
         Produce output images from a whole session and         """
         #Recursively applies show_segmented_image to whole session
         self.Y=[]
-        self.dermatomes_mask = []
         post_processing = PostProcessing(self.ui_window.morphoSpinBox.value())
         for i in range(len(self.outfiles)):
             threshold =  0.5
@@ -626,9 +626,6 @@ class Window(QMainWindow):
             Y = np.where( Y >= threshold  , 1 , 0)
             Y = post_processing.execute(Y[0])
             
-            dermatomes = get_dermatomes(Y.astype('uint8'))
-
-            self.dermatomes_mask.append(dermatomes)
             self.Y.append(Y)    #Eventually required by temp_extract
             
             #print(f"Dimensiones de la salida: {Y.shape}")
@@ -699,20 +696,32 @@ class Window(QMainWindow):
                 self.meanTemperatures = []   #Whole feet mean temperature for all images in session
                 segmented_temps = []
                 original_temps = []
+                dermatomes_temps = []
+                dermatomes_masks = []
                 if self.ui_window.autoScaleCheckBoxImport.isChecked():
                     for i in range(len(self.outfiles)):
                         mean_out, temp, original_temp = mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range[i], plot = False)
+                        derm_temps, derm_mask = dermatomes_temperatures(original_temp, self.Y[i])
                         self.meanTemperatures.append(mean_out)
                         segmented_temps.append(temp)
                         original_temps.append(original_temp)
+                        dermatomes_temps.append(derm_temps)
+                        dermatomes_masks.append(derm_mask)
+                    self.dermatomes_temps = np.array(dermatomes_temps)
+                    self.dermatomes_masks = np.array(dermatomes_masks)
                     self.segmented_temps = np.array(segmented_temps)
                     self.original_temps = np.array(original_temps)
                 else:
                     for i in range(len(self.outfiles)):
                         mean_out, temp, original_temp = mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range, plot = False)
+                        derm_temps, derm_mask = dermatomes_temperatures(original_temp, self.Y[i])
                         self.meanTemperatures.append(mean_out)
                         segmented_temps.append(temp)
                         original_temps.append(original_temp)
+                        dermatomes_temps.append(derm_temps)
+                        dermatomes_masks.append(derm_mask)
+                    self.dermatomes_temps = np.array(dermatomes_temps)
+                    self.dermatomes_masks = np.array(dermatomes_masks)
                     self.segmented_temps = np.array(segmented_temps)
                     self.original_temps = np.array(original_temps)
 
@@ -805,7 +814,7 @@ class Window(QMainWindow):
             self.generate_full_session_plot()
         else:
             exit_value = plot_report(img_temps = self.original_temps, segmented_temps = self.segmented_temps, mean_temps = self.meanTemperatures, times = self.timeList, 
-                        path = os.path.join(self.defaultDirectory,'report'))
+                        path = os.path.join(self.defaultDirectory,'report'), dermatomes_temps = self.dermatomes_temps, dermatomes_masks = self.dermatomes_masks)
             if exit_value == 0:
                 self.message_print("Se ha generado exitosamente el plot completo de sesión")
             else:
