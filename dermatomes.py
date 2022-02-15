@@ -63,17 +63,17 @@ def resample(moving_image,fixed_image,registration_transform):
 
 
 
-def register_one_food(food,dermatomes):
-    hight = food.shape[0]
-    width = food.shape[1]
+def register_one_foot(foot,dermatomes):
+    hight = foot.shape[0]
+    width = foot.shape[1]
     dermatomes = cv2.resize(dermatomes, (width,hight), interpolation = cv2.INTER_NEAREST)    
     mask_dermatomes = (dermatomes >0).astype('int8')
-    registration_transform = no_rigid_registration(food,mask_dermatomes) 
-    return  resample(dermatomes,food,registration_transform)
+    registration_transform = no_rigid_registration(foot,mask_dermatomes) 
+    return  resample(dermatomes,foot,registration_transform)
 
     
 
-def extract_foods(img):
+def extract_feet(img):
     """Get centroids and top-bottom y for initialization template of dermatomes
     """
     _, thresh = cv2.threshold(img,127,255,0)
@@ -93,11 +93,11 @@ def extract_foods(img):
        coord.append([yTop,yBot,xRig,xLef])
 
 
-    coord.sort(key = lambda x: x[2]) #order foods
-    right_food = img[coord[0][0]:coord[0][1],coord[0][2]:coord[0][3]]
-    left_food = img[coord[1][0]:coord[1][1],coord[1][2]:coord[1][3]]
+    coord.sort(key = lambda x: x[2]) #order foots
+    right_foot = img[coord[0][0]:coord[0][1],coord[0][2]:coord[0][3]]
+    left_foot = img[coord[1][0]:coord[1][1],coord[1][2]:coord[1][3]]
 
-    return right_food, left_food,coord
+    return right_foot, left_foot,coord
 
 
 
@@ -121,10 +121,10 @@ def get_dermatomes(fixed_image,path_right_foot='images/dermatomes.png',path_left
     left_dermatomes = cv2.imread(path_left_foot)[...,2] 
     left_dermatomes[(left_dermatomes!=0)&(left_dermatomes!=255)] = left_dermatomes[(left_dermatomes!=0)&(left_dermatomes!=255)] + 1 
 
-    right_food,left_food, coord = extract_foods(fixed_image)
+    right_foot,left_foot, coord = extract_foots(fixed_image)
     
-    right_dermatomes = register_one_food(right_food,right_dermatomes)
-    left_dermatomes = register_one_food(left_food,left_dermatomes)
+    right_dermatomes = register_one_foot(right_foot,right_dermatomes)
+    left_dermatomes = register_one_foot(left_foot,left_dermatomes)
     output_dermatomes = np.zeros_like(fixed_image)
     output_dermatomes[coord[0][0]:coord[0][1],coord[0][2]:coord[0][3]] = right_dermatomes
     output_dermatomes[coord[1][0]:coord[1][1],coord[1][2]:coord[1][3]] = left_dermatomes
@@ -146,17 +146,17 @@ def main(args):
     print(f'Time : {tf:.4f}')
 
 
-    right_food,left_food, _ = extract_foods(mask[...,0])
+    right_foot,left_foot, _ = extract_feet(mask[...,0])
     plt.figure(figsize=(20,10))
 
     plt.subplot(241)
     plt.imshow(mask[...,0])
 
     plt.subplot(242)
-    plt.imshow(right_food)
+    plt.imshow(right_foot)
 
     plt.subplot(243)
-    plt.imshow(left_food)
+    plt.imshow(left_foot)
 
     plt.subplot(244)
     plt.imshow(dermatomes)
