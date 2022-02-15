@@ -121,7 +121,7 @@ def get_dermatomes(fixed_image,path_right_foot='images/dermatomes.png',path_left
     left_dermatomes = cv2.imread(path_left_foot)[...,2] 
     left_dermatomes[(left_dermatomes!=0)&(left_dermatomes!=255)] = left_dermatomes[(left_dermatomes!=0)&(left_dermatomes!=255)] + 1 
 
-    right_foot,left_foot, coord = extract_foots(fixed_image)
+    right_foot,left_foot, coord = extract_feet(fixed_image)
     
     right_dermatomes = register_one_foot(right_foot,right_dermatomes)
     left_dermatomes = register_one_foot(left_foot,left_dermatomes)
