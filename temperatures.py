@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
+from dermatomes import get_dermatomes
 
 def mean_temperature(image , mask , range_=[22.5 , 35.5], plot = False):
     """Get mean temperature of feet image based on mask and scale
@@ -41,3 +42,26 @@ def mean_temperature(image , mask , range_=[22.5 , 35.5], plot = False):
     else:
         mean = (temp[mask!=0]).mean()
         return mean, temp, original_temp
+
+
+dic_dermatomes = {0:'Backgroud', 10:'Medial Plantar Pie Derecho', 11:'Medial Plantar Pie Izquierdo', 20:'Lateral Plantar Pie Derecho', 21:'Lateral Plantar Pie Izquierdo',
+                  30:'Sural Pie Derecho', 31:'Sural Pie Izquierdo', 40:'Tibial Pie Derecho', 41:'Tibial Pie Izquierdo',
+                  50:'Saphenous Pie Derecho', 51:'Saphenous Pie Izquierdo', 255:'Edges'}
+
+
+derm_id = list(dic_dermatomes.keys())
+derm_id.sort()
+derm_names = [dic_dermatomes[key] for key in derm_id[1:-1]]
+
+
+def dermatomes_temperatures(original_temp, mask):
+    
+    dermatomes_mask = get_dermatomes(mask.astype('uint8'))
+     
+    mean_temp_t_derm = np.zeros((len(derm_names)))
+    
+    for j, derm_id in enumerate(np.unique(dermatomes_mask)[1:-1]):
+        mean_temp_t_derm[j] = original_temp[dermatomes_mask==derm_id].mean()
+        
+    
+    return mean_temp_t_derm, dermatomes_mask
