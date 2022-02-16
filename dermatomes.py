@@ -14,34 +14,8 @@ import cv2
 import SimpleITK as sitk
 import numpy as np 
 import matplotlib.pyplot as plt
+import time 
 
-
-def get_centroids_and_tby(img):
-    """Get centroids and top-bottom y for initialization template of dermatomes
-    """
-
-    _, thresh = cv2.threshold(img,127,255,0)
-    contours, _ = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    
-    contours = list(contours)
-    contours.sort(reverse=True,key= lambda c : cv2.contourArea(c))
-    centroids = []
-
-    for i,c in enumerate(contours[:2]):
-       M = cv2.moments(c)
-
-       # calculate x,y coordinate of center
-       cX = int(M["m10"] / M["m00"])
-       cY = int(M["m01"] / M["m00"])
-       #y Top and y Bottom
-       yTop = c[c[:, :, 1].argmin()][0][1]
-       yBot = c[c[:, :, 1].argmax()][0][1]
-
-
-       centroids.append([cX,cY,yTop,yBot])
-
-    centroids.sort(key = lambda x: x[0])
-    return centroids
 
 def plot_predict(y,y_pred):
     red  = np.logical_and(~y,y_pred)[...,None]  #false positive
@@ -51,30 +25,6 @@ def plot_predict(y,y_pred):
     return image
 
 
-def reshape(hight,foot_image):
-    width = int(hight*foot_image.shape[1]/foot_image.shape[0])
-    width = width + width%2
-    hight = hight + hight%2
-    return cv2.resize(foot_image, (width,hight), interpolation = cv2.INTER_NEAREST)
-
-
-def put_image_in_point(img1,img2,point):
-    shape = img2.shape
-    img1[point[1]-shape[0]//2:point[1]+shape[0]//2,point[0]-shape[1]//2:point[0]+shape[1]//2] = img2
-    return img1
-
-def make_moving_image(right_foot,left_foot,final_shape,centroids_and_tby):
-    moved = np.zeros(shape=(final_shape))
-    
-    hight_right =  centroids_and_tby[0][3] -centroids_and_tby[0][2]
-    right_foot = reshape(hight_right,right_foot)
-
-    left_right =  centroids_and_tby[1][3] -centroids_and_tby[1][2]
-    left_foot = reshape(left_right,left_foot)
-
-    moved = put_image_in_point(moved,right_foot,centroids_and_tby[0][:2])
-    moved = put_image_in_point(moved,left_foot,centroids_and_tby[1][:2])
-    return moved
 
 def no_rigid_registration(fixed_image, moving_image): 
     fixed_image =  sitk.Cast(sitk.GetImageFromArray(fixed_image.copy()),sitk.sitkFloat32)
@@ -94,7 +44,7 @@ def no_rigid_registration(fixed_image, moving_image):
                                               convergenceWindowSize=10)
 
     R.SetMetricSamplingStrategy(R.RANDOM)
-    R.SetMetricSamplingPercentage(0.01)
+    R.SetMetricSamplingPercentage(0.01,seed=42)
     R.SetInterpolator(sitk.sitkNearestNeighbor)#sitk.sitkLinear)#
 
     R.SetInitialTransformAsBSpline(tx,
@@ -112,6 +62,45 @@ def resample(moving_image,fixed_image,registration_transform):
     return sitk.GetArrayFromImage(sitk.Resample(moving_image,fixed_image, registration_transform,sitk.sitkNearestNeighbor))
 
 
+
+def register_one_foot(foot,dermatomes):
+    hight = foot.shape[0]
+    width = foot.shape[1]
+    dermatomes = cv2.resize(dermatomes, (width,hight), interpolation = cv2.INTER_NEAREST)    
+    mask_dermatomes = (dermatomes >0).astype('int8')
+    registration_transform = no_rigid_registration(foot,mask_dermatomes) 
+    return  resample(dermatomes,foot,registration_transform)
+
+    
+
+def extract_feet(img):
+    """Get centroids and top-bottom y for initialization template of dermatomes
+    """
+    _, thresh = cv2.threshold(img,127,255,0)
+    contours, _ = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    
+    contours = list(contours)
+    contours.sort(reverse=True,key= lambda c : cv2.contourArea(c))
+    coord = []
+
+    for i,c in enumerate(contours[:2]):
+
+       #y Top and y Bottom
+       yTop = c[c[:, :, 1].argmin()][0][1] - 3
+       yBot = c[c[:, :, 1].argmax()][0][1] + 3
+       xRig = c[c[:, :, 0].argmin()][0][0] - 3
+       xLef = c[c[:, :, 0].argmax()][0][0] + 3
+       coord.append([yTop,yBot,xRig,xLef])
+
+
+    coord.sort(key = lambda x: x[2]) #order foots
+    right_foot = img[coord[0][0]:coord[0][1],coord[0][2]:coord[0][3]]
+    left_foot = img[coord[1][0]:coord[1][1],coord[1][2]:coord[1][3]]
+
+    return right_foot, left_foot,coord
+
+
+
 def get_dermatomes(fixed_image,path_right_foot='images/dermatomes.png',path_left_foot='images/dermatomes.png'):
     """
     0 -> background
@@ -125,18 +114,22 @@ def get_dermatomes(fixed_image,path_right_foot='images/dermatomes.png',path_left
        50-51 -> Saphenous
     """
     #all in hxw
+
     fixed_image = fixed_image[...,0]*255
-    right_foot = cv2.flip(cv2.imread(path_right_foot)[...,2],1)
-    left_foot = cv2.imread(path_left_foot)[...,2] 
-    left_foot[(left_foot!=0)&(left_foot!=255)] = left_foot[(left_foot!=0)&(left_foot!=255)] + 1 
+    
+    right_dermatomes = cv2.flip(cv2.imread(path_right_foot)[...,2],1)
 
-    centroids_and_tby = get_centroids_and_tby(fixed_image)
-    moving_image = make_moving_image(right_foot,left_foot,fixed_image.shape,centroids_and_tby)
-    moving_image_masked = (moving_image > 0).astype('int8')
+    left_dermatomes = cv2.imread(path_left_foot)[...,2] 
+    left_dermatomes[(left_dermatomes!=0)&(left_dermatomes!=255)] = left_dermatomes[(left_dermatomes!=0)&(left_dermatomes!=255)] + 1 
 
-    registration_transform = no_rigid_registration(fixed_image,moving_image_masked ) 
 
-    output_dermatomes = resample(moving_image,fixed_image,registration_transform)
+    right_foot,left_foot, coord = extract_feet(fixed_image)
+    
+    right_dermatomes = register_one_foot(right_foot,right_dermatomes)
+    left_dermatomes = register_one_foot(left_foot,left_dermatomes)
+    output_dermatomes = np.zeros_like(fixed_image)
+    output_dermatomes[coord[0][0]:coord[0][1],coord[0][2]:coord[0][3]] = right_dermatomes
+    output_dermatomes[coord[1][0]:coord[1][1],coord[1][2]:coord[1][3]] = left_dermatomes
 
     return output_dermatomes
 
@@ -148,27 +141,40 @@ def main(args):
 
     mask = cv2.imread(path_mask)
     img = cv2.imread(path_image)
-    dermatomes = get_dermatomes(mask)
 
+    t1 = time.time()
+    dermatomes = get_dermatomes(mask)
+    tf = time.time()-t1
+    print(f'Time : {tf:.4f}')
+
+
+    right_foot,left_foot, _ = extract_feet(mask[...,0])
     plt.figure(figsize=(20,10))
 
-    plt.subplot(141)
+    plt.subplot(241)
     plt.imshow(mask[...,0])
 
-    plt.subplot(142)
+    plt.subplot(242)
+    plt.imshow(right_foot)
+
+    plt.subplot(243)
+    plt.imshow(left_foot)
+
+    plt.subplot(244)
     plt.imshow(dermatomes)
 
-    plt.subplot(143)
+    plt.subplot(245)
     plt.imshow(plot_predict(mask[...,0],dermatomes>0))
 
-    plt.subplot(144)
+    plt.subplot(246)
     img[dermatomes==255,0] = 255
     img[dermatomes==255,1] = 0
     img[dermatomes==255,2] = 0
     plt.imshow(img)
 
-    plt.show()
 
+    plt.show()
+#
 
 if __name__ == "__main__":
     args = docopt.docopt(__doc__)
