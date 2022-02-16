@@ -6,7 +6,9 @@ from functools import partial
 class PostProcessing():
     def __init__(self,  small_object_threshold):
         self.small_object_threshold = small_object_threshold
-        self.default_steps = [partial(opening,diameter=4),
+        self.default_steps = [
+                    fill_inside_holes,
+                    partial(opening,diameter=4),
                     partial(remove_small_objects,min_size = self.small_object_threshold),
                     partial(closing,diameter=4),
                  ]   
@@ -16,6 +18,15 @@ class PostProcessing():
         for step in self.default_steps:
             mask = step(mask)
         return mask[...,None].astype('float32')
+
+
+def  fill_inside_holes(img):
+    img = img.astype('uint8')
+    contours, _ = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    img = np.zeros_like(img)
+    for c in contours:
+        img = cv2.drawContours(img,[c],-1,1,-1)
+    return  img
 
 def circle_structure(diameter):
     """
