@@ -131,15 +131,19 @@ class Window(QMainWindow):
         #print(np.unique(uint8img))
         #print(uint8img.shape)
         thresh = cv2.threshold(uint8img , 100, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)[1]
+        plt.figure()
+        # plt.imshow(thresh)
         text = pytesseract.image_to_string(thresh,   config = '--psm 7')
         #Text cleaning and replacement...
-        clean_text = text.replace(']', '1')
+        clean_text = text.replace(']', '1').replace(' ', '').replace(',', '.')
+        # plt.title(clean_text)
+        # plt.show()
         try:
             num = float(clean_text)
             if num>=100:
                 num/=10
         except:
-            print("Could not convert string into number")
+            print(f"Could not convert string [{clean_text}] into number")
             return -100
         return num
 
@@ -378,7 +382,7 @@ class Window(QMainWindow):
         self.message_print(f"Se ha cambiado exitosamente el colormap de entrada a {self.input_cmap}")
 
     def set_default_input_cmap(self):
-        self.accepted_cmaps = ['Hierro','Gris', 'Arcoiris', 'Lava']
+        self.accepted_cmaps = ['Gris', 'Hierro', 'Arcoiris', 'Lava']
         self.input_cmap = self.accepted_cmaps[0]
         self.ui_window.inputColormapComboBox.addItems(self.accepted_cmaps)
 
