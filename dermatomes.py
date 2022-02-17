@@ -25,11 +25,10 @@ def plot_predict(y,y_pred):
     return image
 
 
-def refine_contour(dermatomes):
+def define_contour(dermatomes):
     without_contours = dermatomes.copy()
-    without_contours[dermatomes==255] = 0
+    
     uniques = sorted(np.unique(without_contours))[1:]
-
     for unique in uniques:
         binary_img = (without_contours==unique).astype('uint8')
         contours, _ = cv2.findContours(binary_img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
@@ -140,7 +139,7 @@ def get_dermatomes(fixed_image,path_right_foot='images/dermatomes.png',path_left
     right_dermatomes = cv2.flip(cv2.imread(path_right_foot)[...,2],1)
 
     left_dermatomes = cv2.imread(path_left_foot)[...,2] 
-    left_dermatomes[(left_dermatomes!=0)&(left_dermatomes!=255)] = left_dermatomes[(left_dermatomes!=0)&(left_dermatomes!=255)] + 1 
+    left_dermatomes[left_dermatomes!=0] = left_dermatomes[left_dermatomes!=0] + 1 
 
 
     right_foot,left_foot, coord = extract_feet(fixed_image)
@@ -152,7 +151,7 @@ def get_dermatomes(fixed_image,path_right_foot='images/dermatomes.png',path_left
     output_dermatomes[coord[0][0]:coord[0][1],coord[0][2]:coord[0][3]] = right_dermatomes
     output_dermatomes[coord[1][0]:coord[1][1],coord[1][2]:coord[1][3]] = left_dermatomes
 
-    output_dermatomes =  refine_contour(output_dermatomes)
+    output_dermatomes =  define_contour(output_dermatomes)
     return output_dermatomes
 
 
