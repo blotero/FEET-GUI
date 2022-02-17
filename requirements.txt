@@ -1,8 +1,8 @@
 matplotlib
 opencv-contrib-python-headless
 PySide2
-tflite-runtime
 scipy
+tflite-runtime
 tesseract
 pytesseract
 tesseract-ocr
