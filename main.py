@@ -144,6 +144,7 @@ class Window(QMainWindow):
                 num/=10
         except:
             print(f"Could not convert string [{clean_text}] into number")
+            self.message_print(f"No se ha podido detectar escalas automáticamente de: Texto base: {text}, Texto limpio: {clean_text}. Dejando rango por defecto: [25, 45]")
             return -100
         return num
 
