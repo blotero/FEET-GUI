@@ -7,4 +7,4 @@ tesseract
 pytesseract
 tesseract-ocr
 docopt
-
+SimpleITK

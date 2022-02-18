@@ -217,12 +217,23 @@ class Window(QMainWindow):
         """
         Fill dictionary attribute with the parms given by the info tab
         """
-        self.session_info['Nombre'] = self.name
+        #Initial information obtained during session creation
+        self.session_info['Nombre'] = self.ui_window.nameField.text()
         self.session_info['Edad'] = self.ui_window.ageField.text()
-        self.session_info['Semanas_de_gestacion'] = self.ui_window.weeksField.text()
-        self.session_info['Estatura'] = self.ui_window.heightField.text()
-        self.session_info['Peso'] = self.ui_window.weightField.text()
+        self.session_info['Tipo_de_documento'] = self.ui_window.weightField.value()           #Spinbox
+        self.session_info['Nro_de_documento'] = self.ui_window.weightField.text()
+        self.session_info['Semanas_de_gestacion'] = self.ui_window.weeksField.value()         #Spinbox
+        self.session_info['Peso'] = self.ui_window.weightField.value()                        #Spinbox
+        self.session_info['Estatura'] = self.ui_window.heightField.value()                    #Spinbox
+        self.session_info['ASA'] = self.ui_window.ASAField.currentText()                      #Combobox
+        self.session_info['Membranas'] = self.ui_window.membField.currentText()               #Combobox
+        self.session_info['Dilatación'] = self.ui_window.dilatationField.value()              #Spinbox
+        self.session_info['Paridad'] = self.ui_window.parityField.currentText()               #Combobox
 
+        #Calculated additional information
+        self.session_info['Temperaturas_medias'] = self.meanTemperatures
+        self.session_info['Escalas_de_temperatura'] = self.scale_range
+        self.session_info['Temperaturas_de_dermatomas'] = self.dermatomes_temps.tolist()
 
     def setup_camera(self):
         """
@@ -820,6 +831,7 @@ class Window(QMainWindow):
             exit_value = plot_report(img_temps = self.original_temps, segmented_temps = self.segmented_temps, mean_temps = self.meanTemperatures, times = self.timeList, 
                         path = os.path.join(self.defaultDirectory,'report'), dermatomes_temps = self.dermatomes_temps, dermatomes_masks = self.dermatomes_masks)
             if exit_value == 0:
+                #Generación de información extra para la sesión
                 self.message_print("Se ha generado exitosamente el plot completo de sesión")
             else:
                 self.message_print("Advertencia, se ha encontrado un valor no válido (nan) en los dígitos de escala de temperatura. Verifique que la imagen es del formato y referencia de cámara correctos")
@@ -846,7 +858,7 @@ class Window(QMainWindow):
             self.input_type = 0
             self.inputExists = True
             self.ui_window.inputImgImport.setPixmap(self.opdir)
-            self.message_print(f"Se ha importado exiosamente la imagen {self.opdir} ")
+            self.message_print(f"Se ha importado exitosamente la imagen {self.opdir} ")
             self.ui_window.tabWidget.setProperty('currentIndex', 1)
 
     def open_folder(self):
@@ -869,7 +881,7 @@ class Window(QMainWindow):
             self.find_images()
             self.sessionIsSegmented = False
             self.ui_window.tabWidget.setProperty('currentIndex', 1)
-            self.message_print(f"Se ha importado exiosamente la sesión {self.defaultDirectory} ")
+            self.message_print(f"Se ha importado exitosamente la sesión {self.defaultDirectory} ")
             #self.file_system_model.setRootPath(QDir(self.defaultDirectory))
             #self.ui_window.treeView.setModel(self.file_system_model)
 
