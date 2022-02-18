@@ -131,7 +131,7 @@ class Window(QMainWindow):
         #print(np.unique(uint8img))
         #print(uint8img.shape)
         thresh = cv2.threshold(uint8img , 100, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)[1]
-        plt.figure()
+        #plt.figure()
         # plt.imshow(thresh)
         text = pytesseract.image_to_string(thresh,   config = '--psm 7')
         #Text cleaning and replacement...
