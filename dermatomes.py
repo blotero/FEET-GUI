@@ -99,10 +99,10 @@ def extract_feet(img):
     for i,c in enumerate(contours[:2]):
 
        #y Top and y Bottom
-       yTop = c[c[:, :, 1].argmin()][0][1] - 5
-       yBot = c[c[:, :, 1].argmax()][0][1] + 5
-       xRig = c[c[:, :, 0].argmin()][0][0] - 5
-       xLef = c[c[:, :, 0].argmax()][0][0] + 5
+       yBot = c[c[:, :, 1].argmax()][0][1] 
+       xRig = c[c[:, :, 0].argmin()][0][0] 
+       yTop = c[c[:, :, 1].argmin()][0][1] 
+       xLef = c[c[:, :, 0].argmax()][0][0] 
        coord.append([yTop,yBot,xRig,xLef,c])
 
        
@@ -141,7 +141,6 @@ def get_dermatomes(fixed_image,path_right_foot='images/dermatomes.png',path_left
     left_dermatomes = cv2.imread(path_left_foot)[...,2] 
     left_dermatomes[left_dermatomes!=0] = left_dermatomes[left_dermatomes!=0] + 1 
 
-
     right_foot,left_foot, coord = extract_feet(fixed_image)
     
     right_dermatomes = register_one_foot(right_foot,right_dermatomes)
@@ -149,7 +148,7 @@ def get_dermatomes(fixed_image,path_right_foot='images/dermatomes.png',path_left
 
     output_dermatomes = np.zeros_like(fixed_image,dtype='float')
     output_dermatomes[coord[0][0]:coord[0][1],coord[0][2]:coord[0][3]] = right_dermatomes
-    output_dermatomes[coord[1][0]:coord[1][1],coord[1][2]:coord[1][3]] = left_dermatomes
+    output_dermatomes[coord[1][0]:coord[1][1],coord[1][2]:coord[1][3]] = output_dermatomes[coord[1][0]:coord[1][1],coord[1][2]:coord[1][3]] +  left_dermatomes
 
     output_dermatomes =  define_contour(output_dermatomes)
     return output_dermatomes
