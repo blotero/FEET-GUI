@@ -313,6 +313,41 @@ class Window(QMainWindow):
             self.ui_window.minSpinBox.setValue(temp_scale[0])
             self.ui_window.maxSpinBox.setValue(temp_scale[1])
 
+    def wipe_outputs(self, hard=False):
+        self.message_print("Limpiando sesión...")
+        self.imgs = []
+        self.subj = []
+        self.inputExists = False
+        self.defaultDirectoryExists = False
+        self.isSegmented = False
+        self.files = None
+        self.temperaturesWereAcquired = False
+        self.s2s = SessionToSegment()
+        self.i2s = ImageToSegment()
+        self.s2s.setModel(self.model)
+        self.i2s.setModel(self.model)
+        self.s2s.loadModel()
+        self.i2s.loadModel()
+        self.sessionIsCreated = False
+        self.ui_window.outputImgImport.setPixmap("")
+        self.ui_window.inputImgImport.setPixmap("")
+        self.ui_window.outputImg.setPixmap("")
+        self.ui_window.temperatureLabelImport.setText("")
+
+        if hard:
+            self.ui_window.nameField.setText("")
+            self.ui_window.ageField.setText("")
+            self.ui_window.weightField.setValue(0)                 
+            self.ui_window.weightField.setValue(0)
+            self.ui_window.weeksField.setValue(0)                  
+            self.ui_window.weightField.setValue(0)                 
+            self.ui_window.heightField.setValue(0)                 
+            self.ui_window.ASAField.setCurrentIndex(0)             
+            self.ui_window.membField.setCurrentIndex(0)            
+            self.ui_window.dilatationField.setValue(0)             
+            self.ui_window.parityField.setCurrentIndex(0)          
+
+
     def create_session(self):
         """
         Creates a new session, including a directory in ./outputs/<session_dir> with given input parameters
@@ -323,6 +358,7 @@ class Window(QMainWindow):
         formatted_today = datetime.today().strftime("%Y-%m-%d_%H:%M")            
         self.dir_name = f"{self.name.replace(' ','_')}{formatted_today}"
         try:
+            self.wipe_outputs()
             self.session_dir = os.path.join('outputs',self.dir_name)
             os.mkdir(self.session_dir)
             self.sessionIsCreated = True
@@ -761,7 +797,7 @@ class Window(QMainWindow):
                 self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
 
             if (self.ui_window.plotCheckBoxImport.isChecked() and self.input_type>=1):  #If user asked for plot
-                self.message_print("Se generara plot de temperatura...")
+                #self.message_print("Se generara plot de temperatura...")
                 self.get_times()
                 # self.temp_plot()
 
@@ -856,6 +892,7 @@ class Window(QMainWindow):
         self.opdir = self.fileDialog.getOpenFileName()[0]
         self.imagesDir = os.path.dirname(self.opdir) 
         if self.opdir:
+            self.wipe_outputs(hard=True)
             self.input_type = 0
             self.inputExists = True
             self.ui_window.inputImgImport.setPixmap(self.opdir)
@@ -872,10 +909,10 @@ class Window(QMainWindow):
         self.defaultDirectory = self.folderDialog.getExistingDirectory()
         self.imagesDir = self.defaultDirectory
         if self.defaultDirectory:
+            self.wipe_outputs(hard=True)
             self.input_type = 1
             self.defaultDirectoryExists = True
             first_image = str(self.defaultDirectory + "/t0.jpg")
-            print(first_image)
             self.ui_window.inputImgImport.setPixmap(first_image)
             self.opdir = first_image
             self.inputExists = True
