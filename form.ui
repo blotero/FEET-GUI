@@ -2364,7 +2364,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
        <property name="text">
-        <string>Peso</string>
+        <string>Peso (kg)</string>
        </property>
       </widget>
       <widget class="QLineEdit" name="heightField_3">
@@ -2454,7 +2454,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
        <property name="text">
-        <string>Estatura</string>
+        <string>Estatura (cm)</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_23">
@@ -2520,7 +2520,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>320</x>
          <y>170</y>
-         <width>61</width>
+         <width>90</width>
          <height>32</height>
         </rect>
        </property>
@@ -2535,7 +2535,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>320</x>
          <y>210</y>
-         <width>62</width>
+         <width>90</width>
          <height>32</height>
         </rect>
        </property>
@@ -2543,6 +2543,9 @@ p, li { white-space: pre-wrap; }
         <font>
          <pointsize>14</pointsize>
         </font>
+       </property>
+       <property name="maximum">
+        <double>500.000000000000000</double>
        </property>
       </widget>
       <widget class="QDoubleSpinBox" name="heightField">
@@ -2550,7 +2553,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>320</x>
          <y>250</y>
-         <width>62</width>
+         <width>90</width>
          <height>32</height>
         </rect>
        </property>
@@ -2558,6 +2561,9 @@ p, li { white-space: pre-wrap; }
         <font>
          <pointsize>14</pointsize>
         </font>
+       </property>
+       <property name="maximum">
+        <double>300.000000000000000</double>
        </property>
       </widget>
       <widget class="QLabel" name="label_24">
@@ -2578,7 +2584,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>320</x>
          <y>330</y>
-         <width>61</width>
+         <width>90</width>
          <height>32</height>
         </rect>
        </property>
@@ -2629,7 +2635,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>320</x>
          <y>410</y>
-         <width>61</width>
+         <width>90</width>
          <height>32</height>
         </rect>
        </property>
@@ -2654,7 +2660,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>320</x>
          <y>290</y>
-         <width>61</width>
+         <width>90</width>
          <height>32</height>
         </rect>
        </property>
@@ -2694,7 +2700,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>320</x>
          <y>370</y>
-         <width>62</width>
+         <width>90</width>
          <height>32</height>
         </rect>
        </property>
