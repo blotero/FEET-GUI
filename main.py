@@ -57,7 +57,7 @@ class NotImplementedError(Exception):
 
     
 
-class Window(QMainWindow):
+class Window:
     def __init__(self):
         super(Window, self).__init__()
         self.load_UI()        
@@ -81,7 +81,7 @@ class Window(QMainWindow):
         self.i2s.setModel(self.model)
         self.s2s.loadModel()
         self.i2s.loadModel()
-        self.ui_window.loadedModelLabel.setText(self.model)
+        self.ui.loadedModelLabel.setText(self.model)
         self.camera_index = 0
         self.setup_camera()
         self.sessionIsCreated = False
@@ -93,10 +93,22 @@ class Window(QMainWindow):
         self.set_default_input_cmap()
         self.file_system_model = QFileSystemModel()
         self.file_system_model.setRootPath(QDir.currentPath())
-        self.ui_window.treeView.setModel(self.file_system_model)
+        self.ui.treeView.setModel(self.file_system_model)
         plt.style.use('bmh')
         self.session_info = {}
         
+    def load_UI(self):
+        """
+        Load xml file with visual objects for the interface
+        """
+        loader = QUiLoader()        
+        path = os.fspath(Path(__file__).resolve().parent / "form.ui")
+        ui_file = QFile(path)
+        ui_file.open(QFile.ReadOnly)
+        self.ui = loader.load(ui_file)
+        self.ui.showFullScreen()
+        ui_file.close()
+
     def predict_number(self,image):
         """
         Predicts digit value from a certain region image
@@ -219,17 +231,17 @@ class Window(QMainWindow):
         Fill dictionary attribute with the parms given by the info tab
         """
         #Initial information obtained during session creation
-        self.session_info['Nombre'] = self.ui_window.nameField.text()
-        self.session_info['Edad'] = self.ui_window.ageField.text()
-        self.session_info['Tipo_de_documento'] = self.ui_window.weightField.value()           #Spinbox
-        self.session_info['Nro_de_documento'] = self.ui_window.weightField.text()
-        self.session_info['Semanas_de_gestacion'] = self.ui_window.weeksField.value()         #Spinbox
-        self.session_info['Peso'] = self.ui_window.weightField.value()                        #Spinbox
-        self.session_info['Estatura'] = self.ui_window.heightField.value()                    #Spinbox
-        self.session_info['ASA'] = self.ui_window.ASAField.currentText()                      #Combobox
-        self.session_info['Membranas'] = self.ui_window.membField.currentText()               #Combobox
-        self.session_info['Dilatación'] = self.ui_window.dilatationField.value()              #Spinbox
-        self.session_info['Paridad'] = self.ui_window.parityField.currentText()               #Combobox
+        self.session_info['Nombre'] = self.ui.nameField.text()
+        self.session_info['Edad'] = self.ui.ageField.text()
+        self.session_info['Tipo_de_documento'] = self.ui.weightField.value()           #Spinbox
+        self.session_info['Nro_de_documento'] = self.ui.weightField.text()
+        self.session_info['Semanas_de_gestacion'] = self.ui.weeksField.value()         #Spinbox
+        self.session_info['Peso'] = self.ui.weightField.value()                        #Spinbox
+        self.session_info['Estatura'] = self.ui.heightField.value()                    #Spinbox
+        self.session_info['ASA'] = self.ui.ASAField.currentText()                      #Combobox
+        self.session_info['Membranas'] = self.ui.membField.currentText()               #Combobox
+        self.session_info['Dilatación'] = self.ui.dilatationField.value()              #Spinbox
+        self.session_info['Paridad'] = self.ui.parityField.currentText()               #Combobox
 
         #Calculated additional information
         self.session_info['Temperaturas_medias'] = self.meanTemperatures
@@ -259,7 +271,7 @@ class Window(QMainWindow):
             # image = qimage2ndarray.array2qimage(self.frame)
             self.image = QImage(self.frame, self.frame.shape[1], self.frame.shape[0], 
                         self.frame.strides[0], QImage.Format_RGB888)
-            self.ui_window.inputImg.setPixmap(QPixmap.fromImage(self.image))
+            self.ui.inputImg.setPixmap(QPixmap.fromImage(self.image))
         except:
             time.sleep(1)
             self.message_print(f'No se detectó cámara {self.camera_index}. Reintentando...')
@@ -272,17 +284,6 @@ class Window(QMainWindow):
                 self.timer.stop()
                 pass
 
-    def load_UI(self):
-        """
-        Load xml file with visual objects for the interface
-        """
-        loader = QUiLoader()        
-        path = os.fspath(Path(__file__).resolve().parent / "form.ui")
-        ui_file = QFile(path)
-        ui_file.open(QFile.ReadOnly)
-        self.ui_window = loader.load(ui_file, self)
-        self.ui_window.showFullScreen()
-        ui_file.close()
     
     def capture_image(self):
         """
@@ -301,17 +302,17 @@ class Window(QMainWindow):
         
         self.save_name = f't{image_number}.jpg'
         plt.imsave(os.path.join(self.session_dir, self.save_name), self.frame)
-        self.ui_window.outputImg.setPixmap(QPixmap.fromImage(self.image))
-        self.ui_window.imgName.setText(self.save_name[:-4])
+        self.ui.outputImg.setPixmap(QPixmap.fromImage(self.image))
+        self.ui.imgName.setText(self.save_name[:-4])
         this_image = f"{self.defaultDirectory}/t{image_number}.jpg"
-        self.ui_window.inputImgImport.setPixmap(this_image)
+        self.ui.inputImgImport.setPixmap(this_image)
         self.find_images()
         
-        if self.ui_window.autoScaleCheckBox.isChecked():
+        if self.ui.autoScaleCheckBox.isChecked():
             # Read and set the temperature range:
             temp_scale = self.extract_scales_with_pytesseract(self.frame)
-            self.ui_window.minSpinBox.setValue(temp_scale[0])
-            self.ui_window.maxSpinBox.setValue(temp_scale[1])
+            self.ui.minSpinBox.setValue(temp_scale[0])
+            self.ui.maxSpinBox.setValue(temp_scale[1])
 
     def wipe_outputs(self, hard=False):
         self.message_print("Limpiando sesión...")
@@ -329,23 +330,23 @@ class Window(QMainWindow):
         self.s2s.loadModel()
         self.i2s.loadModel()
         self.sessionIsCreated = False
-        self.ui_window.outputImgImport.setPixmap("")
-        self.ui_window.inputImgImport.setPixmap("")
-        self.ui_window.outputImg.setPixmap("")
-        self.ui_window.temperatureLabelImport.setText("")
+        self.ui.outputImgImport.setPixmap("")
+        self.ui.inputImgImport.setPixmap("")
+        self.ui.outputImg.setPixmap("")
+        self.ui.temperatureLabelImport.setText("")
 
         if hard:
-            self.ui_window.nameField.setText("")
-            self.ui_window.ageField.setText("")
-            self.ui_window.weightField.setValue(0)                 
-            self.ui_window.weightField.setValue(0)
-            self.ui_window.weeksField.setValue(0)                  
-            self.ui_window.weightField.setValue(0)                 
-            self.ui_window.heightField.setValue(0)                 
-            self.ui_window.ASAField.setCurrentIndex(0)             
-            self.ui_window.membField.setCurrentIndex(0)            
-            self.ui_window.dilatationField.setValue(0)             
-            self.ui_window.parityField.setCurrentIndex(0)          
+            self.ui.nameField.setText("")
+            self.ui.ageField.setText("")
+            self.ui.weightField.setValue(0)                 
+            self.ui.weightField.setValue(0)
+            self.ui.weeksField.setValue(0)                  
+            self.ui.weightField.setValue(0)                 
+            self.ui.heightField.setValue(0)                 
+            self.ui.ASAField.setCurrentIndex(0)             
+            self.ui.membField.setCurrentIndex(0)            
+            self.ui.dilatationField.setValue(0)             
+            self.ui.parityField.setCurrentIndex(0)          
 
 
     def create_session(self):
@@ -354,7 +355,7 @@ class Window(QMainWindow):
         from GUI
         The session is named as the current timestamp if current session_dir is null
         """
-        self.name = self.ui_window.nameField.text()
+        self.name = self.ui.nameField.text()
         formatted_today = datetime.today().strftime("%Y-%m-%d_%H:%M")            
         self.dir_name = f"{self.name.replace(' ','_')}{formatted_today}"
         try:
@@ -403,36 +404,36 @@ class Window(QMainWindow):
         """
         Makes all connections between singleton methods and objects in UI xml
         """
-        QObject.connect(self.ui_window.actionCargar_imagen, SIGNAL ('triggered()'), self.open_image)
-        QObject.connect(self.ui_window.actionCargar_carpeta , SIGNAL ('triggered()'), self.open_folder)
-        QObject.connect(self.ui_window.actionCargar_modelos , SIGNAL ('triggered()'), self.get_models_path)
-        QObject.connect(self.ui_window.actionPantalla_completa , SIGNAL ('triggered()'), self.toggle_fullscreen)
-        QObject.connect(self.ui_window.actionSalir , SIGNAL ('triggered()'), self.exit_)
-        QObject.connect(self.ui_window.actionC_mo_usar , SIGNAL ('triggered()'), self.display_how_to_use)
-        QObject.connect(self.ui_window.actionUpdate , SIGNAL ('triggered()'), self.update_software)
-        QObject.connect(self.ui_window.actionRepoSync , SIGNAL ('triggered()'), self.sync_local_info_to_drive)
-        QObject.connect(self.ui_window.actionRepoConfig , SIGNAL ('triggered()'), self.repo_config_dialog)
-        QObject.connect(self.ui_window.segButtonImport, SIGNAL ('clicked()'), self.segment)
-        QObject.connect(self.ui_window.tempButtonImport, SIGNAL ('clicked()'), self.temp_extract)
-        QObject.connect(self.ui_window.captureButton, SIGNAL ('clicked()'), self.capture_image)
-        QObject.connect(self.ui_window.nextImageButton , SIGNAL ('clicked()'), self.next_image)
-        QObject.connect(self.ui_window.previousImageButton , SIGNAL ('clicked()'), self.previous_image)
-        #QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.export_report)
-        QObject.connect(self.ui_window.reportButton , SIGNAL ('clicked()'), self.generate_full_session_plot)
-        QObject.connect(self.ui_window.loadModelButton , SIGNAL ('clicked()'), self.toggle_model)
-        QObject.connect(self.ui_window.createSession, SIGNAL ('clicked()'), self.create_session)
-        QObject.connect(self.ui_window.segButton, SIGNAL ('clicked()'), self.segment_capture)
+        QObject.connect(self.ui.actionCargar_imagen, SIGNAL ('triggered()'), self.open_image)
+        QObject.connect(self.ui.actionCargar_carpeta , SIGNAL ('triggered()'), self.open_folder)
+        QObject.connect(self.ui.actionCargar_modelos , SIGNAL ('triggered()'), self.get_models_path)
+        QObject.connect(self.ui.actionPantalla_completa , SIGNAL ('triggered()'), self.toggle_fullscreen)
+        QObject.connect(self.ui.actionSalir , SIGNAL ('triggered()'), self.exit_)
+        QObject.connect(self.ui.actionC_mo_usar , SIGNAL ('triggered()'), self.display_how_to_use)
+        QObject.connect(self.ui.actionUpdate , SIGNAL ('triggered()'), self.update_software)
+        QObject.connect(self.ui.actionRepoSync , SIGNAL ('triggered()'), self.sync_local_info_to_drive)
+        QObject.connect(self.ui.actionRepoConfig , SIGNAL ('triggered()'), self.repo_config_dialog)
+        QObject.connect(self.ui.segButtonImport, SIGNAL ('clicked()'), self.segment)
+        QObject.connect(self.ui.tempButtonImport, SIGNAL ('clicked()'), self.temp_extract)
+        QObject.connect(self.ui.captureButton, SIGNAL ('clicked()'), self.capture_image)
+        QObject.connect(self.ui.nextImageButton , SIGNAL ('clicked()'), self.next_image)
+        QObject.connect(self.ui.previousImageButton , SIGNAL ('clicked()'), self.previous_image)
+        #QObject.connect(self.ui.reportButton , SIGNAL ('clicked()'), self.export_report)
+        QObject.connect(self.ui.reportButton , SIGNAL ('clicked()'), self.generate_full_session_plot)
+        QObject.connect(self.ui.loadModelButton , SIGNAL ('clicked()'), self.toggle_model)
+        QObject.connect(self.ui.createSession, SIGNAL ('clicked()'), self.create_session)
+        QObject.connect(self.ui.segButton, SIGNAL ('clicked()'), self.segment_capture)
         #Comboboxes:
-        self.ui_window.inputColormapComboBox.currentIndexChanged['QString'].connect(self.toggle_input_colormap)
+        self.ui.inputColormapComboBox.currentIndexChanged['QString'].connect(self.toggle_input_colormap)
 
     def toggle_input_colormap(self):
-        self.input_cmap = self.accepted_cmaps[self.ui_window.inputColormapComboBox.currentIndex()]
+        self.input_cmap = self.accepted_cmaps[self.ui.inputColormapComboBox.currentIndex()]
         self.message_print(f"Se ha cambiado exitosamente el colormap de entrada a {self.input_cmap}")
 
     def set_default_input_cmap(self):
         self.accepted_cmaps = ['Gris', 'Hierro', 'Arcoiris', 'Lava']
         self.input_cmap = self.accepted_cmaps[0]
-        self.ui_window.inputColormapComboBox.addItems(self.accepted_cmaps)
+        self.ui.inputColormapComboBox.addItems(self.accepted_cmaps)
 
 
     def segment_capture(self):
@@ -449,12 +450,12 @@ class Window(QMainWindow):
         Y = self.i2s.Y_pred
         Y = Y / Y.max()
         Y = np.where( Y >= threshold  , 1 , 0)
-        post_processing = PostProcessing(self.ui_window.morphoSpinBox.value())
+        post_processing = PostProcessing(self.ui.morphoSpinBox.value())
         u = post_processing.execute(Y[0])
         self.Y = u[0]     #Eventually required by temp_extract
         Y = np.copy(u)
         Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
-        if self.ui_window.rainbowCheckBoxImport.isChecked():
+        if self.ui.rainbowCheckBoxImport.isChecked():
             cmap = 'rainbow'
         else:
             cmap = 'gray'
@@ -462,7 +463,7 @@ class Window(QMainWindow):
         # plt.plot(Y*img[:,:,0])
         # plt.savefig("outputs/output.jpg")
         plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap=cmap)
-        self.ui_window.outputImg.setPixmap("outputs/output.jpg")
+        self.ui.outputImg.setPixmap("outputs/output.jpg")
         self.isSegmented = True
         self.message_print("Imagen segmentada exitosamente")
 
@@ -498,9 +499,9 @@ class Window(QMainWindow):
         final_msg = f"\n <br> >>> </br>  {message}\n"
         out_file.write(final_msg)
         out_file.close()
-        self.ui_window.textBrowser.setSource(log_path)
-        self.ui_window.textBrowser.reload()
-        self.ui_window.textBrowser.moveCursor(QTextCursor.End)
+        self.ui.textBrowser.setSource(log_path)
+        self.ui.textBrowser.reload()
+        self.ui.textBrowser.moveCursor(QTextCursor.End)
 
 
     def find_images(self):
@@ -520,7 +521,7 @@ class Window(QMainWindow):
         self.imageQuantity = len(self.fileList)
         self.imageIndex = 0
         self.sort_files()
-        self.ui_window.inputLabel.setText(self.files[self.imageIndex])
+        self.ui.inputLabel.setText(self.files[self.imageIndex])
 
     def sort_files(self):
         """
@@ -553,9 +554,9 @@ class Window(QMainWindow):
         """
         if self.imageIndex < len(self.fileList)-1:
             self.imageIndex += 1
-            self.ui_window.inputImgImport.setPixmap(self.fileList[self.imageIndex])
+            self.ui.inputImgImport.setPixmap(self.fileList[self.imageIndex])
             self.opdir = self.fileList[self.imageIndex]
-            self.ui_window.inputLabel.setText(self.files[self.imageIndex])
+            self.ui.inputLabel.setText(self.files[self.imageIndex])
 
             if self.sessionIsSegmented:
                 #Sentences to display next output image if session was already
@@ -564,9 +565,9 @@ class Window(QMainWindow):
                 if self.temperaturesWereAcquired:
                     self.message_print(f"La temperatura media de pies es:  {np.round(self.meanTemperatures[self.imageIndex], 2)} para el tiempo:{self.files[self.imageIndex].replace('.jpg','')}")
                     rounded_temp = np.round(self.meanTemperatures[self.imageIndex], 2)
-                    self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
-                    self.ui_window.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
-                    self.ui_window.maxSpinBoxImport.setValue(self.scale_range[self.imageIndex][1])
+                    self.ui.temperatureLabelImport.setText(f'{rounded_temp} °C')
+                    self.ui.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
+                    self.ui.maxSpinBoxImport.setValue(self.scale_range[self.imageIndex][1])
                 
     def previous_image(self):
         """
@@ -574,9 +575,9 @@ class Window(QMainWindow):
         """
         if self.imageIndex >= 1:
             self.imageIndex -= 1
-            self.ui_window.inputImgImport.setPixmap(self.fileList[self.imageIndex])
+            self.ui.inputImgImport.setPixmap(self.fileList[self.imageIndex])
             self.opdir = self.fileList[self.imageIndex]
-            self.ui_window.inputLabel.setText(self.files[self.imageIndex])
+            self.ui.inputLabel.setText(self.files[self.imageIndex])
 
             if self.sessionIsSegmented:
                 #Sentences to display next output image if session was already
@@ -585,9 +586,9 @@ class Window(QMainWindow):
                 if self.temperaturesWereAcquired:
                     self.message_print(f"La temperatura media de pies es:  {np.round(self.meanTemperatures[self.imageIndex], 2)} para el tiempo:{self.files[self.imageIndex].replace('.jpg','')}")
                     rounded_temp = np.round(self.meanTemperatures[self.imageIndex], 2)
-                    self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
-                    self.ui_window.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
-                    self.ui_window.maxSpinBoxImport.setValue(self.scale_range[self.imageIndex][1])
+                    self.ui.temperatureLabelImport.setText(f'{rounded_temp} °C')
+                    self.ui.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
+                    self.ui.maxSpinBoxImport.setValue(self.scale_range[self.imageIndex][1])
 
     def save_image(self):
         """
@@ -612,7 +613,7 @@ class Window(QMainWindow):
             self.modelQuantity = len(self.modelList)
             self.modelIndex = 0
             self.models = files
-            self.ui_window.modelComboBox.addItems(self.models)
+            self.ui.modelComboBox.addItems(self.models)
 
 
     def feet_segment(self):
@@ -654,7 +655,7 @@ class Window(QMainWindow):
         self.Y =posprocessing( Y[0])[0]     #Eventually required by temp_extract
         Y = posprocessing(Y[0])
         Y = cv2.resize(Y[0], (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
-        if self.ui_window.rainbowCheckBoxImport.isChecked():
+        if self.ui.rainbowCheckBoxImport.isChecked():
             cmap = 'rainbow'
         else:
             cmap = 'gray'
@@ -662,14 +663,14 @@ class Window(QMainWindow):
         plt.plot(Y*img[:,:,0])
         plt.savefig("outputs/output.jpg")
         plt.imsave("outputs/output.jpg" , Y*img[:,:,0] , cmap=cmap)
-        self.ui_window.outputImgImport.setPixmap("outputs/output.jpg")
+        self.ui.outputImgImport.setPixmap("outputs/output.jpg")
     
     def produce_segmented_session_output(self):
         """
         Produce output images from a whole session and         """
         #Recursively applies show_segmented_image to whole session
         self.Y=[]
-        post_processing = PostProcessing(self.ui_window.morphoSpinBox.value())
+        post_processing = PostProcessing(self.ui.morphoSpinBox.value())
         for i in range(len(self.outfiles)):
             threshold =  0.5
             img = plt.imread(self.fileList[i])/255
@@ -683,7 +684,7 @@ class Window(QMainWindow):
             #print(f"Dimensiones de la salida: {Y.shape}")
             Y = cv2.resize(Y, (img.shape[1],img.shape[0]), interpolation = cv2.INTER_NEAREST) # Resize the prediction to have the same dimensions as the input 
             
-            if self.ui_window.rainbowCheckBox.isChecked():
+            if self.ui.rainbowCheckBox.isChecked():
                 cmap = 'rainbow'
             else:
                 cmap = 'gray'
@@ -699,7 +700,7 @@ class Window(QMainWindow):
         Display segmented image from current one selected from the index 
         established by self.previous_image or self.next_image methods
         """
-        self.ui_window.outputImgImport.setPixmap(self.outfiles[self.imageIndex])
+        self.ui.outputImgImport.setPixmap(self.outfiles[self.imageIndex])
 
     def segment(self):
         """
@@ -737,12 +738,12 @@ class Window(QMainWindow):
         self.message_print("Obteniendo temperaturas...")
         if (self.inputExists and (self.isSegmented or self.sessionIsSegmented)):
             self.message_print("Obteniendo temperaturas de la sesión...")
-            if self.ui_window.autoScaleCheckBoxImport.isChecked and self.input_type>=1:
+            if self.ui.autoScaleCheckBoxImport.isChecked and self.input_type>=1:
                 #Get automatic scales
                 self.scale_range = self.extract_multiple_scales(self.s2s.img_array)
                 
-            elif not self.ui_window.autoScaleCheckBoxImport.isChecked():
-                self.scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()] 
+            elif not self.ui.autoScaleCheckBoxImport.isChecked():
+                self.scale_range = [self.ui.minSpinBoxImport.value() , self.ui.maxSpinBoxImport.value()] 
 
             if self.input_type>=1:   #If segmentation was for full session
                 self.meanTemperatures = []   #Whole feet mean temperature for all images in session
@@ -750,7 +751,7 @@ class Window(QMainWindow):
                 original_temps = []
                 dermatomes_temps = []
                 dermatomes_masks = []
-                if self.ui_window.autoScaleCheckBoxImport.isChecked():
+                if self.ui.autoScaleCheckBoxImport.isChecked():
                     for i in range(len(self.outfiles)):
                         mean_out, temp, original_temp = mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range[i], plot = False)
                         derm_temps, derm_mask = dermatomes_temperatures(original_temp, self.Y[i])
@@ -781,22 +782,22 @@ class Window(QMainWindow):
                 self.message_print("La temperatura media es: " + str(self.meanTemperatures[self.imageIndex]))
                 self.message_print(f"La escala leida es: {self.scale_range[self.imageIndex]}")
                 rounded_temp = np.round(self.meanTemperatures[self.imageIndex], 3)
-                self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
-                self.ui_window.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
-                self.ui_window.maxSpinBoxImport.setValue(self.scale_range[self.imageIndex][1])
+                self.ui.temperatureLabelImport.setText(f'{rounded_temp} °C')
+                self.ui.minSpinBoxImport.setValue(self.scale_range[self.imageIndex][0])
+                self.ui.maxSpinBoxImport.setValue(self.scale_range[self.imageIndex][1])
                 self.temperaturesWereAcquired = True
             else:      #If segmentation was for single image
-                if self.ui_window.autoScaleCheckBoxImport.isChecked():
+                if self.ui.autoScaleCheckBoxImport.isChecked():
                     self.scale_range = self.extract_scales_with_pytesseract(self.i2s.img)
                 else:
-                    self.scale_range = [self.ui_window.minSpinBoxImport.value() , self.ui_window.maxSpinBoxImport.value()]
+                    self.scale_range = [self.ui.minSpinBoxImport.value() , self.ui.maxSpinBoxImport.value()]
                 time.sleep(1.5)
                 mean, _ = mean_temperature(self.i2s.Xarray[:,:,0] , self.Y[:,:,0] , self.scale_range, plot = False)
                 self.message_print("La temperatura media es: " + str(mean))
                 rounded_temp = np.round(mean, 3)
-                self.ui_window.temperatureLabelImport.setText(f'{rounded_temp} °C')
+                self.ui.temperatureLabelImport.setText(f'{rounded_temp} °C')
 
-            if (self.ui_window.plotCheckBoxImport.isChecked() and self.input_type>=1):  #If user asked for plot
+            if (self.ui.plotCheckBoxImport.isChecked() and self.input_type>=1):  #If user asked for plot
                 #self.message_print("Se generara plot de temperatura...")
                 self.get_times()
                 # self.temp_plot()
@@ -807,7 +808,7 @@ class Window(QMainWindow):
             time.sleep(1)
             self.session_segment()
             self.temp_extract()
-        elif self.ui_window.tabWidget.currentIndex() == 0:
+        elif self.ui.tabWidget.currentIndex() == 0:
             #Live video tab
             self.message_print("Obteniendo temperaturas para la última captura...")
             time.sleep(1)
@@ -826,7 +827,7 @@ class Window(QMainWindow):
         """
         Change model loaded if user changes the model modelComboBox
         """
-        self.modelIndex = self.ui_window.modelComboBox.currentIndex()
+        self.modelIndex = self.ui.modelComboBox.currentIndex()
         self.message_print("Cargando modelo: " + self.models[self.modelIndex]
                         +" Esto puede tomar unos momentos...")
         try:
@@ -835,7 +836,7 @@ class Window(QMainWindow):
             self.i2s.setModel(self.model)
             self.s2s.loadModel()
             self.i2s.loadModel()
-            self.ui_window.loadedModelLabel.setText(self.model)
+            self.ui.loadedModelLabel.setText(self.model)
             self.message_print("Modelo " + self.models[self.modelIndex] + " cargado exitosamente")
         except:
             self.message_print("Error al cargar el modelo "+ self.models[self.modelIndex])
@@ -895,9 +896,9 @@ class Window(QMainWindow):
             self.wipe_outputs(hard=True)
             self.input_type = 0
             self.inputExists = True
-            self.ui_window.inputImgImport.setPixmap(self.opdir)
+            self.ui.inputImgImport.setPixmap(self.opdir)
             self.message_print(f"Se ha importado exitosamente la imagen {self.opdir} ")
-            self.ui_window.tabWidget.setProperty('currentIndex', 1)
+            self.ui.tabWidget.setProperty('currentIndex', 1)
 
     def open_folder(self):
         """
@@ -913,25 +914,25 @@ class Window(QMainWindow):
             self.input_type = 1
             self.defaultDirectoryExists = True
             first_image = str(self.defaultDirectory + "/t0.jpg")
-            self.ui_window.inputImgImport.setPixmap(first_image)
+            self.ui.inputImgImport.setPixmap(first_image)
             self.opdir = first_image
             self.inputExists = True
             self.find_images()
             self.sessionIsSegmented = False
-            self.ui_window.tabWidget.setProperty('currentIndex', 1)
+            self.ui.tabWidget.setProperty('currentIndex', 1)
             self.message_print(f"Se ha importado exitosamente la sesión {self.defaultDirectory} ")
             #self.file_system_model.setRootPath(QDir(self.defaultDirectory))
-            #self.ui_window.treeView.setModel(self.file_system_model)
+            #self.ui.treeView.setModel(self.file_system_model)
 
     def toggle_fullscreen(self):
         """
         Toggles fullscreen state
         """
         if self.fullScreen:
-            self.ui_window.showNormal()
+            self.ui.showNormal()
             self.fullScreen = False
         else:
-            self.ui_window.showFullScreen()
+            self.ui.showFullScreen()
             self.fullScreen = True
 
     def exit_(self):
@@ -980,6 +981,6 @@ class Window(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
-    window.show()
-    window.ui_window.show()
+    window.ui.show()
+    #window.ui.show()
     sys.exit(app.exec_())
