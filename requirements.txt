@@ -1,5 +1,10 @@
 matplotlib
 opencv-contrib-python-headless
 PySide2
-tensorflow
 scipy
+tflite-runtime
+tesseract
+pytesseract
+tesseract-ocr
+docopt
+SimpleITK
