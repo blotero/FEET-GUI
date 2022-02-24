@@ -904,7 +904,7 @@ class Window:
         """
         Displays a dialog for loading a whole session
         """
-        self.folderDialog=QFileDialog(self)
+        self.folderDialog=QFileDialog()
         self.folderDialog.setDirectory(QDir.currentPath())        
         self.folderDialog.setFileMode(QFileDialog.FileMode.Directory)
         self.defaultDirectory = self.folderDialog.getExistingDirectory()
