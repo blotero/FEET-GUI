@@ -28,6 +28,7 @@ from datetime import datetime
 import tflite_runtime.interpreter as tflite
 from postprocessing import PostProcessing
 from report import plot_report
+import threading
 
 
 
@@ -238,6 +239,7 @@ class Window:
         self.session_info['Semanas_de_gestacion'] = self.ui.weeksField.value()         #Spinbox
         self.session_info['Peso'] = self.ui.weightField.value()                        #Spinbox
         self.session_info['Estatura'] = self.ui.heightField.value()                    #Spinbox
+        self.session_info['IMC'] = self.session_info['Peso']  / ( ( self.session_info['Estatura'] / 100 ) ** 2 ) #IMC=PESO/ESTATURA^2
         self.session_info['ASA'] = self.ui.ASAField.currentText()                      #Combobox
         self.session_info['Membranas'] = self.ui.membField.currentText()               #Combobox
         self.session_info['Dilatación'] = self.ui.dilatationField.value()              #Spinbox
