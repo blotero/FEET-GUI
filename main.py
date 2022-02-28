@@ -636,6 +636,7 @@ class Window:
         Segments a whole feet session
         """
         self.ui.progressBar.setVisible(True)
+        self.ui.progressBar.setFormat("Segmentando..%p%")
         self.ui.progressBar.setValue(0)
         time.sleep(0.5)
         self.sessionIsSegmented = False
@@ -647,8 +648,9 @@ class Window:
         self.message_print("Se ha segmentado exitosamente la sesion con "+ self.i2s.model)
         self.sessionIsSegmented = True
         self.ui.progressBar.setValue(100)
-        time.sleep(0.5)
+        # time.sleep(0.5)
         self.ui.progressBar.setVisible(False)
+        self.ui.progressBar.setFormat("%p%")
     def show_segmented_image(self):
         """
         Shows segmented image
@@ -747,6 +749,8 @@ class Window:
         self.message_print("Obteniendo temperaturas...")
         if (self.inputExists and (self.isSegmented or self.sessionIsSegmented)):
             self.message_print("Obteniendo temperaturas de la sesión...")
+            self.ui.progressBar.setFormat("Extrayendo temperaturas... %p%")
+
             if self.ui.autoScaleCheckBoxImport.isChecked and self.input_type>=1:
                 #Get automatic scales
                 self.scale_range = self.extract_multiple_scales(self.s2s.img_array)
@@ -836,6 +840,7 @@ class Window:
             self.message_print("No se han seleccionado imagenes de entrada")
 
         self.ui.progressBar.setVisible(False)
+        self.ui.progressBar.setFormat("%p%")
     def toggle_model(self):
         """
         Change model loaded if user changes the model modelComboBox
