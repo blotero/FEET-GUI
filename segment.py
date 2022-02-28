@@ -77,7 +77,7 @@ class SessionToSegment():
         self.X = None
         self.Xarray = None
         
-    def predict(self, X):
+    def predict(self, X, progressBar):
         input_details = self.interpreter.get_input_details()
         output_details = self.interpreter.get_output_details()
         predictions = []
@@ -93,6 +93,7 @@ class SessionToSegment():
 
             output_data = self.interpreter.get_tensor(output_details[0]['index'])
             predictions.append(output_data)
+            progressBar.setValue((100*i+1)/X.shape[0])
 
         return predictions
     
@@ -105,12 +106,13 @@ class SessionToSegment():
         print(input_details)
         return input_details
 
-    def whole_extract(self, dirs, cmap = 'rainbow'):
+    def whole_extract(self, dirs, cmap = 'rainbow',progressBar=None):
         img_size = self.input_shape()
         self.img_array=[]
         if cmap == 'Gris':
             for i in range(len(dirs)):
                 self.img_array.append(plt.imread(dirs[i]))
+
         
         if cmap == 'Hierro': # If input images are in gnuplot2, convert them to grayscale
             for i in range(len(dirs)):
@@ -126,7 +128,7 @@ class SessionToSegment():
         self.X = np.array([cv2.resize(self.img_array[i] , (img_size , img_size), interpolation = cv2.INTER_NEAREST) for i in range(self.img_array.shape[0])])/255.
         self.Xarray  = np.array(self.X)
         self.Xarray = (self.Xarray/self.Xarray.max()).reshape(len(dirs) ,img_size , img_size , 3)
-        self.Y_pred = self.predict(self.X)
+        self.Y_pred = self.predict(self.X,progressBar)
 
     def setPath(self,im):
         self.sessionPath = im

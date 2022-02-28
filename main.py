@@ -97,7 +97,8 @@ class Window:
         self.ui.treeView.setModel(self.file_system_model)
         plt.style.use('bmh')
         self.session_info = {}
-        
+        self.ui.progressBar.setVisible(False)
+
     def load_UI(self):
         """
         Load xml file with visual objects for the interface
@@ -634,16 +635,20 @@ class Window:
         """
         Segments a whole feet session
         """
+        self.ui.progressBar.setVisible(True)
+        self.ui.progressBar.setValue(0)
         time.sleep(0.5)
         self.sessionIsSegmented = False
         self.s2s.setModel(self.model)
         self.s2s.setPath(self.defaultDirectory)
-        self.s2s.whole_extract(self.fileList, cmap = self.input_cmap)
+        self.s2s.whole_extract(self.fileList, cmap = self.input_cmap, progressBar = self.ui.progressBar)
         self.produce_segmented_session_output()
         self.show_output_image_from_session()
         self.message_print("Se ha segmentado exitosamente la sesion con "+ self.i2s.model)
         self.sessionIsSegmented = True
-
+        self.ui.progressBar.setValue(100)
+        time.sleep(0.5)
+        self.ui.progressBar.setVisible(False)
     def show_segmented_image(self):
         """
         Shows segmented image
@@ -737,6 +742,8 @@ class Window:
         """
         Extract temperatures from a segmented image or a whole session
         """
+        self.ui.progressBar.setVisible(True)
+        self.ui.progressBar.setValue(0)
         self.message_print("Obteniendo temperaturas...")
         if (self.inputExists and (self.isSegmented or self.sessionIsSegmented)):
             self.message_print("Obteniendo temperaturas de la sesión...")
@@ -762,10 +769,12 @@ class Window:
                         original_temps.append(original_temp)
                         dermatomes_temps.append(derm_temps)
                         dermatomes_masks.append(derm_mask)
+                        self.ui.progressBar.setValue((100*i+1)/len(self.outfiles))
                     self.dermatomes_temps = np.array(dermatomes_temps)
                     self.dermatomes_masks = np.array(dermatomes_masks)
                     self.segmented_temps = np.array(segmented_temps)
                     self.original_temps = np.array(original_temps)
+
                 else:
                     for i in range(len(self.outfiles)):
                         mean_out, temp, original_temp = mean_temperature(self.s2s.Xarray[i,:,:,0] , self.Y[i][:,:,0] , self.scale_range, plot = False)
@@ -775,6 +784,7 @@ class Window:
                         original_temps.append(original_temp)
                         dermatomes_temps.append(derm_temps)
                         dermatomes_masks.append(derm_mask)
+                        self.ui.progressBar.setValue((100*i+1)/len(self.outfiles))
                     self.dermatomes_temps = np.array(dermatomes_temps)
                     self.dermatomes_masks = np.array(dermatomes_masks)
                     self.segmented_temps = np.array(segmented_temps)
@@ -825,6 +835,7 @@ class Window:
         else:
             self.message_print("No se han seleccionado imagenes de entrada")
 
+        self.ui.progressBar.setVisible(False)
     def toggle_model(self):
         """
         Change model loaded if user changes the model modelComboBox
