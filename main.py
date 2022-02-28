@@ -148,7 +148,7 @@ class Window:
         # plt.imshow(thresh)
         text = pytesseract.image_to_string(thresh,   config = '--psm 7')
         #Text cleaning and replacement...
-        clean_text = text.replace(']', '1').replace(' ', '').replace(',', '.')
+        clean_text = text.replace('\n','').replace('-]', '4').replace(']', '1').replace(' ', '').replace(',', '.').replace('%', '7').replace('€','9').replace('[','').replace('&', '5').replace('-','3')
         # plt.title(clean_text)
         # plt.show()
         try:
@@ -156,7 +156,7 @@ class Window:
             if num>=100:
                 num/=10
         except:
-            print(f"Could not convert string [{clean_text}] into number")
+            print(f"Could not convert string {clean_text} into number")
             self.message_print(f"No se ha podido detectar escalas automáticamente de: Texto base: {text}, Texto limpio: {clean_text}. Dejando rango por defecto: [25, 45]")
             return -100
         return num
