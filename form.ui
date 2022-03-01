@@ -515,7 +515,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <property name="tabBarAutoHide">
      <bool>false</bool>
@@ -596,7 +596,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QPushButton" name="segButton">
        <property name="geometry">
         <rect>
-         <x>320</x>
+         <x>240</x>
          <y>30</y>
          <width>161</width>
          <height>81</height>
@@ -619,7 +619,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>40</x>
          <y>30</y>
-         <width>231</width>
+         <width>161</width>
          <height>81</height>
         </rect>
        </property>
@@ -630,6 +630,26 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="text">
         <string>Capturar</string>
+       </property>
+      </widget>
+      <widget class="QLCDNumber" name="lcdNumber">
+       <property name="geometry">
+        <rect>
+         <x>430</x>
+         <y>30</y>
+         <width>121</width>
+         <height>81</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>20</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Panel</enum>
        </property>
       </widget>
      </widget>

@@ -29,7 +29,7 @@ import tflite_runtime.interpreter as tflite
 from postprocessing import PostProcessing
 from report import plot_report
 import threading
-
+from PySide2.QtCore import QTimer
 
 
 class RemotePullException(Exception):
@@ -98,7 +98,20 @@ class Window:
         plt.style.use('bmh')
         self.session_info = {}
         self.ui.progressBar.setVisible(False)
-
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.tick)
+        
+    def tick(self):
+        if self.current_secs < 10:
+            self.ui.lcdNumber.display(f'{self.current_mins}:0{self.current_secs}')
+        else:
+            self.ui.lcdNumber.display(f'{self.current_mins}:{self.current_secs}')
+        self.current_secs += 1
+        if self.current_secs%60 == 0:
+            self.current_mins += 1
+            self.current_secs = 0
+        
+    
     def load_UI(self):
         """
         Load xml file with visual objects for the interface
@@ -293,6 +306,9 @@ class Window:
         Captures a new image. Creates a new session with current timestamp if a session had
         not been created previously
         """
+        self.current_secs = 1
+        self.current_mins = 0
+        self.timer.start(1000)
         if (not self.sessionIsCreated):
             self.message_print("No se ha creado una sesion. Creando nueva...")
             time.sleep(1)
