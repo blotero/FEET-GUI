@@ -426,6 +426,7 @@ class Window:
         QObject.connect(self.ui.actionCargar_imagen, SIGNAL ('triggered()'), self.open_image)
         QObject.connect(self.ui.actionCargar_carpeta , SIGNAL ('triggered()'), self.open_folder)
         QObject.connect(self.ui.actionCargar_modelos , SIGNAL ('triggered()'), self.get_models_path)
+        QObject.connect(self.ui.actionCargar_varias_carpetas , SIGNAL ('triggered()'), self.open_master)
         QObject.connect(self.ui.actionPantalla_completa , SIGNAL ('triggered()'), self.toggle_fullscreen)
         QObject.connect(self.ui.actionSalir , SIGNAL ('triggered()'), self.exit_)
         QObject.connect(self.ui.actionC_mo_usar , SIGNAL ('triggered()'), self.display_how_to_use)
@@ -442,6 +443,9 @@ class Window:
         QObject.connect(self.ui.loadModelButton , SIGNAL ('clicked()'), self.toggle_model)
         QObject.connect(self.ui.createSession, SIGNAL ('clicked()'), self.create_session)
         QObject.connect(self.ui.segButton, SIGNAL ('clicked()'), self.segment_capture)
+        QObject.connect(self.ui.pushButtonMultiple, SIGNAL ('clicked()'), self.generate_multiple_reports)
+
+
         #Comboboxes:
         self.ui.inputColormapComboBox.currentIndexChanged['QString'].connect(self.toggle_input_colormap)
 
@@ -893,14 +897,34 @@ class Window:
         self.message_print("Plot de temperatura generado exitosamente")
         #Produce plot 
 
-
+    def generate_multiple_reports(self):
+        directories = os.listdir(self.masterDirectory) 
+        for directory in directories:
+            self.load_folder(os.path.join(self.masterDirectory, directory))
+            print(f"Generating report for {directory}")
+            self.defaultDirectory = os.path.join(self.masterDirectory, directory)
+            self.inputExists = True
+            print(self.defaultDirectory)
+            self.sessionIsSegmented = False
+            try:
+                self.generate_full_session_plot()
+            except:
+                self.message_print(f"La sesión {directory} tiene problemas.")
+                pass
+            self.temperaturesWereAcquired = False
+            self.sessionIsSegmented = False
+            
     def generate_full_session_plot(self):
+
         if not self.temperaturesWereAcquired :
+            print("generando plot...")
+            print(self.defaultDirectory)
             self.message_print("No se han extraido las temperaturas, extrayendo...")
             self.temp_extract()
             self.generate_full_session_plot()
         else:
-            exit_value = plot_report(img_temps = self.original_temps, segmented_temps = self.segmented_temps, mean_temps = self.meanTemperatures, times = self.timeList, 
+            print("generando plot 2...")
+            exit_value = plot_report(fig_title = self.defaultDirectory.split('/')[-1].replace("_"," "),img_temps = self.original_temps, segmented_temps = self.segmented_temps, mean_temps = self.meanTemperatures, times = self.timeList, 
                         path = os.path.join(self.defaultDirectory,'report'), dermatomes_temps = self.dermatomes_temps, dermatomes_masks = self.dermatomes_masks)
             if exit_value == 0:
                 #Generación de información extra para la sesión
@@ -909,7 +933,7 @@ class Window:
                 self.message_print("Advertencia, se ha encontrado un valor no válido (nan) en los dígitos de escala de temperatura. Verifique que la imagen es del formato y referencia de cámara correctos")
             self.populate_session_info()
             self.export_report()
-        
+            
 
     def open_image(self):
         """
@@ -942,12 +966,18 @@ class Window:
         self.folderDialog.setDirectory(QDir.currentPath())        
         self.folderDialog.setFileMode(QFileDialog.FileMode.Directory)
         self.defaultDirectory = self.folderDialog.getExistingDirectory()
-        self.imagesDir = self.defaultDirectory
-        if self.defaultDirectory:
+        self.load_folder(self.defaultDirectory)
+
+
+    def load_folder(self, defaultDirectory):
+        self.defaultDirectory = defaultDirectory
+        self.imagesDir = defaultDirectory
+        if defaultDirectory:
             self.wipe_outputs(hard=True)
             self.input_type = 1
             self.defaultDirectoryExists = True
-            first_image = str(self.defaultDirectory + "/t0.jpg")
+            self.masterDirectoryExists = False
+            first_image = str(defaultDirectory + "/t0.jpg")
             self.ui.inputImgImport.setPixmap(first_image)
             self.opdir = first_image
             self.inputExists = True
@@ -955,8 +985,20 @@ class Window:
             self.sessionIsSegmented = False
             self.ui.tabWidget.setProperty('currentIndex', 1)
             self.message_print(f"Se ha importado exitosamente la sesión {self.defaultDirectory} ")
-            #self.file_system_model.setRootPath(QDir(self.defaultDirectory))
-            #self.ui.treeView.setModel(self.file_system_model)
+        
+
+
+    def open_master(self):
+        """
+        Displays a dialog for loading multiple sessions
+        """
+        self.folderDialog=QFileDialog()
+        self.folderDialog.setDirectory(QDir.currentPath())        
+        self.folderDialog.setFileMode(QFileDialog.FileMode.Directory)
+        self.masterDirectory = self.folderDialog.getExistingDirectory()
+        self.imagesDir = self.masterDirectory
+        
+
 
     def toggle_fullscreen(self):
         """

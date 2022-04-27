@@ -15,11 +15,11 @@ derm_id.sort()
 derm_names = [dic_dermatomes[key] for key in derm_id[1:-1]]
 
 
-def plot_report(img_temps, segmented_temps, mean_temps, dermatomes_temps, dermatomes_masks, times, path = './outputs/report'):
+def plot_report(img_temps, segmented_temps, mean_temps, dermatomes_temps, dermatomes_masks, times, fig_title, path = './outputs/report'):
     exit_code = 0
     num_rows = 3
     num_cols = img_temps.shape[0]
-    fig_title = 'Report'
+    fig_title = f'Report \n {fig_title}'
     figsize = 15,8,
 
     #Definiton of grid layout
